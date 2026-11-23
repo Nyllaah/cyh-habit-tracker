@@ -44,10 +44,6 @@ export function legProgress(route: City[], meters: number, endIndex: number): nu
   return Math.min(1, Math.max(0, (meters - start) / (end - start)));
 }
 
-export function formatKilometers(meters: number): string {
-  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(meters / 1000)} km`;
-}
-
 export type JourneyState = {
   days: Day[];
   route: City[];
@@ -59,15 +55,38 @@ export function initialJourney(days: Day[], route: City[]): JourneyState {
   return { days, route, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
 }
 
-export function journeyReducer(state: JourneyState, action: { type: "import"; reading: Day } | { type: "dismiss-arrival" }): JourneyState {
+export type JourneyAction =
+  | { type: "import"; reading: Day }
+  | { type: "correct-day"; date: string; meters: number }
+  | { type: "use-imported"; date: string }
+  | { type: "dismiss-arrival" };
+
+export function journeyReducer(state: JourneyState, action: JourneyAction): JourneyState {
   if (action.type === "dismiss-arrival") return { ...state, arrivals: state.arrivals.slice(1) };
-  const days = mergeImport(state.days, action.reading);
-  const newArrivals = arrivedCities(state.route, totalMeters(days))
+  let days: Day[];
+  if (action.type === "import") {
+    days = mergeImport(state.days, action.reading);
+  } else if (action.type === "correct-day") {
+    if (!Number.isSafeInteger(action.meters) || action.meters < 0) return state;
+    const existing = state.days.find((day) => day.date === action.date);
+    days = existing
+      ? state.days.map((day) => day.date === action.date ? { ...day, manualOverrideMeters: action.meters } : day)
+      : [...state.days, { date: action.date, importedMeters: 0, manualOverrideMeters: action.meters }];
+  } else {
+    days = state.days.map((day) => {
+      if (day.date !== action.date) return day;
+      const imported = { ...day };
+      delete imported.manualOverrideMeters;
+      return imported;
+    });
+  }
+  const reached = arrivedCities(state.route, totalMeters(days));
+  const newArrivals = reached
     .filter((city) => !state.announcedCityIds.includes(city.id));
   return {
     ...state,
     days,
     announcedCityIds: [...state.announcedCityIds, ...newArrivals.map((city) => city.id)],
-    arrivals: [...state.arrivals, ...newArrivals],
+    arrivals: [...state.arrivals.filter((city) => reached.some((current) => current.id === city.id)), ...newArrivals],
   };
 }

@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { JourneyMap } from "@/app/components/journey-map";
+import { DailyTotalEditor } from "@/app/components/daily-total-editor";
 import { getJourneySample } from "@/lib/data";
 import { readDemoHealth } from "@/lib/health";
-import { arrivedCities, effectiveMeters, formatKilometers, initialJourney, journeyReducer, nextCity, totalMeters, type City } from "@/lib/journey";
+import { arrivedCities, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters, type City } from "@/lib/journey";
+import { formatDistance, type DistanceUnit } from "@/lib/distance";
 
 const sample = getJourneySample();
 
@@ -38,6 +40,8 @@ function Arrival({ city, next, onContinue }: { city: City; next?: City; onContin
 export default function Page() {
   const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route));
   const [syncing, setSyncing] = useState(true);
+  const [unit, setUnit] = useState<DistanceUnit>("metric");
+  const [editing, setEditing] = useState(false);
   const syncInFlight = useRef(true);
   const meters = totalMeters(state.days);
   const next = nextCity(state.route, meters);
@@ -73,7 +77,10 @@ export default function Page() {
       <header className="home-header">
         <div className="brand-mark" aria-hidden="true"><Icon name="passport" /></div>
         <h1>Your journey</h1>
-        <span className="habit-label">Walk + run</span>
+        <div className="unit-switch" role="group" aria-label="Distance units">
+          <button type="button" aria-label="Kilometers" aria-pressed={unit === "metric"} onClick={() => setUnit("metric")}>km</button>
+          <button type="button" aria-label="Miles" aria-pressed={unit === "miles"} onClick={() => setUnit("miles")}>mi</button>
+        </div>
       </header>
 
       <p className="origin"><Icon name="location" /> {state.route[0].name}, {state.route[0].region}</p>
@@ -81,20 +88,21 @@ export default function Page() {
       <section className="journey-section" aria-labelledby="next-stop-title">
         <div className="destination-heading">
           <div><p className="eyebrow">Next stop</p><h2 id="next-stop-title">{next?.name ?? "Journey complete"}</h2></div>
-          {next && <p className="remaining"><strong>{formatKilometers(next.cumulativeMeters - meters)}</strong><span>to go</span></p>}
+          {next && <p className="remaining"><strong>{formatDistance(next.cumulativeMeters - meters, unit)}</strong><span>to go</span></p>}
         </div>
         <div className="map-container">
           <JourneyMap route={state.route} meters={meters} />
-          <p className="traveled"><Icon name="footsteps" />{formatKilometers(meters)} traveled</p>
+          <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} traveled</p>
         </div>
       </section>
 
       <section className="today-card" aria-labelledby="today-title">
         <h2 id="today-title">Today</h2>
-        <p className="today-distance" aria-live="polite" aria-atomic="true">{formatKilometers(today ? effectiveMeters(today) : 0)}</p>
+        <button type="button" className="icon-button light-icon edit-total" aria-label="Edit today's total" onClick={() => setEditing(true)}><Icon name="edit" /></button>
+        <p className="today-distance" aria-live="polite" aria-atomic="true">{formatDistance(today ? effectiveMeters(today) : 0, unit)}</p>
         <Icon name="footsteps" className="today-footsteps" />
         <div className="health-row">
-          <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : "Health Connect · Demo"}</p>
+          <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
           <button className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
         </div>
       </section>
@@ -111,7 +119,11 @@ export default function Page() {
         </ul>
       </section>
 
-      {state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
+      {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={today?.importedMeters} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}
+        onSave={(meters) => { dispatch({ type: "correct-day", date: sample.today, meters }); setEditing(false); }}
+        onUseImported={() => { dispatch({ type: "use-imported", date: sample.today }); setEditing(false); }}
+        onClose={() => setEditing(false)} />}
+      {!editing && state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
     </main>
   );
 }

@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** Implementation in progress. S1 (daily journey and simulated health sync) is implemented; later slices remain planned.
+**Status:** Implementation in progress. S1 (daily journey and simulated health sync) and S2 (units and daily corrections) are implemented; later slices remain planned.
 
 This file is the feature's authoritative documentation. It holds requirements,
 product and technical decisions, rationale, open questions, implementation status,
@@ -43,10 +43,10 @@ Reuse the existing Next.js, React, TypeScript, and local JSON scaffold. Keep dis
 
 1. `data/sample.json` (exists) supplies sample activity and geographic fixtures through `lib/data.ts` (exists).
 2. A health-source adapter (new) simulates an asynchronous distance import into daily activity state. Stable source/day identities prevent duplicate imports.
-3. A daily-total editor in `app/page.tsx` (exists) stores an optional manual correction for the same day. The correction replaces the imported total.
+3. `app/components/daily-total-editor.tsx`, opened by `app/page.tsx`, edits an optional manual correction for the same day. The page dispatches it to the journey reducer; the correction replaces the imported total.
 4. Browser geolocation or city selection supplies an origin. A city adapter (new) normalizes city coordinates and supplies candidates for nearby destinations.
 5. Journey calculations (new) derive accumulated meters, upcoming destinations, and earned stamps from effective daily activity and the selected origin.
-6. Distance formatting (new) renders metric or miles; `app/page.tsx` displays the journey using reusable vector assets.
+6. `lib/distance.ts` formats metric/miles and converts editor values to canonical meters; `app/page.tsx` displays the journey using reusable vector assets.
 
 ```mermaid
 flowchart LR
@@ -124,6 +124,9 @@ when implementing and update that comparison artifact during visual integration.
 - Formatting never writes back into stored distance. Repeated unit switches and unchanged saves must not introduce rounding drift.
 - The habit is walking and running distance. Health integration is a local simulation identified by a compact “Demo” label. It updates the journey without a second manual save.
 - Earned stamps are recalculated from corrected accumulated distance. Arrival announcements are tracked separately so an identical re-sync cannot replay them.
+- The current default is metric, matching the existing design and first slice. Summaries show kilometers or miles to one decimal at most; metric editing uses whole meters, while miles editing shows up to three decimal places. The unit selection is in memory and affects presentation only.
+- The editor captures its starting value. Saving an unchanged displayed value, including equivalent numeric formatting, preserves the original integer meters instead of converting the rounded display back. A changed value is converted and rounded once on save. Empty, negative, non-numeric, fractional-meter, and unsafe-size entries remain unsaved with a short inline error.
+- Saving or restoring an imported total closes the sheet; cancel, close, backdrop dismissal, and Escape discard the draft. “Use imported total” is available when a manual correction exists and restores the latest imported reading. Imports may update their source record while the sheet is open but do not rewrite its draft. Pending arrival notices for cities no longer reached are removed after a downward correction.
 
 ### Origin and city discovery
 
@@ -258,6 +261,8 @@ The repository carries [three project-local skills](skills.md), including source
 - S1: `5904704` implements the page with original landmark/scenery SVGs, live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total automatically. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
 - Styling uses plain CSS with shared tokens. The unused Tailwind CSS loader was removed from `next.config.ts`; no component framework or new runtime dependency was added. The font stack uses Ubuntu Sans when available and local sans-serif fallbacks, avoiding a build-time font download.
 - Verification for S1: five rule tests pass, ESLint passes, production build passes, and the running page was exercised at 360px, 390px, and 1024px. Browser checks cover automatic import, new-city arrival, unchanged re-sync, Escape dismissal, reduced motion, and absence of page runtime errors. Later slices and the final independent review are still pending.
+- S2: the header switches metric/miles throughout the page. A native-dialog bottom sheet edits today's distance, with imported-value context, replacement correction, and restoration of the imported value. Draft state belongs to the sheet; saved activity belongs to the reducer. Corrections and imports share the same arrival reconciliation, so stamps and progress recalculate together.
+- Verification for S2: all twelve rule tests pass, ESLint passes, and production build passes. Browser checks cover both unit systems, unchanged rounded-mile saves, 500m and zero corrections, repeated sync preserving corrections, restoration of imports, cancel/Escape/backdrop dismissal, invalid values, and a changed 2.5-mile entry producing 4,023 stored meters. Keyboard checks confirm input focus, Tab containment, and focus restoration to the edit control. Layout checks cover 360px/390px/1024px widths, 44px unit buttons, a short 360×500 viewport, and no page runtime errors. No runtime dependencies were added.
 
 Test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. A fresh review follows implementation; record actual results rather than anticipated passes.
 
@@ -274,9 +279,9 @@ No remote publishing or deployment is part of this phase.
 
 ## Open decisions
 
-Before the affected behavior is implemented: daily target, if included; default unit and metric summary formatting; city catalog and destination pacing bounds; treatment of a changed origin; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance, and stamps recalculate after corrections. The mockup's numbers and DC corridor are illustrative fixtures.
+Before the affected behavior is implemented: daily target, if included; city catalog and destination pacing bounds; treatment of a changed origin; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance, and stamps recalculate after corrections. The mockup's numbers and DC corridor are illustrative fixtures.
 
-Implementation proceeds in the documented slices. The initial screen does not yet include unit switching, daily correction, origin selection, or activity history; these remain part of the delivery sequence.
+Implementation proceeds in the documented slices. Origin selection, automatic nearby-city discovery, activity history, and complete passport browsing remain part of the delivery sequence.
 
 ## Sources
 
