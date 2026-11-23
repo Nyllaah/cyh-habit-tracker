@@ -137,7 +137,7 @@ export default function Page() {
         <button type="button" className="primary-button" onClick={openCityPicker}>Choose a city</button>
         <button type="button" className="start-location" disabled={locating} onClick={useLocation}><Icon name="locate" />{locating ? "Finding your location…" : "Use my location"}</button>
         {locationMessage && <p className="location-message" role="status">{locationMessage}</p>}
-      </section> : <div className="journey-view view-reveal" key={state.route[0].id}>
+      </section> : <div className="journey-view view-reveal" key={`journey-${state.route[0].id}`}>
       <button type="button" className="origin" aria-label="Change starting city" aria-describedby="origin-name" onClick={openCityPicker}><Icon name="location" /><span id="origin-name" className="origin-name">{[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")}</span><Icon name="chevron-down" className="origin-chevron" /></button>
 
       <section className="journey-section" aria-labelledby="next-stop-title">
@@ -171,7 +171,7 @@ export default function Page() {
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} />
 
-      <Passport key={state.route[0]?.id ?? "unselected"} countries={countryPassports(state)} currentCountry={currentCountry} />
+      <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state)} currentCountry={currentCountry} />
 
       {choosingCity && <CityPicker catalog={catalog} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
       {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={hasSynced ? today?.importedMeters : undefined} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}

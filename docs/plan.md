@@ -395,6 +395,8 @@ The repository carries [three project-local skills](skills.md), including source
 
 - Municipality classification validation: all seventy-four rule tests, lint, and production build pass. Regression tests reject DF regions tagged city/town, distinguish Cruzeiro/Planaltina across states, handle accents and the newly listed Boa Esperança do Norte municipality, preserve every saved Brazilian city, reject provider suburbs, and cover search/initial route/extension/offline fallback. An isolated Chromium run replays the actual twenty-feature Photon Brasília response: Águas Lindas de Goiás is the first destination at zero, invalid districts never appear in route/search results, explicit sync unlocks the city, the next checkpoint is Alexânia, and blocked service requests still produce the saved city itinerary. No page runtime errors occurred.
 
+- View identity correction: the animated journey wrapper and passport previously used the same origin ID as sibling React keys. Their keys now use separate journey/passport prefixes, preserving per-origin reset behavior without duplicate-key reconciliation warnings. Lint passes; an isolated Chromium check switches Brasília → New York → Boston → Brasília and syncs the first arrival while capturing console output: one journey/passport remains mounted and no duplicate-key warning occurs.
+
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
 No remote publishing or deployment is part of this phase.
