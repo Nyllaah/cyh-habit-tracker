@@ -27,7 +27,9 @@
       "region": "DC",
       "latitude": 38.9042429,
       "longitude": -77.0165243,
-      "cumulativeMeters": 0
+      "cumulativeMeters": 0,
+      "country": "US",
+      "artwork": "washington"
     },
     {
       "id": "alexandria",
@@ -35,7 +37,9 @@
       "region": "VA",
       "latitude": 38.8188148,
       "longitude": -77.0832273,
-      "cumulativeMeters": 11117
+      "cumulativeMeters": 11117,
+      "country": "US",
+      "artwork": "alexandria"
     },
     {
       "id": "occoquan",
@@ -43,7 +47,9 @@
       "region": "VA",
       "latitude": 38.681729,
       "longitude": -77.2618611,
-      "cumulativeMeters": 32850
+      "cumulativeMeters": 32850,
+      "country": "US",
+      "artwork": "occoquan"
     },
     {
       "id": "fredericksburg",
@@ -51,7 +57,9 @@
       "region": "VA",
       "latitude": 38.2992718,
       "longitude": -77.4866583,
-      "cumulativeMeters": 79662
+      "cumulativeMeters": 79662,
+      "country": "US",
+      "artwork": "fredericksburg"
     },
     {
       "id": "richmond",
@@ -59,7 +67,9 @@
       "region": "VA",
       "latitude": 37.531399,
       "longitude": -77.4760085,
-      "cumulativeMeters": 165051
+      "cumulativeMeters": 165051,
+      "country": "US",
+      "artwork": "richmond"
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { legProgress, type City } from "@/lib/journey";
+import { cityArtwork, routeWindow } from "@/lib/places";
 
 const stops = [{ x: 91, y: 94 }, { x: 126, y: 200 }, { x: 270, y: 296 }];
 const curves = [
@@ -15,7 +16,9 @@ function pointOnCurve(index: number, t: number) {
   };
 }
 
-export function JourneyMap({ route, meters }: { route: City[]; meters: number }) {
+export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters: number }) {
+  const route = routeWindow(fullRoute, meters);
+  const nextIndex = route.findIndex((city, index) => index > 0 && city.cumulativeMeters > meters);
   const currentLeg = meters < route[1].cumulativeMeters ? 0 : 1;
   const marker = pointOnCurve(currentLeg, legProgress(route, meters, currentLeg + 1));
   return (
@@ -40,15 +43,12 @@ export function JourneyMap({ route, meters }: { route: City[]; meters: number })
         </g>
       ))}
       {stops.map((stop, index) => <circle key={index} cx={stop.x} cy={stop.y} r="8" fill={meters >= route[index].cumulativeMeters ? "#12786F" : "#FEFFFD"} stroke="#FEFFFD" strokeWidth="3" />)}
-      <image href="/journey/game/cities/washington.svg" x="55" y="7" width="79" height="79" />
-      <image href="/journey/game/cities/alexandria.svg" x="65" y="119" width="79" height="79" />
-      <image href="/journey/game/cities/occoquan.svg" x="222" y="206" width="96" height="96" />
-      <rect x="130" y="22" width="124" height="27" rx="13" fill="#FEFFFD" />
-      <text x="192" y="40" textAnchor="middle" fontSize="11" fontWeight="600">{route[0].name}, {route[0].region}</text>
-      <rect x="157" y="159" width="88" height="27" rx="13" fill="#FEFFFD" />
-      <text x="201" y="177" textAnchor="middle" fontSize="12" fontWeight="700">{route[1].name}</text>
-      <rect x="221" y="313" width="99" height="28" rx="14" fill="#103F3C" />
-      <text x="270" y="332" textAnchor="middle" fontSize="12" fontWeight="700" fill="#FEFFFD">{route[2].name}</text>
+      <image href={`/journey/game/cities/${cityArtwork(route[0])}.svg`} x="55" y="7" width="79" height="79" />
+      <image href={`/journey/game/cities/${cityArtwork(route[1])}.svg`} x="65" y="119" width="79" height="79" />
+      <image href={`/journey/game/cities/${cityArtwork(route[2])}.svg`} x="222" y="206" width="96" height="96" />
+      <foreignObject x="130" y="22" width="174" height="44"><div className="map-place-label">{route[0].name}{route[0].region && `, ${route[0].region}`}</div></foreignObject>
+      <foreignObject x="157" y="159" width="174" height="44"><div className={`map-place-label ${nextIndex === 1 ? "map-place-next" : ""}`}>{route[1].name}</div></foreignObject>
+      <foreignObject x="215" y="313" width="130" height="42"><div className={`map-place-label ${nextIndex === 2 ? "map-place-next" : ""}`}>{route[2].name}</div></foreignObject>
       <image href="/journey/game/traveler.svg" x={marker.x - 17} y={marker.y - 32} width="34" height="39" />
       <text x="18" y="337" fontSize="7" fill="#506E68" letterSpacing="1">ILLUSTRATED MAP</text>
       <text x="329" y="27" textAnchor="middle" fontSize="9" fill="#506E68">N</text>

@@ -1,16 +1,10 @@
+import { distinctPlaces, extendRoute, placeKey, routeFromOrigin, type City, type Place } from "./places.ts";
+export type { City, Place } from "./places.ts";
+
 export type Day = {
   date: string;
   importedMeters: number;
   manualOverrideMeters?: number;
-};
-
-export type City = {
-  id: string;
-  name: string;
-  region: string;
-  latitude: number;
-  longitude: number;
-  cumulativeMeters: number;
 };
 
 export function effectiveMeters(day: Day): number {
@@ -49,20 +43,78 @@ export type JourneyState = {
   route: City[];
   announcedCityIds: string[];
   arrivals: City[];
+  candidates: Place[];
+  routeOffsetMeters: number;
+  previousJourneys: { route: City[]; meters: number }[];
 };
 
-export function initialJourney(days: Day[], route: City[]): JourneyState {
-  return { days, route, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+export function initialJourney(days: Day[], route: City[], candidates: Place[] = route): JourneyState {
+  return { days, route, candidates, routeOffsetMeters: 0, previousJourneys: [], announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+}
+
+// Completed checkpoints consume distance; only the unfinished leg moves to a new origin.
+export function routeMeters(state: JourneyState): number {
+  return Math.max(0, totalMeters(state.days) - state.routeOffsetMeters);
+}
+
+export function checkpointCarry(state: JourneyState): number {
+  const meters = routeMeters(state);
+  const reached = arrivedCities(state.route, meters);
+  return meters - (reached.at(-1)?.cumulativeMeters ?? 0);
+}
+
+export function collectedStamps(state: JourneyState): { city: City; origin: boolean }[] {
+  const stamps = new Map<string, { city: City; origin: boolean }>();
+  for (const journey of [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }]) {
+    for (const city of [journey.route[0], ...arrivedCities(journey.route, journey.meters)]) {
+      const key = placeKey(city);
+      const origin = city === journey.route[0];
+      // A destination stamp takes precedence if this city was also an origin.
+      if (!stamps.has(key) || !origin) stamps.set(key, { city, origin });
+    }
+  }
+  return [...stamps.values()];
+}
+
+function availableCandidates(state: JourneyState, candidates: Place[]): Place[] {
+  const archived = new Set(state.previousJourneys.flatMap((journey) =>
+    [journey.route[0], ...arrivedCities(journey.route, journey.meters)].map(placeKey)));
+  return candidates.filter((place) => !archived.has(placeKey(place)));
+}
+
+export function routeForOrigin(state: JourneyState, origin: Place, candidates: Place[]): City[] {
+  const archivedState = { ...state, previousJourneys: [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] };
+  return routeFromOrigin(origin, availableCandidates(archivedState, distinctPlaces([...state.candidates, ...candidates])), checkpointCarry(state));
 }
 
 export type JourneyAction =
   | { type: "import"; reading: Day }
   | { type: "correct-day"; date: string; meters: number }
   | { type: "use-imported"; date: string }
+  | { type: "extend-route"; candidates: Place[] }
+  | { type: "change-origin"; origin: Place; candidates: Place[] }
   | { type: "dismiss-arrival" };
 
 export function journeyReducer(state: JourneyState, action: JourneyAction): JourneyState {
   if (action.type === "dismiss-arrival") return { ...state, arrivals: state.arrivals.slice(1) };
+  if (action.type === "change-origin") {
+    if (placeKey(action.origin) === placeKey(state.route[0])) return state;
+    const route = routeForOrigin(state, action.origin, action.candidates);
+    if (route.length < 3) return state;
+    const carry = checkpointCarry(state);
+    const moved = {
+      ...state,
+      routeOffsetMeters: totalMeters(state.days) - carry,
+      previousJourneys: [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }],
+      arrivals: [],
+    };
+    return reconcileJourney(moved, state.days, route, distinctPlaces([...state.candidates, ...action.candidates]));
+  }
+  if (action.type === "extend-route") {
+    const candidates = distinctPlaces([...state.candidates, ...action.candidates]);
+    const route = extendRoute(state.route, availableCandidates(state, candidates), routeMeters(state));
+    return reconcileJourney(state, state.days, route, candidates);
+  }
   let days: Day[];
   if (action.type === "import") {
     days = mergeImport(state.days, action.reading);
@@ -80,12 +132,19 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
       return imported;
     });
   }
-  const reached = arrivedCities(state.route, totalMeters(days));
+  const route = extendRoute(state.route, availableCandidates(state, state.candidates), Math.max(0, totalMeters(days) - state.routeOffsetMeters));
+  return reconcileJourney(state, days, route, state.candidates);
+}
+
+function reconcileJourney(state: JourneyState, days: Day[], route: City[], candidates: Place[]): JourneyState {
+  const reached = arrivedCities(route, Math.max(0, totalMeters(days) - state.routeOffsetMeters));
   const newArrivals = reached
     .filter((city) => !state.announcedCityIds.includes(city.id));
   return {
     ...state,
     days,
+    route,
+    candidates,
     announcedCityIds: [...state.announcedCityIds, ...newArrivals.map((city) => city.id)],
     arrivals: [...state.arrivals.filter((city) => reached.some((current) => current.id === city.id)), ...newArrivals],
   };

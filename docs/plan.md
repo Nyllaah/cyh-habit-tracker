@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** Implementation in progress. S1 (daily journey and simulated health sync) and S2 (units and daily corrections) are implemented; later slices remain planned.
+**Status:** Implementation in progress. S1 and S2 are implemented. S3 starting-city selection, nearby routing, dynamic artwork, and checkpoint carry are implemented and validated.
 
 This file is the feature's authoritative documentation. It holds requirements,
 product and technical decisions, rationale, open questions, implementation status,
@@ -24,7 +24,7 @@ The daily screen will show activity advancing a journey, the next destination, a
 | Habit and retention | Walking and running distance advances travel between real cities and collects city stamps | Turn repeated local activity into visible exploration and a collection that grows over months |
 | Daily interaction | Simulated automatic health totals plus manual replacement of a day's total | Reduce daily effort while allowing a clear correction without double-counting |
 | Units | Support metric and miles, including meter entry; store integer meters | Make the interface familiar across audiences and prevent display conversions from changing progress |
-| Rewards | Recalculate earned stamps from effective accumulated distance; track arrival announcements separately | Keep collection and progress consistent after corrections while avoiding repeated arrival dialogs on sync |
+| Rewards | Recalculate active-route stamps from effective distance; archive earned stamps when changing origin; track arrival announcements separately | Keep collection and progress consistent after corrections while avoiding repeated arrival dialogs on sync |
 | Origin and journey | Offer browser location and city selection; suggest nearby destinations first and extend automatically | Make the journey personal without requiring itinerary planning |
 | Presentation | One scrolling page with a prominent playful map, compact activity card, inline history and passport, and contextual sheets | Preserve the main daily moment on a phone while allowing deeper exploration on the same route |
 | Visual identity | Cool white, deep teal, turquoise, restrained orange, miniature landmarks, and collectible stamps | Give the journey a playful, modern, gender-neutral identity with concise interface copy |
@@ -44,7 +44,7 @@ Reuse the existing Next.js, React, TypeScript, and local JSON scaffold. Keep dis
 1. `data/sample.json` (exists) supplies sample activity and geographic fixtures through `lib/data.ts` (exists).
 2. A health-source adapter (new) simulates an asynchronous distance import into daily activity state. Stable source/day identities prevent duplicate imports.
 3. `app/components/daily-total-editor.tsx`, opened by `app/page.tsx`, edits an optional manual correction for the same day. The page dispatches it to the journey reducer; the correction replaces the imported total.
-4. Browser geolocation or city selection supplies an origin. A city adapter (new) normalizes city coordinates and supplies candidates for nearby destinations.
+4. Browser geolocation or city selection supplies an origin. `lib/cities.ts` normalizes public city results and falls back to `data/cities.json`. `lib/places.ts` ranks nearby destinations and extends routes using city coordinates.
 5. Journey calculations (new) derive accumulated meters, upcoming destinations, and earned stamps from effective daily activity and the selected origin.
 6. `lib/distance.ts` formats metric/miles and converts editor values to canonical meters; `app/page.tsx` displays the journey using reusable vector assets.
 
@@ -67,7 +67,7 @@ erDiagram
     JOURNEY ||--o{ DAY : accumulates
 ```
 
-New: in-memory activity, origin, destination, and presentation state. These entities do not imply a database.
+New: in-memory activity, origin, destination, route offset, previous journey snapshots, and presentation state. These entities do not imply a database.
 
 ```mermaid
 stateDiagram-v2
@@ -123,7 +123,7 @@ when implementing and update that comparison artifact during visual integration.
 - Keep the imported value when a manual override exists. A later import must not silently remove the correction.
 - Formatting never writes back into stored distance. Repeated unit switches and unchanged saves must not introduce rounding drift.
 - The habit is walking and running distance. Health integration is a local simulation identified by a compact “Demo” label. It updates the journey without a second manual save.
-- Earned stamps are recalculated from corrected accumulated distance. Arrival announcements are tracked separately so an identical re-sync cannot replay them.
+- Active-route stamps are recalculated from corrected accumulated distance. Stamps archived by an origin change remain collected. Arrival announcements are tracked separately so an identical re-sync cannot replay them.
 - The current default is metric, matching the existing design and first slice. Summaries show kilometers or miles to one decimal at most; metric editing uses whole meters, while miles editing shows up to three decimal places. The unit selection is in memory and affects presentation only.
 - The editor captures its starting value. Saving an unchanged displayed value, including equivalent numeric formatting, preserves the original integer meters instead of converting the rounded display back. A changed value is converted and rounded once on save. Empty, negative, non-numeric, fractional-meter, and unsafe-size entries remain unsaved with a short inline error.
 - Saving or restoring an imported total closes the sheet; cancel, close, backdrop dismissal, and Escape discard the draft. “Use imported total” is available when a manual correction exists and restores the latest imported reading. Imports may update their source record while the sheet is open but do not rewrite its draft. Pending arrival notices for cities no longer reached are removed after a downward correction.
@@ -133,11 +133,16 @@ when implementing and update that comparison artifact during visual integration.
 - Use `navigator.geolocation.getCurrentPosition` on an explicit gesture for starting-location coordinates. This requires no paid service or API key; the browser requests permission and uses its available location providers.
 - Location establishes an origin; it does not record the person's walking route or measure daily activity. Health data and manual totals supply that distance.
 - Offer manual city search independently of location permission. A location denial or timeout keeps the picker usable. Simulation, when needed for a demo, is explicitly marked rather than presented as a measured location.
-- Open-Meteo's Geocoding API is the proposed city-search provider: it returns names, administrative areas, and coordinates without a key for non-commercial use. The take-home uses a local fallback when requests are slow or unavailable. A commercial deployment would require a fresh provider/terms decision.
+- Photon replaces the initial Open-Meteo proposal because it supplies both city search and nearby place lookup through one no-key service. Use explicit search submissions rather than network requests on every keystroke. Its public demo permits reasonable project use without an availability guarantee; keep requests bounded and retain a local fallback. No self-hosted geocoder is introduced.
+- Search uses Photon's city-layer forward endpoint. Nearby discovery uses its coordinate-based reverse endpoint, requesting up to twenty settlements within 100km. Normalize only named cities/towns with valid point coordinates. Time out requests after four seconds and abort obsolete searches or closed-sheet requests. Location permission denial leaves city selection usable.
+- `data/cities.json` bundles 57 sample settlements around Washington, New York, Boston, Seattle, and San Francisco, including a longer New York corridor. OSM-derived data is credited to OpenStreetMap/Photon; the original DC corridor uses Census coordinates. This is a demonstration fallback, not a comprehensive global city catalog.
 - Use the city name, state, and country to distinguish duplicate names. Normalize external results behind one adapter. Do not treat a text-search endpoint as a radius/nearby-city service.
-- Rank destination candidates by geographic distance from the current stop, exclude previously visited identities, and extend the journey as destinations are reached. The geographic candidate catalog and distance/pacing bounds remain open implementation decisions requiring a small data evaluation.
+- Rank available destination candidates by geographic distance from the current stop, exclude already visited place identities, and extend the journey while retaining the existing route prefix. Maintain two upcoming destinations where available. Use great-circle distances rounded once per segment, with candidate legs between 1km and 250km. The minimum avoids effectively colocated stops; the maximum prevents a sparse fallback from silently suggesting a cross-country jump. These are demo bounds, not road distances or a walking-navigation service.
+- Fetch additional candidates near the last known stop when fewer than two upcoming destinations remain. Candidate exhaustion leaves existing progress intact and keeps city selection available; no invented coordinates or city names fill gaps. Normalize city/state/country identity and provider aliases so known places keep their original artwork and coordinates.
 - Geolocation supplies coordinates, not a city name. Resolve the name from a sufficiently complete local city catalog, or leave it as “Current location” and offer city selection. Do not label a far-away catalog entry as the detected city. The example map is not a fixed origin or itinerary.
-- Starting-location changes must not silently destroy accumulated distance or the collection; the exact reset/rebase behavior remains open before that interaction is implemented.
+- Changing the starting city preserves all daily records, manual overrides, previous journey snapshots, and already collected stamps (including origin stamps). Only distance beyond the last reached checkpoint transfers into the new route. For example, 12,400 total meters with the last checkpoint at 11,117 transfers 1,283 meters. Repeated changes without activity preserve that remainder. Selecting the same city is a no-op.
+- Store a route offset in meters: active distance is `max(0, effective lifetime distance - route offset)`. On an origin change, set the offset to lifetime distance minus the carried remainder. The map uses active distance while the traveled total remains lifetime distance. Corrections continue to change daily history and active progress; previously archived stamps stay collected. A correction below the offset clamps active distance to zero; later activity first covers that difference.
+- Archive the departing route and its effective distance before replacement. Exclude archived collected cities from future destination candidates and deduplicate passport stamps by normalized place identity. Reject a proposed origin without enough genuine nearby candidates to render its route, leaving the existing journey intact.
 
 ### Visual system and content
 
@@ -150,6 +155,7 @@ when implementing and update that comparison artifact during visual integration.
 - Use local SVGs for reusable artwork. Origin, route points, city labels, and live progress remain data-driven. The supplied geographic route is a visual fixture, not the production map for every city.
 - City-specific motifs are available for the sample collection, with neutral city, harbor, and mountain motifs for extension. Never associate a specific landmark illustration with an unrelated city.
 - Stamps include earned and future variants. Long city names need readable wrapping or an adjacent HTML label, not arbitrarily shrinking text.
+- Map labels, landmark choices, and the three-stop map window follow the route and progress. Known sample cities reuse their original motifs; other places use the generic skyline. Runtime stamp frames compose the existing motif with the actual city label and earned state, avoiding static sample text for unrelated places.
 
 ### Activity history
 
@@ -192,6 +198,7 @@ External assets and data require provenance. The local SVG artwork is original p
 13. IF city lookup fails or times out THEN the picker SHALL offer local sample cities without blocking the rest of the screen.
 14. WHEN a next destination is needed THEN the application SHALL suggest a nearby unvisited candidate and extend the journey automatically.
 15. WHILE named location data is unavailable THEN the application SHALL avoid presenting an unrelated city as the detected location.
+28. WHEN the starting city changes THEN the application SHALL preserve activity history and collected stamps, transfer only distance since the last reached checkpoint, and add subsequent activity once.
 
 ### S4: Deliver the reviewed mobile experience
 
@@ -263,6 +270,9 @@ The repository carries [three project-local skills](skills.md), including source
 - Verification for S1: five rule tests pass, ESLint passes, production build passes, and the running page was exercised at 360px, 390px, and 1024px. Browser checks cover automatic import, new-city arrival, unchanged re-sync, Escape dismissal, reduced motion, and absence of page runtime errors. Later slices and the final independent review are still pending.
 - S2: the header switches metric/miles throughout the page. A native-dialog bottom sheet edits today's distance, with imported-value context, replacement correction, and restoration of the imported value. Draft state belongs to the sheet; saved activity belongs to the reducer. Corrections and imports share the same arrival reconciliation, so stamps and progress recalculate together.
 - Verification for S2: all twelve rule tests pass, ESLint passes, and production build passes. Browser checks cover both unit systems, unchanged rounded-mile saves, 500m and zero corrections, repeated sync preserving corrections, restoration of imports, cancel/Escape/backdrop dismissal, invalid values, and a changed 2.5-mile entry producing 4,023 stored meters. Keyboard checks confirm input focus, Tab containment, and focus restoration to the edit control. Layout checks cover 360px/390px/1024px widths, 44px unit buttons, a short 360×500 viewport, and no page runtime errors. No runtime dependencies were added.
+- S3: the origin control opens a city-search/location sheet. `lib/cities.ts` validates Photon responses and provides timed, cancellable requests with a bundled fallback. `lib/places.ts` owns geographic distance, candidate identity, nearby ordering, and route extension. The reducer owns origin replacement, route offsets, archived journey snapshots, and reward reconciliation; the page derives lifetime and active-route distances separately. The map window and stamp labels follow actual route places. Collected stamps remain visible inline after origin changes; the dedicated collection interaction is a later slice.
+- Verification for S3: twenty-nine rule tests, lint, and production build pass. Tests cover nearest-place ordering, real-coordinate segment distances, stable route prefixes, provider normalization, cancellation and timeout fallback, unchanged daily history, exact-checkpoint carry, repeated origin changes, new activity counted once, protected archived stamps, and active correction recalculation. Mobile browser checks cover New York/Seattle/Boston selection, retained Alexandria stamps and 12.4km lifetime distance, 1.283km carry, offline search, successful browser geolocation, denied permission with manual fallback, and no overflow at 360px/390px/1024px. The complete S2 browser workflow still passes. Phone captures were visually inspected; the next-city map emphasis follows progress. No runtime dependencies were added.
+- S3 tradeoffs: distances use straight-line city-to-city segments on an illustrated map, not pedestrian routing. Photon is a bounded public demo service; the local catalog covers five demonstration regions. Browser location chooses the origin only. State, including archived journeys, remains in memory; reload persistence is still an open decision.
 
 Test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. A fresh review follows implementation; record actual results rather than anticipated passes.
 
@@ -279,14 +289,15 @@ No remote publishing or deployment is part of this phase.
 
 ## Open decisions
 
-Before the affected behavior is implemented: daily target, if included; city catalog and destination pacing bounds; treatment of a changed origin; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance, and stamps recalculate after corrections. The mockup's numbers and DC corridor are illustrative fixtures.
+Before the affected behavior is implemented: daily target, if included; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance. Active-route stamps recalculate after corrections; stamps archived when changing origin remain collected. The mockup's numbers and DC corridor are illustrative fixtures.
 
-Implementation proceeds in the documented slices. Origin selection, automatic nearby-city discovery, activity history, and complete passport browsing remain part of the delivery sequence.
+Implementation proceeds in the documented slices. Activity history, mobile polish, and complete passport browsing remain part of the delivery sequence.
 
 ## Sources
 
 - Repository `README.md` and `AGENTS.md` provide the challenge constraints.
 - [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) documents permission, secure-context requirements, and coordinate access.
 - [Open-Meteo geocoding](https://open-meteo.com/en/docs/geocoding-api) documents city matching, coordinates, optional API keys, and GeoNames attribution.
+- [Photon API](https://github.com/komoot/photon/blob/master/docs/api-v1.md) documents forward/reverse lookup and city-layer filtering; [public demo guidance](https://github.com/komoot/photon#demo-server) describes reasonable-use access and availability limits. [OpenStreetMap copyright](https://www.openstreetmap.org/copyright) provides data attribution and licensing information.
 - [Android Health Connect](https://developer.android.com/health-and-fitness/health-connect) is the platform reference for the simulated source.
 - [TLC spec lean](https://github.com/tech-leads-club/agent-skills/blob/main/packages/skills-catalog/skills/%28development%29/tlc-spec-lean/SKILL.md), Tech Leads Club, CC BY 4.0: planning structure adapted for the technical specification.
