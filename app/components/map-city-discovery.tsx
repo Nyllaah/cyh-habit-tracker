@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
 import { citiesInView, discoverMapCities, discoverRouteCities, type MapCityView } from "@/lib/cities";
 import { distinctPlaces, type Place } from "@/lib/places";
@@ -13,6 +13,7 @@ type Props = {
 
 // One batch per settled movement. Route updates must not trigger another lookup.
 export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }: Props) {
+  const [loading, setLoading] = useState(false);
   const cache = useRef(new Map<string, Place[]>());
   const latestFrontier = useRef(frontier);
   useEffect(() => { latestFrontier.current = frontier; }, [frontier]);
@@ -24,7 +25,7 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
     let version = 0;
     let popupOpen = false;
 
-    function cancel() { version++; clearTimeout(timer); controller?.abort(); }
+    function cancel() { version++; clearTimeout(timer); controller?.abort(); setLoading(false); }
     async function cached(key: string, load: () => Promise<Place[]>, request: number) {
       const saved = cache.current.get(key);
       if (saved) return saved;
@@ -44,6 +45,7 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
       const request = version;
       const zoom = map.getZoom();
       timer = setTimeout(async () => {
+        setLoading(true);
         controller = new AbortController();
         const signal = controller.signal;
         const tail = latestFrontier.current;
@@ -57,6 +59,7 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
           // Merge both results once: cached views still allow a fresh tail to grow.
           onDiscover(distinctPlaces([...visible, ...onward]));
         } catch { /* New movement or unmount cancels obsolete results. */ }
+        finally { if (request === version) setLoading(false); }
       }, 650);
     }
 
@@ -71,5 +74,5 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
     map.whenReady(refresh);
     return () => { cancel(); map.off("popupopen", openPopup); map.off("popupclose", closePopup); map.off("dragstart zoomstart", closeForNavigation); map.off("load", refresh); map.off("movestart", cancel); map.off("moveend", refresh); };
   }, [api, country, catalog, onDiscover]);
-  return null;
+  return loading ? <p className="map-discovery-status" role="status"><span className="map-discovery-spinner" aria-hidden="true" />Finding cities…</p> : null;
 }
