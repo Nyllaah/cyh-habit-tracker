@@ -38,7 +38,7 @@ test('completed Brazil distance matches geographic checkpoints and yields retain
   const brasilia = catalog.find(city => city.name === 'Brasília');
   assert.ok(routeFromOrigin(brasilia, catalog, 10000).length >= 3);
   const moved = journeyReducer(state, { type: 'change-origin', origin: brasilia, candidates: catalog });
-  assert.equal(routeMeters(moved), 10000);
+  assert.equal(routeMeters(moved), 0);
   assert.strictEqual(moved.days, state.days);
   assert.ok(moved.route.length >= 3);
   assert.ok(collectedStamps(moved).some(stamp => stamp.city.name === 'Goiânia'));

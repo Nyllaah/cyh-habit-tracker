@@ -57,20 +57,16 @@ export function initialJourney(days: Day[], route: City[], candidates: Place[] =
   return { days: allDays, route, candidates, routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
 }
 
-// Completed checkpoints consume distance; only the unfinished leg moves to a new origin.
+// The active journey counts activity added after its starting offset.
 export function routeMeters(state: JourneyState): number {
+  if (!state.route.length) return 0;
   return Math.max(0, totalMeters(state.days) - state.routeOffsetMeters);
-}
-
-export function checkpointCarry(state: JourneyState): number {
-  const meters = routeMeters(state);
-  const reached = arrivedCities(state.route, meters);
-  return meters - (reached.at(-1)?.cumulativeMeters ?? 0);
 }
 
 export function collectedStamps(state: JourneyState): { city: City; origin: boolean }[] {
   const stamps = new Map<string, { city: City; origin: boolean }>();
   for (const journey of [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }]) {
+    if (!journey.route.length) continue;
     for (const city of [journey.route[0], ...arrivedCities(journey.route, journey.meters)]) {
       const key = placeKey(city);
       const origin = city === journey.route[0];
@@ -88,8 +84,8 @@ function availableCandidates(state: JourneyState, candidates: Place[]): Place[] 
 }
 
 export function routeForOrigin(state: JourneyState, origin: Place, candidates: Place[]): City[] {
-  const archivedState = { ...state, previousJourneys: [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] };
-  return routeFromOrigin(origin, availableCandidates(archivedState, distinctPlaces([...state.candidates, ...candidates])), checkpointCarry(state));
+  const previousJourneys = state.route.length ? [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] : state.previousJourneys;
+  return routeFromOrigin(origin, availableCandidates({ ...state, previousJourneys }, distinctPlaces([...state.candidates, ...candidates])), 0);
 }
 
 export type JourneyAction =
@@ -103,14 +99,13 @@ export type JourneyAction =
 export function journeyReducer(state: JourneyState, action: JourneyAction): JourneyState {
   if (action.type === "dismiss-arrival") return { ...state, arrivals: state.arrivals.slice(1) };
   if (action.type === "change-origin") {
-    if (placeKey(action.origin) === placeKey(state.route[0])) return state;
+    if (state.route[0] && placeKey(action.origin) === placeKey(state.route[0])) return state;
     const route = routeForOrigin(state, action.origin, action.candidates);
     if (route.length < 3) return state;
-    const carry = checkpointCarry(state);
     const moved = {
       ...state,
-      routeOffsetMeters: totalMeters(state.days) - carry,
-      previousJourneys: [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }],
+      routeOffsetMeters: totalMeters(state.days),
+      previousJourneys: state.route.length ? [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] : state.previousJourneys,
       arrivals: [],
     };
     return reconcileJourney(moved, state.days, route, distinctPlaces([...state.candidates, ...action.candidates]));

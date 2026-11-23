@@ -10,8 +10,8 @@ function StampGrid({ stamps }: { stamps: PassportStamp[] }) {
   </li>)}</ul>;
 }
 
-export function Passport({ countries, currentCountry }: { countries: CountryPassport[]; currentCountry: string }) {
-  const [selectedCountry, setSelectedCountry] = useState(currentCountry);
+export function Passport({ countries, currentCountry }: { countries: CountryPassport[]; currentCountry?: string }) {
+  const [selectedCountry, setSelectedCountry] = useState(currentCountry ?? countries.find((country) => country.country === "US")?.country ?? countries[0].country);
   const selected = countries.find((country) => country.country === selectedCountry) ?? countries[0];
   const { collection, name } = selected;
   const { preview, moreCollected, moreUpcoming, arrivalCount } = collection;

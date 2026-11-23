@@ -5,12 +5,11 @@ import { searchLocalPlaces, type Place } from "@/lib/places";
 
 type Props = {
   catalog: Place[];
-  carryLabel: string;
   onSelect: (origin: Place, candidates: Place[]) => boolean;
   onClose: () => void;
 };
 
-export function CityPicker({ catalog, carryLabel, onSelect, onClose }: Props) {
+export function CityPicker({ catalog, onSelect, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const requests = useRef({ id: 0, controller: null as AbortController | null });
   const [query, setQuery] = useState("");
@@ -88,7 +87,7 @@ export function CityPicker({ catalog, carryLabel, onSelect, onClose }: Props) {
     }}>
       <div className="sheet-handle" aria-hidden="true" />
       <div className="sheet-heading"><h2 id="city-picker-title">Start somewhere</h2><button type="button" className="icon-button" aria-label="Close city picker" onClick={onClose}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button></div>
-      <p className="city-status">{carryLabel}</p>
+      <p className="city-status">New journey · history and stamps kept</p>
       <button type="button" className="primary-button locate-button" disabled={busy === "location" || busy === "route"} onClick={() => choose()}><Image src="/journey/icons/locate.svg" width={22} height={22} alt="" />{busy === "location" ? "Finding your location…" : "Use my location"}</button>
       <form className="city-search" role="search" onSubmit={search}>
         <label className="sr-only" htmlFor="city-search">City, state</label>

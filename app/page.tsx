@@ -11,10 +11,10 @@ import { Passport } from "@/app/components/passport";
 import { countryPassports, passportCollection } from "@/lib/passport";
 import { placeCountry } from "@/lib/countries";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
-import { discoverNearby } from "@/lib/cities";
-import { placeKey } from "@/lib/places";
-import { readDemoHealth } from "@/lib/health";
-import { checkpointCarry, routeForOrigin, routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters } from "@/lib/journey";
+import { discoverNearby, readStartingLocation } from "@/lib/cities";
+import { placeKey, type Place } from "@/lib/places";
+import { demoReadingForJourney, readDemoHealth } from "@/lib/health";
+import { routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters, type Day } from "@/lib/journey";
 import { formatDistance, type DistanceUnit } from "@/lib/distance";
 
 const sample = getJourneySample();
@@ -25,17 +25,22 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
 }
 
 export default function Page() {
-  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route, catalog, sample.previousJourneys));
+  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney([], [], catalog, [...sample.previousJourneys, { days: sample.days, route: sample.route }]));
   const [syncing, setSyncing] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
   const [unit, setUnit] = useState<DistanceUnit>("metric");
   const [editing, setEditing] = useState(false);
   const [choosingCity, setChoosingCity] = useState(false);
+  const [demoReading, setDemoReading] = useState<Day | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationMessage, setLocationMessage] = useState("");
+  const locationRequest = useRef(0);
   const syncButton = useRef<HTMLButtonElement>(null);
   const syncInFlight = useRef(false);
+  const syncRequest = useRef(0);
   const meters = routeMeters(state);
   const next = nextCity(state.route, meters);
-  const currentCountry = placeCountry(state.route[0]);
+  const currentCountry = state.route[0] ? placeCountry(state.route[0]) : undefined;
   const collection = passportCollection(state, currentCountry);
   const today = state.days.find((day) => day.date === sample.today);
   const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
@@ -56,16 +61,57 @@ export default function Page() {
   }, [frontier, frontierKey]);
 
   async function syncHealth() {
-    if (syncInFlight.current) return;
+    if (syncInFlight.current || !demoReading) return;
+    const request = ++syncRequest.current;
     syncInFlight.current = true;
     setSyncing(true);
     try {
-      const reading = await readDemoHealth(sample.healthImport);
+      const reading = await readDemoHealth(demoReading);
+      if (request !== syncRequest.current) return;
       dispatch({ type: "import", reading });
       setHasSynced(true);
     } finally {
-      syncInFlight.current = false;
-      setSyncing(false);
+      if (request === syncRequest.current) {
+        syncInFlight.current = false;
+        setSyncing(false);
+      }
+    }
+  }
+
+  function openCityPicker() {
+    locationRequest.current++;
+    setLocating(false);
+    setLocationMessage("");
+    setChoosingCity(true);
+  }
+
+  function startJourney(origin: Place, candidates: Place[]): boolean {
+    if (state.route[0] && placeKey(origin) === placeKey(state.route[0])) { setChoosingCity(false); return true; }
+    const action = { type: "change-origin" as const, origin, candidates };
+    const started = journeyReducer(state, action);
+    if (started === state) return false;
+    syncRequest.current++;
+    syncInFlight.current = false;
+    setSyncing(false);
+    setDemoReading(demoReadingForJourney(started, sample.today));
+    dispatch(action);
+    setChoosingCity(false);
+    return true;
+  }
+
+  async function useLocation() {
+    const request = ++locationRequest.current;
+    setLocating(true);
+    setLocationMessage("");
+    try {
+      const origin = await readStartingLocation();
+      if (request !== locationRequest.current) return;
+      const candidates = await discoverNearby(origin, catalog);
+      if (request === locationRequest.current && !startJourney(origin, candidates)) setLocationMessage("Nearby cities unavailable. Choose a city.");
+    } catch {
+      if (request === locationRequest.current) setLocationMessage("Location unavailable. Choose a city.");
+    } finally {
+      if (request === locationRequest.current) setLocating(false);
     }
   }
 
@@ -80,7 +126,17 @@ export default function Page() {
         </div>
       </header>
 
-      <button type="button" className="origin" aria-label="Change starting city" aria-describedby="origin-name" onClick={() => setChoosingCity(true)}><Icon name="location" /><span id="origin-name" className="origin-name">{[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")}</span><Icon name="chevron-down" className="origin-chevron" /></button>
+      {!state.route.length ? <section className="journey-start" aria-labelledby="journey-start-title">
+        <div className="journey-start-art" aria-hidden="true">
+          <svg viewBox="0 0 300 120"><path d="M38 96C10 42 100 32 123 76S215 112 251 45" fill="none" stroke="#69A99B" strokeWidth="3" strokeDasharray="4 8" strokeLinecap="round" /><circle cx="38" cy="96" r="7" fill="#E87C3B" stroke="#FEFFFD" strokeWidth="3" /></svg>
+          <Image src="/journey/game/cities/generic-city.svg" width={108} height={108} alt="" />
+        </div>
+        <h2 id="journey-start-title">Choose your start</h2>
+        <button type="button" className="primary-button" onClick={openCityPicker}>Choose a city</button>
+        <button type="button" className="start-location" disabled={locating} onClick={useLocation}><Icon name="locate" />{locating ? "Finding your location…" : "Use my location"}</button>
+        {locationMessage && <p className="location-message" role="status">{locationMessage}</p>}
+      </section> : <>
+      <button type="button" className="origin" aria-label="Change starting city" aria-describedby="origin-name" onClick={openCityPicker}><Icon name="location" /><span id="origin-name" className="origin-name">{[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")}</span><Icon name="chevron-down" className="origin-chevron" /></button>
 
       <section className="journey-section" aria-labelledby="next-stop-title">
         <div className="destination-heading">
@@ -90,10 +146,11 @@ export default function Page() {
         {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose a city to explore another route."}</p>}
         <div className="map-container">
           <JourneyMap route={state.route} meters={meters} />
-          <p className="traveled"><Icon name="footsteps" />{formatDistance(totalMeters(state.days), unit)} traveled</p>
+          <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} this journey</p>
         </div>
-        <p className="city-credit map-credit">Virtual journey · straight-line distances</p>
+        <p className="city-credit map-credit">{formatDistance(totalMeters(state.days), unit)} total · Virtual journey</p>
       </section>
+      </>}
 
       <section className="today-card" aria-labelledby="today-title">
         <h2 id="today-title">Today</h2>
@@ -102,7 +159,7 @@ export default function Page() {
         <Icon name="footsteps" className="today-footsteps" />
         <div className="health-row">
           <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
-          <button ref={syncButton} className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}>
+          <button ref={syncButton} className="icon-button light-icon" disabled={syncing || !demoReading} aria-label="Sync health activity" title={!demoReading ? "Choose a starting city first" : "Sync health activity"} onClick={syncHealth}>
             <Icon name="sync" className={syncing ? "spinning" : ""} />
           </button>
         </div>
@@ -110,13 +167,9 @@ export default function Page() {
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} />
 
-      <Passport key={state.route[0].id} countries={countryPassports(state)} currentCountry={currentCountry} />
+      <Passport key={state.route[0]?.id ?? "unselected"} countries={countryPassports(state)} currentCountry={currentCountry} />
 
-      {choosingCity && <CityPicker catalog={catalog} carryLabel={`${formatDistance(checkpointCarry(state), unit)} carries over · stamps kept`}
-        onSelect={(origin, candidates) => {
-          if (placeKey(origin) !== placeKey(state.route[0]) && routeForOrigin(state, origin, candidates).length < 3) return false;
-          dispatch({ type: "change-origin", origin, candidates }); setChoosingCity(false); return true;
-        }} onClose={() => setChoosingCity(false)} />}
+      {choosingCity && <CityPicker catalog={catalog} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
       {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={hasSynced ? today?.importedMeters : undefined} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}
         onSave={(meters) => { dispatch({ type: "correct-day", date: sample.today, meters }); setEditing(false); }}
         onUseImported={() => { dispatch({ type: "use-imported", date: sample.today }); setEditing(false); }}

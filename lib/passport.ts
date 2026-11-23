@@ -21,7 +21,7 @@ export function passportCollection(state: JourneyState, country?: string): Passp
   const upcoming: PassportStamp[] = state.route.slice(1)
     .filter((city) => (country === undefined || placeCountry(city) === country) && city.cumulativeMeters > meters && !collectedKeys.has(placeKey(city)))
     .map((city) => ({ city, origin: false, earned: false }));
-  const focusRoute = country === undefined || placeCountry(state.route[0]) === country
+  const focusRoute = state.route[0] && (country === undefined || placeCountry(state.route[0]) === country)
     ? state.route
     : state.previousJourneys.findLast((journey) => placeCountry(journey.route[0]) === country)?.route;
   const originKey = focusRoute ? placeKey(focusRoute[0]) : "";

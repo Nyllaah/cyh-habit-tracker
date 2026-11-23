@@ -20,9 +20,10 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 
 ## Try the daily moment
 
-- The page opens before Alexandria is reached. Tap the sync icon beside Health Connect when ready to simulate a Health Connect reading and unlock its stamp. “Demo” identifies the source.
+- The page opens with no city selected. Choose a city or use browser location to start its automatic itinerary at zero.
+- Tap the sync icon beside Health Connect when ready to simulate enough new activity to unlock that route’s first stamp. Repeating sync does not add more distance. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
-- Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
+- Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
 - Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
 - Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
 - Explore the populated monthly calendar and swipe through the yearly grid. Activity history stays shared across countries.
@@ -40,7 +41,7 @@ chooses the origin; it does not measure walks. City-to-city distances are straig
 virtual segments on a geographic map, not walking directions. Leaflet supplies map interaction; OpenStreetMap street tiles need no key. Local US/Brazil outlines and route markers remain available if tiles fail. Browser geolocation needs
 permission and a secure context (localhost works).
 
-The demo uses a fixed November 22, 2026 sample day, with August–November activity from a completed Brazil journey, three days on the current Washington route, and an on-demand health reading. Lifetime distance and both history views use those same records. Refreshing resets local state. Native health access,
+The demo uses a fixed November 22, 2026 sample day, with August–November activity from a completed Brazil journey, three days on a past Washington route, and a route-specific on-demand health reading. Lifetime distance and both history views use those same records. Refreshing resets local state. Native health access,
 persistence, authentication, and payments are outside the current implementation.
 
 Run `npm test`, `npm run lint`, and `npm run build` for verification. The complete
