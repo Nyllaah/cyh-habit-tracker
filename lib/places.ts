@@ -1,3 +1,6 @@
+import { placeCountry } from "./countries.ts";
+import capitals from "../data/capitals.json" with { type: "json" };
+
 export type Place = {
   id: string;
   name: string;
@@ -11,9 +14,8 @@ export type Place = {
 export type City = Place & { cumulativeMeters: number };
 
 const regionCodes: Record<string, string> = {
-  "District of Columbia": "DC", Virginia: "VA", "New York": "NY",
-  "New Jersey": "NJ", Massachusetts: "MA", Washington: "WA", California: "CA",
-  "Federal District": "DF", "Distrito Federal": "DF", Goiás: "GO",
+  ...Object.fromEntries(capitals.capitals.map((capital) => [capital.regionName, capital.region])),
+  "Federal District": "DF",
 };
 
 export function regionCode(region: string): string {
@@ -27,6 +29,15 @@ function normalized(value: string): string {
 export function placeKey(place: Place): string {
   if (place.id.startsWith("location-")) return `coordinates|${place.latitude.toFixed(4)}|${place.longitude.toFixed(4)}`;
   return [place.name, regionCode(place.region), place.country ?? "US"].map(normalized).join("|");
+}
+
+export function capitalKind(place: Place): "national" | "state" | null {
+  const country = placeCountry(place);
+  const region = normalized(regionCode(place.region));
+  const name = normalized(place.name);
+  const capital = capitals.capitals.find((capital) => capital.country === country && normalized(capital.region) === region
+    && [capital.name, ...(capital.aliases ?? [])].some((alias) => normalized(alias) === name));
+  return capital?.kind === "national" ? "national" : capital ? "state" : null;
 }
 
 export function distinctPlaces(places: Place[]): Place[] {
@@ -48,7 +59,8 @@ export function distanceMeters(a: Pick<Place, "latitude" | "longitude">, b: Pick
 }
 
 export function nearbyPlaces(origin: Place, candidates: Place[]): Place[] {
-  return distinctPlaces(candidates).filter((place) => placeKey(place) !== placeKey(origin))
+  const country = placeCountry(origin);
+  return distinctPlaces(candidates).filter((place) => placeKey(place) !== placeKey(origin) && placeCountry(place) === country)
     .map((place) => ({ place, distance: distanceMeters(origin, place) }))
     .filter(({ distance }) => distance >= 1000 && distance <= 250000)
     .sort((a, b) => a.distance - b.distance || placeKey(a.place).localeCompare(placeKey(b.place)))
@@ -61,7 +73,7 @@ export function searchLocalPlaces(places: Place[], query: string): Place[] {
   // Match each word independently so city/state queries work with short codes.
   const tokens = query.toLowerCase().split(/[\s,]+/).filter(Boolean).map(normalized);
   return places.filter((place) => {
-    const fullRegion = Object.keys(regionCodes).find((name) => regionCodes[name] === place.region) ?? "";
+    const fullRegion = capitals.capitals.find((capital) => capital.region === place.region && capital.country === placeCountry(place))?.regionName ?? "";
     const searchable = normalized(`${place.name} ${place.region} ${fullRegion} ${place.country ?? ""}`);
     return tokens.every((token) => searchable.includes(token));
   });

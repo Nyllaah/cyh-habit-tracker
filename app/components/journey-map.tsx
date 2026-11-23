@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
 import { countryMaps, placeCountry } from "@/lib/countries";
 import { type City } from "@/lib/journey";
-import { cityArtwork, routeWindow } from "@/lib/places";
+import { capitalKind, cityArtwork, routeWindow } from "@/lib/places";
 import { journeyPosition } from "@/lib/map";
 
 type MapApi = { map: Leaflet.Map; library: typeof Leaflet };
@@ -67,14 +67,15 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
     L.polyline([...reached, [position.latitude, position.longitude]], { color: "#12786F", weight: 5, interactive: false }).addTo(layers);
     route.forEach((city) => {
       const earned = city.cumulativeMeters <= meters;
-      const icon = L.divIcon({ className: "map-city-marker", html: `<img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt="">`, iconSize: [48, 48], iconAnchor: [24, 43] });
-      const marker = L.marker([city.latitude, city.longitude], { icon, title: city.name, alt: city.name, keyboard: true }).addTo(layers);
+      const capital = capitalKind(city);
+      const icon = L.divIcon({ className: `map-city-marker${capital ? " map-capital-marker" : ""}`, html: `<img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt="">${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}`, iconSize: [48, 48], iconAnchor: [24, 43] });
+      const marker = L.marker([city.latitude, city.longitude], { icon, title: `${city.name}${capital ? ", capital milestone" : ""}`, alt: city.name, keyboard: true }).addTo(layers);
       const label = document.createElement("span");
       label.textContent = city.name;
       marker.bindTooltip(label, { permanent: true, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
       const content = document.createElement("div");
       const title = document.createElement("strong"); title.textContent = city.name;
-      const status = document.createElement("p"); status.textContent = city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : "Up next";
+      const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : "Up next"}`;
       content.append(title, status); marker.bindPopup(content);
     });
     L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);

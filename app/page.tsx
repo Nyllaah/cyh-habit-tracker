@@ -12,7 +12,7 @@ import { countryPassports, passportCollection } from "@/lib/passport";
 import { placeCountry } from "@/lib/countries";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
 import { discoverNearby, readStartingLocation } from "@/lib/cities";
-import { placeKey, type Place } from "@/lib/places";
+import { capitalKind, placeKey, type Place } from "@/lib/places";
 import { demoReadingForJourney, readDemoHealth } from "@/lib/health";
 import { routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters, type Day } from "@/lib/journey";
 import { formatDistance, type DistanceUnit } from "@/lib/distance";
@@ -140,7 +140,7 @@ export default function Page() {
 
       <section className="journey-section" aria-labelledby="next-stop-title">
         <div className="destination-heading">
-          <div><p className="eyebrow">Next stop</p><h2 id="next-stop-title">{next?.name ?? "More cities ahead"}</h2></div>
+          <div><p className="eyebrow">{next && capitalKind(next) ? "Capital milestone" : "Next stop"}</p><h2 id="next-stop-title">{next?.name ?? "More cities ahead"}</h2></div>
           {next && <p className="remaining"><strong>{formatDistance(next.cumulativeMeters - meters, unit)}</strong><span>to go</span></p>}
         </div>
         {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose a city to explore another route."}</p>}

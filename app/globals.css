@@ -247,3 +247,9 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .start-location { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; width: 100%; margin-top: 10px; padding: 10px 0; border: 0; border-radius: 14px; background: transparent; color: var(--ink); font-size: 14px; font-weight: 700; }
 .start-location:disabled { opacity: .7; }
 .location-message { margin-top: 6px; color: var(--ink); font-size: 12px; }
+
+.stamp-capital .stamp-name { color: #6C390D; }
+.stamp-capital .stamp-status { color: #805329; }
+.map-capital-emblem { position: absolute; top: 0; right: -2px; display: grid; place-items: center; width: 19px; height: 19px; border: 2px solid #FFF9EB; border-radius: 50%; background: #B95F13; color: #FFF1AD; font-size: 11px; line-height: 1; }
+.map-overview .map-capital-emblem { display: none; }
+.map-overview .map-capital-marker::after { background: #B95F13; }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { CityStamp } from "@/app/components/city-stamp";
 import type { City } from "@/lib/journey";
+import { capitalKind } from "@/lib/places";
 
 type Props = {
   city: City;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }: Props) {
+  const capital = capitalKind(city);
   const dialog = useRef<HTMLDialogElement>(null);
   const continueButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -30,7 +32,7 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
     <dialog ref={dialog} className="arrival-dialog" aria-labelledby="arrival-title"
       onCancel={(event) => { event.preventDefault(); onContinue(); }}
       onKeyDown={(event) => { if (event.key === "Tab") { event.preventDefault(); continueButton.current?.focus(); } }}>
-      <p className="arrival-eyebrow">A new place. Yours.</p>
+      <p className="arrival-eyebrow">{capital ? "Capital milestone" : "A new place. Yours."}</p>
       <div className="arrival-art">
         <span className="spark spark-one" aria-hidden="true">✦</span>
         <div className="arrival-stamp"><CityStamp city={city} earned /></div>

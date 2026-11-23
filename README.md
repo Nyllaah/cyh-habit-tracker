@@ -25,6 +25,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
 - Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
+- National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary always chooses the nearest unvisited city within the country, including across state borders.
 - Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
 - Explore the populated monthly calendar and swipe through the yearly grid. Activity history stays shared across countries.
 

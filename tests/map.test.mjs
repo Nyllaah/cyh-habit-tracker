@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { insideRing, journeyPosition } from '../lib/map.ts';
+import { journeyPosition } from '../lib/map.ts';
+import { insideRing } from '../lib/countries.ts';
 const sample = JSON.parse(readFileSync(new URL('../data/sample.json', import.meta.url)));
 const outlines = JSON.parse(readFileSync(new URL('../data/country-maps.json', import.meta.url)));
 

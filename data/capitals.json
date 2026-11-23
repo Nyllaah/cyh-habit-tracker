@@ -1,0 +1,561 @@
+{
+  "sources": [
+    "https://www.lrl.mn.gov/docs/2013/other/130551.pdf",
+    "https://alabamamaps.ua.edu/contemporarymaps/usa/basemaps/uscapz2c.pdf",
+    "https://educa.ibge.gov.br/jovens/conheca-o-brasil/territorio/19637-divisao-territorial.html",
+    "https://geoftp.ibge.gov.br/cartas_e_mapas/mapas_do_brasil/politico/brasil_politico5000k_2023.pdf"
+  ],
+  "scope": "US and Brazil national/state capital names; factual lookup only, not route destinations or coordinates",
+  "capitals": [
+    {
+      "country": "US",
+      "region": "DC",
+      "regionName": "District of Columbia",
+      "name": "Washington",
+      "kind": "national"
+    },
+    {
+      "country": "BR",
+      "region": "DF",
+      "regionName": "Distrito Federal",
+      "name": "Brasília",
+      "kind": "national"
+    },
+    {
+      "country": "US",
+      "region": "AL",
+      "regionName": "Alabama",
+      "name": "Montgomery",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "AK",
+      "regionName": "Alaska",
+      "name": "Juneau",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "AZ",
+      "regionName": "Arizona",
+      "name": "Phoenix",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "AR",
+      "regionName": "Arkansas",
+      "name": "Little Rock",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "CA",
+      "regionName": "California",
+      "name": "Sacramento",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "CO",
+      "regionName": "Colorado",
+      "name": "Denver",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "CT",
+      "regionName": "Connecticut",
+      "name": "Hartford",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "DE",
+      "regionName": "Delaware",
+      "name": "Dover",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "FL",
+      "regionName": "Florida",
+      "name": "Tallahassee",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "GA",
+      "regionName": "Georgia",
+      "name": "Atlanta",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "HI",
+      "regionName": "Hawaii",
+      "name": "Honolulu",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "ID",
+      "regionName": "Idaho",
+      "name": "Boise",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "IL",
+      "regionName": "Illinois",
+      "name": "Springfield",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "IN",
+      "regionName": "Indiana",
+      "name": "Indianapolis",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "IA",
+      "regionName": "Iowa",
+      "name": "Des Moines",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "KS",
+      "regionName": "Kansas",
+      "name": "Topeka",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "KY",
+      "regionName": "Kentucky",
+      "name": "Frankfort",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "LA",
+      "regionName": "Louisiana",
+      "name": "Baton Rouge",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "ME",
+      "regionName": "Maine",
+      "name": "Augusta",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MD",
+      "regionName": "Maryland",
+      "name": "Annapolis",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MA",
+      "regionName": "Massachusetts",
+      "name": "Boston",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MI",
+      "regionName": "Michigan",
+      "name": "Lansing",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MN",
+      "regionName": "Minnesota",
+      "name": "Saint Paul",
+      "kind": "state",
+      "aliases": [
+        "St. Paul",
+        "St Paul"
+      ]
+    },
+    {
+      "country": "US",
+      "region": "MS",
+      "regionName": "Mississippi",
+      "name": "Jackson",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MO",
+      "regionName": "Missouri",
+      "name": "Jefferson City",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "MT",
+      "regionName": "Montana",
+      "name": "Helena",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NE",
+      "regionName": "Nebraska",
+      "name": "Lincoln",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NV",
+      "regionName": "Nevada",
+      "name": "Carson City",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NH",
+      "regionName": "New Hampshire",
+      "name": "Concord",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NJ",
+      "regionName": "New Jersey",
+      "name": "Trenton",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NM",
+      "regionName": "New Mexico",
+      "name": "Santa Fe",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NY",
+      "regionName": "New York",
+      "name": "Albany",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "NC",
+      "regionName": "North Carolina",
+      "name": "Raleigh",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "ND",
+      "regionName": "North Dakota",
+      "name": "Bismarck",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "OH",
+      "regionName": "Ohio",
+      "name": "Columbus",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "OK",
+      "regionName": "Oklahoma",
+      "name": "Oklahoma City",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "OR",
+      "regionName": "Oregon",
+      "name": "Salem",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "PA",
+      "regionName": "Pennsylvania",
+      "name": "Harrisburg",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "RI",
+      "regionName": "Rhode Island",
+      "name": "Providence",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "SC",
+      "regionName": "South Carolina",
+      "name": "Columbia",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "SD",
+      "regionName": "South Dakota",
+      "name": "Pierre",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "TN",
+      "regionName": "Tennessee",
+      "name": "Nashville",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "TX",
+      "regionName": "Texas",
+      "name": "Austin",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "UT",
+      "regionName": "Utah",
+      "name": "Salt Lake City",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "VT",
+      "regionName": "Vermont",
+      "name": "Montpelier",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "VA",
+      "regionName": "Virginia",
+      "name": "Richmond",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "WA",
+      "regionName": "Washington",
+      "name": "Olympia",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "WV",
+      "regionName": "West Virginia",
+      "name": "Charleston",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "WI",
+      "regionName": "Wisconsin",
+      "name": "Madison",
+      "kind": "state"
+    },
+    {
+      "country": "US",
+      "region": "WY",
+      "regionName": "Wyoming",
+      "name": "Cheyenne",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "AC",
+      "regionName": "Acre",
+      "name": "Rio Branco",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "AL",
+      "regionName": "Alagoas",
+      "name": "Maceió",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "AP",
+      "regionName": "Amapá",
+      "name": "Macapá",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "AM",
+      "regionName": "Amazonas",
+      "name": "Manaus",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "BA",
+      "regionName": "Bahia",
+      "name": "Salvador",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "CE",
+      "regionName": "Ceará",
+      "name": "Fortaleza",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "ES",
+      "regionName": "Espírito Santo",
+      "name": "Vitória",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "GO",
+      "regionName": "Goiás",
+      "name": "Goiânia",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "MA",
+      "regionName": "Maranhão",
+      "name": "São Luís",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "MT",
+      "regionName": "Mato Grosso",
+      "name": "Cuiabá",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "MS",
+      "regionName": "Mato Grosso do Sul",
+      "name": "Campo Grande",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "MG",
+      "regionName": "Minas Gerais",
+      "name": "Belo Horizonte",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "PA",
+      "regionName": "Pará",
+      "name": "Belém",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "PB",
+      "regionName": "Paraíba",
+      "name": "João Pessoa",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "PR",
+      "regionName": "Paraná",
+      "name": "Curitiba",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "PE",
+      "regionName": "Pernambuco",
+      "name": "Recife",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "PI",
+      "regionName": "Piauí",
+      "name": "Teresina",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "RJ",
+      "regionName": "Rio de Janeiro",
+      "name": "Rio de Janeiro",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "RN",
+      "regionName": "Rio Grande do Norte",
+      "name": "Natal",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "RS",
+      "regionName": "Rio Grande do Sul",
+      "name": "Porto Alegre",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "RO",
+      "regionName": "Rondônia",
+      "name": "Porto Velho",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "RR",
+      "regionName": "Roraima",
+      "name": "Boa Vista",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "SC",
+      "regionName": "Santa Catarina",
+      "name": "Florianópolis",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "SP",
+      "regionName": "São Paulo",
+      "name": "São Paulo",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "SE",
+      "regionName": "Sergipe",
+      "name": "Aracaju",
+      "kind": "state"
+    },
+    {
+      "country": "BR",
+      "region": "TO",
+      "regionName": "Tocantins",
+      "name": "Palmas",
+      "kind": "state"
+    }
+  ]
+}
