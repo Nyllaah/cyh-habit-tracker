@@ -10,7 +10,7 @@ the first arrival and sustained walking days; the demo does not collect analytic
 
 ## Run locally
 
-Use Node 22, then:
+Use Node 22.21.1 or newer (`.nvmrc` pins the tested version), then:
 
 ```bash
 npm install && npm run dev
@@ -108,8 +108,8 @@ big fragile one every time.
 npm install && npm run dev
 ```
 
-It opens at http://localhost:3000 and reloads as you edit. Use Node 22 if you can
-(there's an `.nvmrc`).
+It opens at http://localhost:3000 and reloads as you edit. Use Node 22.21.1 or
+newer; `.nvmrc` pins the tested version.
 
 ## Sending it back
 
