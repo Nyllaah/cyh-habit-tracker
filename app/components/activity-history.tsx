@@ -49,7 +49,7 @@ export function ActivityHistory({ days, today, unit }: { days: Day[]; today: str
         <button type="button" className="icon-button" aria-label={`Previous ${view}`} onClick={() => select(shiftMonth(selectedDate, view === "year" ? -12 : -1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" className="previous-period" /></button>
         <button type="button" className="icon-button" aria-label={`Next ${view}`} onClick={() => select(shiftMonth(selectedDate, view === "year" ? 12 : 1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" /></button>
       </div>
-      <div ref={calendar}>
+      <div ref={calendar} key={view} className="history-content">
       {view === "year" ? (
         <YearActivityGrid cells={cells} selectedDate={selectedDate} today={today} label={(cell) => activityValue(cell, unit)} onSelect={select} onNavigate={navigate} />
       ) : (

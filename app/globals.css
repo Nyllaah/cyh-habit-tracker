@@ -260,3 +260,23 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .country-selected { margin-left: auto; min-width: 16px; color: #117D75; font-size: 18px; }
 @media (prefers-reduced-motion: reduce) { .passport-country-trigger > img { transition: none; } }
 .passport-empty { padding: 24px 16px; border: 1px dashed #A9C8BC; border-radius: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+
+/* Short fades connect state changes without delaying map or activity updates. */
+.view-reveal { animation: view-reveal 360ms cubic-bezier(.22,1,.36,1) both; }
+.history-content { animation: content-fade 260ms cubic-bezier(.22,1,.36,1) both; }
+.journey-start-art img { animation: city-drift 4500ms cubic-bezier(.65,0,.35,1) 2; }
+.journey-start-art circle { transform-box: fill-box; transform-origin: center; animation: start-pulse 2200ms cubic-bezier(.65,0,.35,1) 3; }
+.arrival-dialog[open] { animation: arrival-reveal 320ms cubic-bezier(.22,1,.36,1) both; }
+.arrival-dialog[open]::backdrop { animation: content-fade 240ms cubic-bezier(.22,1,.36,1) both; }
+.arrival-dialog[open].is-closing { animation: arrival-leaves 160ms cubic-bezier(.7,0,.84,0) both; }
+.arrival-dialog[open].is-closing::backdrop { animation: content-fade 160ms cubic-bezier(.7,0,.84,0) reverse both; }
+.arrival-stamp { animation-delay: 80ms; animation-fill-mode: both; }
+.arrival-art .spark { animation: spark-reveal 360ms cubic-bezier(.22,1,.36,1) 160ms both; }
+.arrival-art .spark-two, .arrival-art .spark-four { animation-delay: 220ms; }
+@keyframes content-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes view-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes city-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes start-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.18); opacity: .7; } }
+@keyframes arrival-reveal { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes arrival-leaves { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.99); } }
+@keyframes spark-reveal { from { opacity: 0; transform: scale(.65); } to { opacity: 1; transform: scale(1); } }

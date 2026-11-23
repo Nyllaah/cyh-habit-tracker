@@ -1,4 +1,4 @@
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { CityStamp } from "@/app/components/city-stamp";
 import type { City } from "@/lib/journey";
 import { capitalKind } from "@/lib/places";
@@ -13,6 +13,7 @@ type Props = {
 
 export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }: Props) {
   const capital = capitalKind(city);
+  const [closing, setClosing] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const continueButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -28,9 +29,22 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
     };
   }, [fallbackFocus]);
 
+  useEffect(() => {
+    if (!closing) return;
+    // Keep the modal mounted through its short exit, then advance the queue.
+    const timer = window.setTimeout(onContinue, 180);
+    return () => window.clearTimeout(timer);
+  }, [closing, onContinue]);
+
+  function dismiss() {
+    if (closing) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onContinue();
+    else setClosing(true);
+  }
+
   return (
-    <dialog ref={dialog} className="arrival-dialog" aria-labelledby="arrival-title"
-      onCancel={(event) => { event.preventDefault(); onContinue(); }}
+    <dialog ref={dialog} className={`arrival-dialog${closing ? " is-closing" : ""}`} aria-labelledby="arrival-title"
+      onCancel={(event) => { event.preventDefault(); dismiss(); }}
       onKeyDown={(event) => { if (event.key === "Tab") { event.preventDefault(); continueButton.current?.focus(); } }}>
       <p className="arrival-eyebrow">{capital ? "Capital milestone" : "A new place. Yours."}</p>
       <div className="arrival-art">
@@ -42,7 +56,7 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
       </div>
       <h2 id="arrival-title">{city.name} unlocked</h2>
       {next && <p className="arrival-next">Next stop: {next.name}</p>}
-      <button ref={continueButton} type="button" className="primary-button" onClick={onContinue}>Continue journey</button>
+      <button ref={continueButton} type="button" className="primary-button" onClick={dismiss}>Continue journey</button>
       <p className="arrival-count">{arrivalCount} {arrivalCount === 1 ? "destination" : "destinations"} collected</p>
     </dialog>
   );

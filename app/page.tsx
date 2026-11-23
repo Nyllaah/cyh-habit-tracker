@@ -127,7 +127,7 @@ export default function Page() {
         </div>
       </header>
 
-      {!state.route.length ? <section className="journey-start" aria-labelledby="journey-start-title">
+      {!state.route.length ? <section className="journey-start view-reveal" aria-labelledby="journey-start-title">
         <div className="journey-start-art" aria-hidden="true">
           <svg viewBox="0 0 300 120"><path d="M38 96C10 42 100 32 123 76S215 112 251 45" fill="none" stroke="#69A99B" strokeWidth="3" strokeDasharray="4 8" strokeLinecap="round" /><circle cx="38" cy="96" r="7" fill="#E87C3B" stroke="#FEFFFD" strokeWidth="3" /></svg>
           <Image src="/journey/game/cities/generic-city.svg" width={108} height={108} alt="" />
@@ -136,7 +136,7 @@ export default function Page() {
         <button type="button" className="primary-button" onClick={openCityPicker}>Choose a city</button>
         <button type="button" className="start-location" disabled={locating} onClick={useLocation}><Icon name="locate" />{locating ? "Finding your location…" : "Use my location"}</button>
         {locationMessage && <p className="location-message" role="status">{locationMessage}</p>}
-      </section> : <>
+      </section> : <div className="journey-view view-reveal" key={state.route[0].id}>
       <button type="button" className="origin" aria-label="Change starting city" aria-describedby="origin-name" onClick={openCityPicker}><Icon name="location" /><span id="origin-name" className="origin-name">{[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")}</span><Icon name="chevron-down" className="origin-chevron" /></button>
 
       <section className="journey-section" aria-labelledby="next-stop-title">
@@ -151,7 +151,7 @@ export default function Page() {
         </div>
         <p className="city-credit map-credit">{formatDistance(totalMeters(state.days), unit)} total · Virtual journey</p>
       </section>
-      </>}
+      </div>}
 
       <section className="today-card" aria-labelledby="today-title">
         <h2 id="today-title">Today</h2>
