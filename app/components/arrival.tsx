@@ -24,10 +24,11 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
     element?.showModal();
     // A manual popover paints above the modal without being clipped by it.
     const celebration = confetti.current;
-    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) celebration?.showPopover();
+    const supportsPopover = typeof celebration?.showPopover === "function" && typeof celebration?.hidePopover === "function";
+    if (supportsPopover && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) celebration?.showPopover();
     continueButton.current?.focus();
     return () => {
-      celebration?.hidePopover();
+      if (supportsPopover) celebration?.hidePopover();
       element?.close();
       const target = previousFocus?.isConnected ? previousFocus : fallback;
       target?.focus({ preventScroll: true });
