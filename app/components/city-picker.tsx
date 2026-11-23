@@ -106,7 +106,7 @@ export function CityPicker({ catalog, carryLabel, onSelect, onClose }: Props) {
           </button>
         </li>)}
       </ul>
-      <p className="city-credit">City data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a> / <a href="https://photon.komoot.io" target="_blank" rel="noreferrer">Photon</a></p>
+      <p className="city-credit">City data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a> / <a href="https://github.com/komoot/photon" target="_blank" rel="noreferrer" aria-label="Photon project (opens in a new tab)">Photon</a></p>
     </dialog>
   );
 }
