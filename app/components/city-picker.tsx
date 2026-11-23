@@ -122,8 +122,8 @@ export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
         <input id="city-search" type="search" enterKeyHint="search" value={query} placeholder="City, state" autoComplete="off" onChange={(event) => { if (searchTimer.current) clearTimeout(searchTimer.current); requests.current.controller?.abort(); requests.current.id++; setQuery(event.target.value); setResult(null); setBusy(null); setMessage(""); }} />
         <button type="submit" className="icon-button" aria-label="Search cities"><Image src="/journey/icons/search.svg" width={22} height={22} alt="" /></button>
       </form>
-      <p className="city-status" role="status">{searching ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>
-      {(query.trim() || savedCities.length > 0) && <p className="eyebrow city-results-label">{query.trim() ? "Cities" : "Saved cities"}</p>}
+      <p className="city-status city-search-status" role="status">{searching ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>
+      <p className={`eyebrow city-results-label${!query.trim() && savedCities.length === 0 ? " is-empty" : ""}`} aria-hidden={!query.trim() && savedCities.length === 0}>{query.trim() ? "Cities" : "Saved cities"}</p>
       <ul className="city-results" aria-busy={searching}>
         {(query.trim() ? matches.slice(0, 8) : matches).map((place) => <li key={place.id}>
           <button type="button" disabled={busy === "route" || busy === "location"} onClick={() => choose(place)}>
