@@ -58,3 +58,33 @@ export function periodActivity(dates: string[], days: Day[], today: string): Act
     return { date, status: "recorded", meters, band: distanceBand(meters, maximum) };
   });
 }
+
+export type HistoryView = "month" | "year";
+
+export function yearDates(date: string): string[] {
+  const year = date.slice(0, 4);
+  const length = monthDates(`${year}-02-01`).length === 29 ? 366 : 365;
+  return Array.from({ length }, (_, index) => addDays(`${year}-01-01`, index));
+}
+
+// Only year-boundary padding is empty; month boundaries never restart a week.
+export function yearColumns(date: string): (string | null)[][] {
+  const dates = yearDates(date);
+  const offset = weekdayIndex(dates[0]);
+  return Array.from({ length: Math.ceil((offset + dates.length) / 7) }, (_, week) =>
+    Array.from({ length: 7 }, (_, weekday) => dates[week * 7 + weekday - offset] ?? null));
+}
+
+export function navigateHistory(date: string, key: string, view: HistoryView): string | null {
+  switch (key) {
+    case "ArrowLeft": return addDays(date, view === "year" ? -7 : -1);
+    case "ArrowRight": return addDays(date, view === "year" ? 7 : 1);
+    case "ArrowUp": return addDays(date, view === "year" ? -1 : -7);
+    case "ArrowDown": return addDays(date, view === "year" ? 1 : 7);
+    case "Home": return addDays(date, -weekdayIndex(date));
+    case "End": return addDays(date, 6 - weekdayIndex(date));
+    case "PageUp": return shiftMonth(date, view === "year" ? -12 : -1);
+    case "PageDown": return shiftMonth(date, view === "year" ? 12 : 1);
+    default: return null;
+  }
+}

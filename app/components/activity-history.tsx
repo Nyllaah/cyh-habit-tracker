@@ -1,7 +1,8 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
-import { addDays, dateLabel, distanceColors, monthDates, periodActivity, shiftMonth, weekdayIndex, type ActivityCell } from "@/lib/history";
+import { dateLabel, distanceColors, monthDates, navigateHistory, periodActivity, shiftMonth, weekdayIndex, yearDates, type HistoryView, type ActivityCell } from "@/lib/history";
 import { formatImportedDistance, type DistanceUnit } from "@/lib/distance";
+import { YearActivityGrid } from "@/app/components/year-activity-grid";
 import type { Day } from "@/lib/journey";
 
 const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -12,47 +13,47 @@ function activityValue(cell: ActivityCell, unit: DistanceUnit): string {
 
 export function ActivityHistory({ days, today, unit }: { days: Day[]; today: string; unit: DistanceUnit }) {
   const [selectedDate, setSelectedDate] = useState(today);
+  const [view, setView] = useState<HistoryView>("month");
   const calendar = useRef<HTMLDivElement>(null);
-  const cells = periodActivity(monthDates(selectedDate), days, today);
+  const cells = periodActivity(view === "month" ? monthDates(selectedDate) : yearDates(selectedDate), days, today);
   const selected = cells.find((cell) => cell.date === selectedDate)!;
-  const monthTitle = dateLabel(selectedDate, { month: "long", year: "numeric" });
+  const periodTitle = dateLabel(selectedDate, view === "month" ? { month: "long", year: "numeric" } : { year: "numeric" });
 
   function select(date: string, focus = false) {
     setSelectedDate(date);
-    // Arrow navigation can render a different month before its day is focused.
-    if (focus) requestAnimationFrame(() => calendar.current?.querySelector<HTMLButtonElement>(`[data-date="${date}"]`)?.focus());
+    // Navigation can render a different period before its day is focused.
+    if (focus) requestAnimationFrame(() => calendar.current?.querySelector<HTMLButtonElement>(`[data-date="${date}"]`)?.focus({ preventScroll: true }));
   }
 
   function navigate(event: KeyboardEvent<HTMLButtonElement>, date: string) {
-    let next: string;
-    switch (event.key) {
-      case "ArrowLeft": next = addDays(date, -1); break;
-      case "ArrowRight": next = addDays(date, 1); break;
-      case "ArrowUp": next = addDays(date, -7); break;
-      case "ArrowDown": next = addDays(date, 7); break;
-      case "Home": next = addDays(date, -weekdayIndex(date)); break;
-      case "End": next = addDays(date, 6 - weekdayIndex(date)); break;
-      case "PageUp": next = shiftMonth(date, -1); break;
-      case "PageDown": next = shiftMonth(date, 1); break;
-      default: return;
-    }
+    const next = navigateHistory(date, event.key, view);
+    if (!next) return;
     event.preventDefault();
     select(next, true);
   }
 
   const offset = weekdayIndex(cells[0].date);
-  const rows = Array.from({ length: Math.ceil((offset + cells.length) / 7) }, (_, week) =>
-    Array.from({ length: 7 }, (_, day) => cells[week * 7 + day - offset]));
+  const rows = view === "month" ? Array.from({ length: Math.ceil((offset + cells.length) / 7) }, (_, week) =>
+    Array.from({ length: 7 }, (_, day) => cells[week * 7 + day - offset])) : [];
 
   return (
     <section className="activity-history" aria-labelledby="history-title">
-      <div className="section-heading"><h2 id="history-title">Your rhythm</h2></div>
-      <div className="history-period">
-        <h3 id="history-period-title">{monthTitle}</h3>
-        <button type="button" className="icon-button" aria-label="Previous month" onClick={() => select(shiftMonth(selectedDate, -1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" className="previous-period" /></button>
-        <button type="button" className="icon-button" aria-label="Next month" onClick={() => select(shiftMonth(selectedDate, 1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" /></button>
+      <div className="section-heading"><h2 id="history-title">Your rhythm</h2>
+        <div className="history-view-switch" role="group" aria-label="Activity history view">
+          <button type="button" aria-pressed={view === "month"} onClick={() => setView("month")}>Month</button>
+          <button type="button" aria-pressed={view === "year"} onClick={() => setView("year")}>Year</button>
+        </div>
       </div>
-      <div ref={calendar} role="grid" className="month-calendar" aria-labelledby="history-period-title">
+      <div className="history-period">
+        <h3 id="history-period-title">{periodTitle}</h3>
+        <button type="button" className="icon-button" aria-label={`Previous ${view}`} onClick={() => select(shiftMonth(selectedDate, view === "year" ? -12 : -1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" className="previous-period" /></button>
+        <button type="button" className="icon-button" aria-label={`Next ${view}`} onClick={() => select(shiftMonth(selectedDate, view === "year" ? 12 : 1))}><Image src="/journey/icons/chevron-right.svg" width={24} height={24} alt="" /></button>
+      </div>
+      <div ref={calendar}>
+      {view === "year" ? (
+        <YearActivityGrid cells={cells} selectedDate={selectedDate} today={today} label={(cell) => activityValue(cell, unit)} onSelect={select} onNavigate={navigate} />
+      ) : (
+      <div role="grid" className="month-calendar" aria-labelledby="history-period-title">
         <div role="row" className="calendar-weekdays">{weekdays.map((day) => <span role="columnheader" key={day} aria-label={day}>{day[0]}</span>)}</div>
         {rows.map((row, index) => <div role="row" className="calendar-week" key={index}>
           {row.map((cell, column) => <div role="gridcell" key={cell?.date ?? `blank-${column}`} aria-selected={cell ? cell.date === selectedDate : undefined}>
@@ -64,8 +65,10 @@ export function ActivityHistory({ days, today, unit }: { days: Day[]; today: str
           </div>)}
         </div>)}
       </div>
+      )}
+      </div>
       <div className="history-legend" aria-hidden="true"><span>Less</span><i className="legend-zero" />{distanceColors.map((color) => <i key={color} style={{ backgroundColor: color }} />)}<span>More</span></div>
-      <p className="sr-only">Colors show distance from low to high within this month. Unrecorded and upcoming dates have no distance.</p>
+      <p className="sr-only">Colors show distance from low to high within this {view}. Unrecorded and upcoming dates have no distance.</p>
       <div className="history-readout" aria-live="polite" aria-atomic="true"><span>{dateLabel(selectedDate, { month: "short", day: "numeric" })}</span><strong>{activityValue(selected, unit)}</strong></div>
     </section>
   );
