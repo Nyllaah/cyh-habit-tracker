@@ -1,4 +1,15 @@
+import municipalities from "../data/brazil-municipalities.json" with { type: "json" };
+import { placeCountry } from "./countries.ts";
 import { distinctPlaces, nearbyPlaces, placeKey, regionCode, searchLocalPlaces, type Place } from "./places.ts";
+
+function municipalityKey(name: string, state: string): string {
+  return `${state}|${name}`.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N}|]/gu, "");
+}
+
+// Photon also labels DF administrative regions as city/town. Match municipality
+// name AND state so Cruzeiro, SP remains valid while Cruzeiro, DF is rejected.
+const brazilianMunicipalities = new Set(Object.entries(municipalities.municipalitiesByState)
+  .flatMap(([state, names]) => names.map((name) => municipalityKey(name, state))));
 
 function object(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -24,6 +35,7 @@ export function normalizeCities(data: unknown, catalog: Place[]): Place[] {
       country: typeof properties.countrycode === "string" ? properties.countrycode.toUpperCase() : "",
       latitude, longitude,
     };
+    if (placeCountry(place) === "BR" && !brazilianMunicipalities.has(municipalityKey(place.name, place.region))) continue;
     if (properties.osm_id === undefined || properties.osm_type === undefined) place.id = `place-${placeKey(place)}`;
     // Reuse sample identity and artwork when the provider returns a known place.
     places.push(catalog.find((known) => placeKey(known) === placeKey(place)) ?? place);
