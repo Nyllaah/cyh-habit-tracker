@@ -42,14 +42,17 @@ test('US completion excludes CDPs, deduplicates MA Town-city aliases, and includ
   assert.equal(result.country.supported, false);
 });
 
-test('starting city counts, fresh accounts have no rewards, and notices do not replay', () => {
+test('starting city counts silently, fresh accounts have no rewards, and setup notices do not replay', () => {
   const origin = place('Brasília', 'DF', 'BR', -15.79, -47.88);
   const candidates = [place('Formosa', 'GO', 'BR', -15.5, -47.3), place('Luziânia', 'GO', 'BR', -16.2, -47.9)];
   let state = initialJourney([], [], candidates);
   assert.deepEqual(earnedCompletions(collectedStamps(state).map(stamp => stamp.city)), []);
   state = journeyReducer(state, { type: 'change-origin', origin, candidates });
-  assert.equal(state.completionArrivals[0].id, 'BR:DF');
-  assert.equal(state.completionArrivals[0].kind, 'district');
+  assert.deepEqual(state.completionArrivals, []);
+  assert.equal(earnedCompletions(collectedStamps(state).map(stamp => stamp.city))[0].id, 'BR:DF');
+  assert(state.announcedCompletionIds.includes('BR:DF'));
+  state = journeyReducer(state, { type: 'extend-route', candidates, appendCount: 6 });
+  assert.deepEqual(state.completionArrivals, []);
   assert.equal(state.days.length, 0);
   state = journeyReducer(state, { type: 'dismiss-completion' });
   state = journeyReducer(state, { type: 'correct-day', date: '2026-11-22', meters: 0 });
@@ -81,4 +84,19 @@ test('historical backfill exposes old completion without replaying its celebrati
   state = journeyReducer(state, { type: 'demo-sync', reading: { date: '2026-11-22', importedMeters: 0 }, history: [{ days: [], route: [{ ...brasilia, cumulativeMeters: 0 }] }] });
   assert.equal(earnedCompletions(collectedStamps(state).map(stamp => stamp.city))[0].id, 'BR:DF');
   assert.equal(state.completionArrivals.length, 0);
+});
+
+
+test('loading an existing district journey never announces its origin reward', () => {
+  const origin = place('Washington', 'DC', 'US', 38.9072, -77.0369);
+  const candidates = [place('Alexandria', 'VA', 'US', 38.8048, -77.0469), place('Occoquan', 'VA', 'US', 38.6839, -77.2603)];
+  for (let state of [initialJourney([], routeFromOrigin(origin, candidates), candidates), journeyReducer(initialJourney([], [], candidates), { type: 'change-origin', origin, candidates })]) {
+    assert.deepEqual(state.completionArrivals, []);
+    assert(state.announcedCompletionIds.includes('US:DC'));
+    state = journeyReducer(state, { type: 'extend-route', candidates, appendCount: 6 });
+    assert.deepEqual(state.completionArrivals, []);
+    state = journeyReducer(state, { type: 'import', reading: { date: '2026-11-22', importedMeters: 12500 } });
+    assert.equal(state.arrivals[0].name, 'Alexandria');
+    assert.deepEqual(state.completionArrivals, []);
+  }
 });

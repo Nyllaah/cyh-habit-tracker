@@ -137,7 +137,10 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
       arrivals: [],
       completionArrivals: [],
     };
-    return reconcileJourney(moved, state.days, route, distinctPlaces([...state.candidates, ...action.candidates]));
+    const started = reconcileJourney(moved, state.days, route, distinctPlaces([...state.candidates, ...action.candidates]));
+    // Origin-only rewards belong in the passport, not in a setup celebration.
+    // Reconciliation records them as announced so later discovery cannot replay them.
+    return { ...started, completionArrivals: [] };
   }
   if (action.type === "extend-route") {
     const candidates = distinctPlaces([...state.candidates, ...action.candidates]);
