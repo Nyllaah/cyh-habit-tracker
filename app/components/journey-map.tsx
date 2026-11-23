@@ -77,11 +77,11 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
       const isNext = city === next;
       const icon = L.divIcon({
         className: `map-city-marker${isNext ? " map-city-next" : ""}${capital ? " map-capital-marker" : ""}${earned ? " is-collected" : ""}`,
-        html: `<span class="map-landmark"><img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt=""></span>${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}<span class="route-city-dot" aria-hidden="true"></span>`,
+        html: `<span class="map-landmark"><img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt=""></span>${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}<span class="route-city-dot" aria-hidden="true"></span>${earned ? '<span class="map-collected-check" aria-hidden="true">✓</span>' : ""}`,
         iconSize: isNext ? [56, 56] : [44, 44], iconAnchor: isNext ? [28, 28] : [22, 22],
         popupAnchor: isNext ? [0, -28] : [0, -22],
       });
-      const marker = L.marker([city.latitude, city.longitude], { icon, title: `${city.name}${capital ? ", capital milestone" : ""}`, alt: city.name, keyboard: true, zIndexOffset: isNext ? 1000 : 0 }).addTo(layers);
+      const marker = L.marker([city.latitude, city.longitude], { icon, title: `${city.name}${capital ? ", capital milestone" : ""}`, alt: `${city.name}, ${earned ? "collected" : "not collected"}`, keyboard: true, zIndexOffset: isNext ? 1000 : 0 }).addTo(layers);
       landmarks.push({ marker, city, size: isNext ? 56 : 44, priority: isNext ? 0 : earned ? 1 : capital ? 2 : 3 });
       const label = document.createElement("span");
       label.textContent = city.name;

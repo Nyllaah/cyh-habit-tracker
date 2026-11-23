@@ -341,3 +341,7 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 
 .route-city-dot { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; border: 3px solid #B1E7D2; border-radius: 50%; background: #174E47; box-shadow: 0 0 0 2px #103F3C; }
 .map-city-marker.is-collected .route-city-dot { background: var(--turquoise); }
+
+/* The check stays visible when crowded landmarks collapse to map dots. */
+.map-collected-check { position: absolute; right: -3px; bottom: 0; display: grid; place-items: center; width: 19px; height: 19px; border: 2px solid #FEFFFD; border-radius: 50%; background: #E87C3B; color: #103F3C; font: 800 13px/1 sans-serif; pointer-events: none; }
+.map-landmark-compact .map-collected-check, .map-overview .map-collected-check { right: 8px; bottom: 7px; width: 15px; height: 15px; border-width: 1px; font-size: 11px; }
