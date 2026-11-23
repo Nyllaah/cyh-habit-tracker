@@ -3,7 +3,7 @@ import type * as Leaflet from "leaflet";
 import { MapCityDiscovery } from "@/app/components/map-city-discovery";
 import { getCityCatalog } from "@/lib/data";
 import { countryMaps, placeCountry } from "@/lib/countries";
-import { type City } from "@/lib/journey";
+import { nextCity, type City, type Place } from "@/lib/journey";
 import { capitalKind, cityArtwork, routeWindow } from "@/lib/places";
 import { journeyPosition } from "@/lib/map";
 
@@ -11,7 +11,7 @@ const catalog = getCityCatalog();
 
 type MapApi = { map: Leaflet.Map; library: typeof Leaflet };
 
-export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters: number }) {
+export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { route: City[]; meters: number; onDiscoverCities: (places: Place[]) => void }) {
   const container = useRef<HTMLDivElement>(null);
   const [api, setApi] = useState<MapApi | null>(null);
   const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "offline">("loading");
@@ -63,24 +63,30 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
     if (!api) return;
     const { map, library: L } = api;
     const layers = L.layerGroup().addTo(map);
-    const points = route.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    const points = fullRoute.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
     L.polyline(points, { color: "#FEFFFD", weight: 9, interactive: false }).addTo(layers);
-    L.polyline(points, { color: "#12786F", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
+    L.polyline(points, { className: "map-route-line", color: "#12786F", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
     const position = journeyPosition(fullRoute, meters);
-    const reached = route.filter((city) => city.cumulativeMeters <= meters).map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    const reached = fullRoute.filter((city) => city.cumulativeMeters <= meters).map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
     L.polyline([...reached, [position.latitude, position.longitude]], { color: "#12786F", weight: 5, interactive: false }).addTo(layers);
-    route.forEach((city) => {
+    const next = nextCity(fullRoute, meters);
+    fullRoute.forEach((city) => {
       const earned = city.cumulativeMeters <= meters;
       const capital = capitalKind(city);
-      const icon = L.divIcon({ className: `map-city-marker${capital ? " map-capital-marker" : ""}`, html: `<img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt="">${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}`, iconSize: [48, 48], iconAnchor: [24, 43] });
+      const isNext = city === next;
+      const icon = L.divIcon({
+        className: `map-city-marker${isNext ? " map-city-next" : " map-route-dot"}${isNext && capital ? " map-capital-marker" : ""}${earned ? " is-collected" : ""}`,
+        html: isNext ? `<img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt="">${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}` : '<span class="route-city-dot" aria-hidden="true"></span>',
+        iconSize: isNext ? [48, 48] : [44, 44], iconAnchor: isNext ? [24, 43] : [22, 22],
+      });
       const marker = L.marker([city.latitude, city.longitude], { icon, title: `${city.name}${capital ? ", capital milestone" : ""}`, alt: city.name, keyboard: true }).addTo(layers);
       const label = document.createElement("span");
       label.textContent = city.name;
       label.addEventListener("click", () => marker.openPopup());
-      marker.bindTooltip(label, { interactive: true, permanent: true, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
+      marker.bindTooltip(label, { interactive: true, permanent: isNext, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
       const content = document.createElement("div");
       const title = document.createElement("strong"); title.textContent = city.name;
-      const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : "Up next"}`;
+      const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : isNext ? "Up next" : "Later stop"}`;
       content.append(title, status);
       if (!earned) {
         const distance = document.createElement("p");
@@ -93,7 +99,7 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
     L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
     const key = `${fullRoute[0].id}|${route.map((city) => city.id).join("|")}`;
     if (viewKey.current !== key) {
-      map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [50, 75], paddingBottomRight: [50, 85], maxZoom: 12, animate: false });
+      map.fitBounds(L.latLngBounds(route.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude])), { paddingTopLeft: [50, 75], paddingBottomRight: [50, 85], maxZoom: 12, animate: false });
       viewKey.current = key;
     }
     return () => { map.removeLayer(layers); };
@@ -113,7 +119,7 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
 
   return (
     <div className="interactive-map">
-      <MapCityDiscovery api={api} route={fullRoute} meters={meters} country={placeCountry(fullRoute[0])} catalog={catalog} />
+      <MapCityDiscovery api={api} country={placeCountry(fullRoute[0])} catalog={catalog} onDiscover={onDiscoverCities} />
       <div ref={container} className="journey-map" role="region" aria-label={`Interactive journey map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
       <div className="map-framing">
         {country && <button type="button" onClick={showCountry} disabled={!api} aria-label={`Show ${country.properties.name} map`}>{country.properties.name}<span aria-hidden="true">↗</span></button>}

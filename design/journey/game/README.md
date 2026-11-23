@@ -98,3 +98,5 @@ The original artwork is composed in native SVG by CityStamp; no downloaded decor
 The current history layout supersedes the horizontal yearly studies: seven weekday columns, continuous week rows, and month labels down the left, without internal scrolling. Initial selection is yesterday relative to the shared demo clock; choosing another day remains available.
 
 Runtime motion uses short opacity/transform reveals for the start, selected map, and Month/Year content. The initial skyline and marker move subtly for a finite duration. Arrival layers fade in around the stamp and fade out before dismissal; reduced motion disables these effects and their delay.
+
+Connected itinerary refinement: the full planned route is drawn, with up to twelve upcoming stops. Viewport discovery supplies candidate cities to the state-first planner without reordering existing legs. The next stop alone uses city artwork and a permanent label; later stops use circles and kilometer popups. The three-stop window remains the initial/recenter framing.

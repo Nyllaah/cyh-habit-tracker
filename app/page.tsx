@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { JourneyMap } from "@/app/components/journey-map";
 import { DailyTotalEditor } from "@/app/components/daily-total-editor";
 import { ActivityHistory } from "@/app/components/activity-history";
@@ -65,6 +65,8 @@ export default function Page() {
     });
     return () => controller.abort();
   }, [frontier, frontierKey]);
+
+  const discoverRoute = useCallback((candidates: Place[]) => dispatch({ type: "extend-route", candidates, upcomingCount: 12 }), []);
 
   async function syncHealth() {
     if (syncInFlight.current || !demoReading) return;
@@ -151,7 +153,7 @@ export default function Page() {
         </div>
         {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose a city to explore another route."}</p>}
         <div className="map-container">
-          <JourneyMap route={state.route} meters={meters} />
+          <JourneyMap route={state.route} meters={meters} onDiscoverCities={discoverRoute} />
           <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} this journey</p>
         </div>
         <p className="city-credit map-credit">{formatDistance(totalMeters(state.days), unit)} total · Virtual journey</p>
