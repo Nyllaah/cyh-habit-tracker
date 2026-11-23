@@ -33,14 +33,14 @@ test('registry covers supported national/state capitals and preserves country-sp
 });
 
 test('nearest-city routing stays in the country, permits state borders, and does not prioritize capitals',()=>{
- const origin={...place('Origin','VA'),latitude:39,longitude:-77,cumulativeMeters:0};
+ const origin={...place('Origin','VA'),latitude:39,longitude:-77,distanceFromOriginMeters:0};
  const foreign={...place('Foreign','ON','CA'),latitude:39.02,longitude:-77};
  const ordinary={...place('Small town','MD'),latitude:39.03,longitude:-77};
  const capital={...place('Albany','NY'),latitude:39.04,longitude:-77};
  assert.deepEqual(nearbyPlaces(origin,[capital,foreign,ordinary]).map(c=>c.name),['Small town','Albany']);
  const route=extendRoute([origin],[capital,foreign,ordinary],0);
  assert.deepEqual(route.map(c=>c.name),['Origin','Small town','Albany']);
- assert.equal(route[2].cumulativeMeters-route[1].cumulativeMeters<route[2].cumulativeMeters,true);
+ assert.equal(route[2].distanceFromOriginMeters-route[1].distanceFromOriginMeters<route[2].distanceFromOriginMeters,true);
  const gps={...origin,country:''};
  assert.deepEqual(nearbyPlaces(gps,[foreign,ordinary]).map(c=>c.name),['Small town']);
 });

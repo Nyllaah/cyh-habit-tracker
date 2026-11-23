@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { arrivedCities, initialJourney, journeyReducer, legProgress, mergeImport, nextCity, totalMeters } from '../lib/journey.ts';
+import { arrivedCities, initialJourney, journeyReducer, cityProgress, mergeImport, nextCity, totalMeters } from '../lib/journey.ts';
 
 const sample = JSON.parse(readFileSync(new URL('../data/sample.json', import.meta.url)));
 
@@ -10,7 +10,7 @@ test('a daily import advances the journey from 10,000 to 12,400 meters (S1.1)', 
   const days = mergeImport(sample.days, sample.healthImport);
   assert.equal(totalMeters(days), 12400);
   assert.equal(nextCity(sample.route, 12400).id, 'occoquan');
-  assert.equal(nextCity(sample.route, 12400).cumulativeMeters - 12400, 20450);
+  assert.equal(nextCity(sample.route, 12400).distanceFromOriginMeters - 12400, 20223);
 });
 
 test('reimporting a daily total replaces it and cannot duplicate distance (S1.2)', () => {
@@ -24,8 +24,8 @@ test('reimporting a daily total replaces it and cannot duplicate distance (S1.2)
 test('arrival begins exactly at the threshold; origin is not an arrival (S1.3)', () => {
   assert.deepEqual(arrivedCities(sample.route, 11116), []);
   assert.deepEqual(arrivedCities(sample.route, 11117).map(city => city.id), ['alexandria']);
-  assert.equal(legProgress(sample.route, 11117, 1), 1);
-  assert.equal(legProgress(sample.route, 11117, 2), 0);
+  assert.equal(cityProgress(sample.route, 11117, 1), 1);
+  assert.equal(cityProgress(sample.route, 11117, 2), 11117 / sample.route[2].distanceFromOriginMeters);
 });
 
 test('sync announces a new city once, including after dismissal (S1.2-3)', () => {

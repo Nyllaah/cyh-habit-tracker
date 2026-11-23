@@ -29,9 +29,9 @@ test('backfilled account shares older records across history and lifetime distan
 test('completed Brazil distance matches geographic checkpoints and yields retained stamps', () => {
   const state = account();
   for (const journey of state.previousJourneys) {
-    assert.equal(journey.meters, journey.route.at(-1).cumulativeMeters);
-    journey.route.slice(1).forEach((city, index) => {
-      assert.equal(city.cumulativeMeters - journey.route[index].cumulativeMeters, distanceMeters(journey.route[index], city));
+    assert.ok(journey.meters >= journey.route.at(-1).distanceFromOriginMeters);
+    journey.route.slice(1).forEach((city) => {
+      assert.equal(city.distanceFromOriginMeters, distanceMeters(journey.route[0], city));
     });
     for (const city of journey.route) assert.ok(collectedStamps(state).some(stamp => placeKey(stamp.city) === placeKey(city)));
   }

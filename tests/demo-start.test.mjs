@@ -31,8 +31,8 @@ test('each saved demonstration city starts at zero and sync reaches its own firs
     const synced = journeyReducer(state,{type:'import',reading});
     assert.equal(synced.arrivals.length,1,name);
     assert.equal(synced.arrivals[0].id,state.route[1].id,name);
-    assert.ok(routeMeters(synced)>state.route[1].cumulativeMeters);
-    assert.ok(routeMeters(synced)<state.route[2].cumulativeMeters);
+    assert.ok(routeMeters(synced)>state.route[1].distanceFromOriginMeters);
+    assert.ok(routeMeters(synced)<state.route[2].distanceFromOriginMeters);
     const dismissed = journeyReducer(synced,{type:'dismiss-arrival'});
     const repeated = journeyReducer(dismissed,{type:'import',reading});
     assert.equal(totalMeters(repeated.days),totalMeters(synced.days));

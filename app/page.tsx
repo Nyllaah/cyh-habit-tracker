@@ -49,7 +49,7 @@ export default function Page() {
   const editingDay = state.days.find((day) => day.date === editingDate);
   const editingHasImport = editingDate === sample.today ? hasSynced : state.demoHistoryLoaded && importedHistoryDates.has(editingDate ?? "");
   const today = state.days.find((day) => day.date === sample.today);
-  const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
+  const needsDestinations = state.route.filter((city) => city.distanceFromOriginMeters > meters).length < 2;
   const frontier = needsDestinations ? state.route[state.route.length - 1] : null;
   const frontierKey = frontier ? `${state.route[0].id}|${frontier.id}` : "";
   const [completedFrontier, setCompletedFrontier] = useState("");
@@ -148,15 +148,15 @@ export default function Page() {
 
       <section className="journey-section" aria-labelledby="next-stop-title">
         <div className="destination-heading">
-          <div><p className="eyebrow">{next && capitalKind(next) ? "Capital milestone" : "Next stop"}</p><h2 id="next-stop-title">{next?.name ?? "More cities ahead"}</h2></div>
-          {next && <p className="remaining"><strong>{formatDistance(next.cumulativeMeters - meters, unit)}</strong><span>to go</span></p>}
+          <div><p className="eyebrow">{next && capitalKind(next) ? "Capital milestone" : "Next discovery"}</p><h2 id="next-stop-title">{next?.name ?? "More places to discover"}</h2></div>
+          {next && <p className="remaining"><strong>{formatDistance(next.distanceFromOriginMeters - meters, unit)}</strong><span>to go</span></p>}
         </div>
-        {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose a city to explore another route."}</p>}
+        {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose another starting city."}</p>}
         <div className="map-container">
           <JourneyMap route={state.route} meters={meters} onDiscoverCities={discoverRoute} />
-          <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} this journey</p>
+          <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} reach</p>
         </div>
-        <p className="city-credit map-credit">{formatDistance(totalMeters(state.days), unit)} total · Virtual journey</p>
+        <p className="city-credit map-credit">{formatDistance(totalMeters(state.days), unit)} total · Virtual reach</p>
       </section>
       </div>}
 

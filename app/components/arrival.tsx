@@ -70,7 +70,7 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
         <span className="spark spark-four" aria-hidden="true">✦</span>
       </div>
       <h2 id="arrival-title">{city.name} unlocked</h2>
-      {next && <p className="arrival-next">Next stop: {next.name}</p>}
+      {next && <p className="arrival-next">Next discovery: {next.name}</p>}
       <button ref={continueButton} type="button" className="primary-button" onClick={dismiss}>Continue journey</button>
       <p className="arrival-count">{arrivalCount} {arrivalCount === 1 ? "destination" : "destinations"} collected</p>
     </dialog>

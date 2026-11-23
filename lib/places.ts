@@ -11,7 +11,7 @@ export type Place = {
   artwork?: string;
 };
 
-export type City = Place & { cumulativeMeters: number };
+export type City = Place & { distanceFromOriginMeters: number };
 
 const regionCodes: Record<string, string> = {
   ...Object.fromEntries(capitals.capitals.map((capital) => [capital.regionName, capital.region])),
@@ -79,48 +79,43 @@ export function searchLocalPlaces(places: Place[], query: string): Place[] {
   });
 }
 
-function stateKey(place: Place): string {
-  const region = normalized(regionCode(place.region));
-  return region ? `${placeCountry(place)}|${region}` : "";
-}
-
-// Preserve the route prefix; add the nearest unvisited place only when needed.
-export function extendRoute(route: City[], candidates: Place[], meters: number, upcomingCount = 2): City[] {
-  const futureCount = route.filter((city) => city.cumulativeMeters > meters).length;
-  // Bound each batch, not the lifetime size of the itinerary.
+// Every checkpoint is measured independently from the chosen origin. Adding a
+// closer city can change display order, but never another city's threshold.
+export function extendRoute(route: City[], candidates: Place[], meters = 0, upcomingCount = 2): City[] {
+  const origin = route[0];
+  if (!origin) return [];
+  const country = placeCountry(origin);
+  const ranked = distinctPlaces([...route.slice(1), ...candidates])
+    .filter((place) => placeKey(place) !== placeKey(origin) && placeCountry(place) === country)
+    .map((place) => ({ ...place, distanceFromOriginMeters: distanceMeters(origin, place) }))
+    .filter((place) => place.distanceFromOriginMeters >= 1000)
+    .sort((a, b) => a.distanceFromOriginMeters - b.distanceFromOriginMeters || placeKey(a).localeCompare(placeKey(b)));
+  const known = new Set(route.slice(1).map(placeKey));
+  // All discovered cities inside the radius unlock, even if they were not in
+  // the preview. Only future suggestions are limited to incremental batches.
+  const chosen = ranked.filter((city) => known.has(placeKey(city)) || city.distanceFromOriginMeters <= meters);
+  const futureCount = chosen.filter((city) => city.distanceFromOriginMeters > meters).length;
   const target = Math.max(2, Math.min(futureCount + 12, Math.floor(upcomingCount)));
-  const extended = [...route];
-  const visited = new Set(route.map(placeKey));
-  while (extended.filter((city) => city.cumulativeMeters > meters).length < target) {
-    const last = extended[extended.length - 1];
-    if (!last) break;
-    const currentState = stateKey(last);
-    const completedStates = new Set(extended.slice(0, -1).map(stateKey).filter((state) => state && state !== currentState));
-    const remaining = candidates.filter((place) => !visited.has(placeKey(place)) && !completedStates.has(stateKey(place)));
-    const inState = currentState ? remaining.filter((place) => stateKey(place) === currentState && distanceMeters(last, place) >= 1000) : [];
-    // Finish known cities in this state first. If the next leg exceeds the
-    // distance bound, wait for closer candidates instead of skipping states.
-    const next = nearbyPlaces(last, inState.length ? inState : remaining)[0];
-    if (!next) break;
-    extended.push({ ...next, cumulativeMeters: last.cumulativeMeters + distanceMeters(last, next) });
-    visited.add(placeKey(next));
-  }
-  return extended;
+  const remaining = ranked.filter((city) => !known.has(placeKey(city)) && city.distanceFromOriginMeters > meters);
+  chosen.push(...remaining.slice(0, Math.max(0, target - futureCount)));
+  chosen.sort((a, b) => a.distanceFromOriginMeters - b.distanceFromOriginMeters || placeKey(a).localeCompare(placeKey(b)));
+  return [{ ...origin, distanceFromOriginMeters: 0 }, ...chosen];
 }
 
-export function routeFromOrigin(origin: Place, candidates: Place[], meters: number): City[] {
-  return extendRoute([{ ...origin, cumulativeMeters: 0 }], candidates, meters);
+export function routeFromOrigin(origin: Place, candidates: Place[], meters = 0): City[] {
+  return extendRoute([{ ...origin, distanceFromOriginMeters: 0 }], candidates, meters);
 }
 
+// Keep the origin in the frame even after several cities have been unlocked.
 export function routeWindow(route: City[], meters: number): City[] {
-  const next = route.findIndex((city, index) => index > 0 && city.cumulativeMeters > meters);
-  const start = Math.max(0, Math.min(route.length - 3, (next === -1 ? route.length - 1 : next) - 2));
-  return route.slice(start, start + 3);
+  if (!route.length) return [];
+  const upcoming = route.slice(1).filter((city) => city.distanceFromOriginMeters > meters);
+  return [route[0], ...(upcoming.length ? upcoming.slice(0, 2) : route.slice(-2).filter((city) => city !== route[0]))];
 }
 
 export function passportPreview(route: City[], meters: number): City[] {
-  const reached = route.slice(1).filter((city) => city.cumulativeMeters <= meters);
-  const future = route.slice(1).filter((city) => city.cumulativeMeters > meters);
+  const reached = route.slice(1).filter((city) => city.distanceFromOriginMeters <= meters);
+  const future = route.slice(1).filter((city) => city.distanceFromOriginMeters > meters);
   return [route[0], ...reached.slice(-1), ...future].filter(Boolean).slice(0, 3);
 }
 
