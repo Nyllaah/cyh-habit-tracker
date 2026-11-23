@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { discoverNearby, readStartingLocation, searchCities } from "@/lib/cities";
 import { searchLocalPlaces, type Place } from "@/lib/places";
 
@@ -12,6 +12,7 @@ type Props = {
 export function CityPicker({ catalog, onSelect, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const requests = useRef({ id: 0, controller: null as AbortController | null });
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [query, setQuery] = useState("");
   const [result, setResult] = useState<{ query: string; places: Place[]; saved: boolean } | null>(null);
   const [busy, setBusy] = useState<"search" | "location" | "route" | null>(null);
@@ -33,28 +34,41 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
     };
   }, []);
 
-  function begin() {
+  const begin = useCallback(() => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
     requests.current.controller?.abort();
     requests.current.controller = new AbortController();
     setMessage("");
     return { id: ++requests.current.id, signal: requests.current.controller.signal };
-  }
+  }, []);
 
-  async function search(event: FormEvent) {
-    event.preventDefault();
+  const runSearch = useCallback(async (searchQuery: string) => {
     const { id, signal } = begin();
     setBusy("search");
     try {
-      const found = await searchCities(query, catalog, signal);
+      const found = await searchCities(searchQuery, catalog, signal);
       if (id !== requests.current.id) return;
-      setResult({ query, ...found });
-      setMessage(found.saved ? "Showing saved cities" : found.places.length ? "" : "No matches. Try another city.");
+      setResult({ query: searchQuery, ...found });
+      setMessage(found.saved ? (found.places.length ? "Offline · saved cities" : "Search unavailable. Try again.") : found.places.length ? "" : "No matches. Try another city.");
     } catch {
       // A newer request or closing the sheet cancels this one.
     } finally {
       if (id === requests.current.id) setBusy(null);
     }
+  }, [begin, catalog]);
+
+  useEffect(() => {
+    if (query.trim().length < 2) return;
+    searchTimer.current = setTimeout(() => { void runSearch(query); }, 600);
+    return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
+  }, [query, runSearch]);
+
+  function search(event: FormEvent) {
+    event.preventDefault();
+    void runSearch(query);
   }
+
+  const searching = busy === "search" || (query.trim().length >= 2 && result?.query !== query && busy === null);
 
   async function choose(origin?: Place) {
     const { id, signal } = begin();
@@ -91,13 +105,13 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
       <button type="button" className="primary-button locate-button" disabled={busy === "location" || busy === "route"} onClick={() => choose()}><Image src="/journey/icons/locate.svg" width={22} height={22} alt="" />{busy === "location" ? "Finding your location…" : "Use my location"}</button>
       <form className="city-search" role="search" onSubmit={search}>
         <label className="sr-only" htmlFor="city-search">City, state</label>
-        <input id="city-search" type="search" enterKeyHint="search" value={query} placeholder="City, state" autoComplete="off" onChange={(event) => { requests.current.controller?.abort(); requests.current.id++; setQuery(event.target.value); setBusy(null); setMessage(""); }} />
+        <input id="city-search" type="search" enterKeyHint="search" value={query} placeholder="City, state" autoComplete="off" onChange={(event) => { if (searchTimer.current) clearTimeout(searchTimer.current); requests.current.controller?.abort(); requests.current.id++; setQuery(event.target.value); setResult(null); setBusy(null); setMessage(""); }} />
         <button type="submit" className="icon-button" aria-label="Search cities"><Image src="/journey/icons/search.svg" width={22} height={22} alt="" /></button>
       </form>
-      <p className="city-status" role="status">{busy === "search" ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>
+      <p className="city-status" role="status">{searching ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>
       <p className="eyebrow city-results-label">{query.trim() ? "Cities" : "Saved cities"}</p>
-      <ul className="city-results">
-        {(matches.length ? matches : featured).slice(0, 8).map((place) => <li key={place.id}>
+      <ul className="city-results" aria-busy={searching}>
+        {matches.slice(0, 8).map((place) => <li key={place.id}>
           <button type="button" disabled={busy === "route" || busy === "location"} onClick={() => choose(place)}>
             <span className="city-result-icon"><Image src="/journey/icons/city.svg" width={22} height={22} alt="" /></span>
             <span><strong>{place.name}</strong><span className="city-region">{[place.region, place.country].filter(Boolean).join(", ")}</span></span>

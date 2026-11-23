@@ -299,5 +299,51 @@
         }
       }
     ]
+  },
+  "rio": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -43.2093727,
+            -22.9110137
+          ]
+        },
+        "properties": {
+          "name": "Rio de Janeiro",
+          "state": "Rio de Janeiro",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 2697338,
+          "type": "city"
+        }
+      }
+    ]
+  },
+  "denver": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -104.984862,
+            39.7392364
+          ]
+        },
+        "properties": {
+          "name": "Denver",
+          "state": "Colorado",
+          "countrycode": "US",
+          "osm_key": "place",
+          "osm_value": "city",
+          "osm_type": "R",
+          "osm_id": 1411339,
+          "type": "city"
+        }
+      }
+    ]
   }
 }

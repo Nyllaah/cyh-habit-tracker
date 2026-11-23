@@ -33,3 +33,16 @@ test('city-layer administrative boundaries still require an official BR/US munic
   assert.deepEqual(normalizeCities({features:features.map(feature=>({...feature,properties:{...feature.properties,type:'state'}}))},catalog),[]);
   assert.deepEqual(normalizeCities({features:features.map(feature=>({...feature,properties:{...feature.properties,countrycode:'FR'}}))},catalog),[]);
 });
+
+
+test('global searches find Rio and Denver without adding either city to the saved catalog', async () => {
+  for (const [query, fixture, region] of [['Rio de Janeiro', responses.rio, 'RJ'], ['Denver', responses.denver, 'CO']]) {
+    assert(!catalog.some(city=>city.name===query));
+    let requested;
+    const result=await searchCities(query,catalog,undefined,async url=>{requested=new URL(url);return Response.json(fixture);});
+    assert.equal(requested.searchParams.get('q'),query);
+    assert.equal(result.saved,false);
+    assert.equal(result.places[0].name,query);
+    assert.equal(result.places[0].region,region);
+  }
+});
