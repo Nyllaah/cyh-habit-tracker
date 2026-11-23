@@ -9,7 +9,7 @@ const catalog = JSON.parse(readFileSync(new URL('../data/cities.json', import.me
 const account = () => initialJourney([], [], catalog, [...sample.previousJourneys, {days:sample.days,route:sample.route}]);
 const start = (state,name) => journeyReducer(state, {type:'change-origin',origin:catalog.find(city=>city.name===name),candidates:catalog});
 
-test('demo starts without a selected city, retaining historical activity and country stamps', () => {
+test('an archived account can retain history and country stamps without a selected city', () => {
   const state = account();
   assert.deepEqual(state.route, []);
   assert.equal(routeMeters(state), 0);

@@ -19,13 +19,14 @@ import { formatDistance, type DistanceUnit } from "@/lib/distance";
 
 const sample = getJourneySample();
 const catalog = getCityCatalog();
+const demoHistory = [...sample.previousJourneys, { days: sample.days, route: sample.route }];
 
 function Icon({ name, className = "" }: { name: string; className?: string }) {
   return <Image className={`icon ${className}`} src={`/journey/icons/${name}.svg`} width={24} height={24} alt="" />;
 }
 
 export default function Page() {
-  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney([], [], catalog, [...sample.previousJourneys, { days: sample.days, route: sample.route }]));
+  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney([], [], catalog));
   const [syncing, setSyncing] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
   const [unit, setUnit] = useState<DistanceUnit>("metric");
@@ -68,7 +69,7 @@ export default function Page() {
     try {
       const reading = await readDemoHealth(demoReading);
       if (request !== syncRequest.current) return;
-      dispatch({ type: "import", reading });
+      dispatch({ type: "demo-sync", reading, history: demoHistory });
       setHasSynced(true);
     } finally {
       if (request === syncRequest.current) {

@@ -46,6 +46,7 @@ export type JourneyState = {
   candidates: Place[];
   routeOffsetMeters: number;
   previousJourneys: { route: City[]; meters: number }[];
+  demoHistoryLoaded: boolean;
 };
 
 export type PastJourney = { days: Day[]; route: City[] };
@@ -54,7 +55,7 @@ export function initialJourney(days: Day[], route: City[], candidates: Place[] =
   const previousJourneys = history.map((journey) => ({ route: journey.route, meters: totalMeters(journey.days) }));
   // Older journeys populate the same history without spending their distance twice.
   const allDays = [...history.flatMap((journey) => journey.days), ...days].sort((a, b) => a.date.localeCompare(b.date));
-  return { days: allDays, route, candidates, routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+  return { days: allDays, route, candidates, routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, demoHistoryLoaded: history.length > 0, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
 }
 
 // The active journey counts activity added after its starting offset.
@@ -90,6 +91,7 @@ export function routeForOrigin(state: JourneyState, origin: Place, candidates: P
 
 export type JourneyAction =
   | { type: "import"; reading: Day }
+  | { type: "demo-sync"; reading: Day; history: PastJourney[] }
   | { type: "correct-day"; date: string; meters: number }
   | { type: "use-imported"; date: string }
   | { type: "extend-route"; candidates: Place[] }
@@ -97,6 +99,20 @@ export type JourneyAction =
   | { type: "dismiss-arrival" };
 
 export function journeyReducer(state: JourneyState, action: JourneyAction): JourneyState {
+  if (action.type === "demo-sync") {
+    if (!state.route.length) return state;
+    if (state.demoHistoryLoaded) return journeyReducer(state, { type: "import", reading: action.reading });
+    // Existing records win over the backfill, including any manual correction.
+    const byDate = new Map([...action.history.flatMap((journey) => journey.days), ...state.days].map((day) => [day.date, day]));
+    const days = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+    const historicalMeters = totalMeters(days) - totalMeters(state.days);
+    const populated = {
+      ...state, days, demoHistoryLoaded: true,
+      routeOffsetMeters: state.routeOffsetMeters + historicalMeters,
+      previousJourneys: [...action.history.map((journey) => ({ route: journey.route, meters: totalMeters(journey.days) })), ...state.previousJourneys],
+    };
+    return journeyReducer(populated, { type: "import", reading: action.reading });
+  }
   if (action.type === "dismiss-arrival") return { ...state, arrivals: state.arrivals.slice(1) };
   if (action.type === "change-origin") {
     if (state.route[0] && placeKey(action.origin) === placeKey(state.route[0])) return state;

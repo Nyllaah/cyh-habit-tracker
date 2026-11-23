@@ -14,7 +14,9 @@ export function placeCountry(place: Place): string {
 }
 
 export function countryName(code: string): string {
-  return countryMaps.features.find((feature) => feature.properties.code === code)?.properties.name ?? (code || "Other places");
+  const known = countryMaps.features.find((feature) => feature.properties.code === code)?.properties.name;
+  if (known) return known;
+  return /^[A-Z]{2}$/.test(code) ? new Intl.DisplayNames(["en"], { type: "region" }).of(code) ?? code : code || "Other places";
 }
 
 // Ray casting lets coordinate-only GPS origins pick an offline country outline.

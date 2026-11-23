@@ -87,7 +87,7 @@ The runtime map now uses real geography with Leaflet 1.9.4: drag, pinch, zoom co
 
 Leaflet is BSD-2-Clause; its notice is retained in [the bundled license](../../../docs/licenses/leaflet-BSD-2-Clause.txt). Runtime dependencies are installed normally by npm; no CDN script is required.
 
-The current start flow supersedes the fixed Washington screen studies: the page opens with no city selected and an original-art start panel offering city selection or GPS. Each different origin creates an automatic itinerary at zero. The map badge shows current journey distance; its caption keeps lifetime distance separate. A route-specific mock reading is prepared on selection and imported only on sync, so any supported origin can demonstrate its first arrival. Country passport views follow the starting city by default while the calendar remains global.
+The current start flow supersedes the fixed Washington screen studies: the page opens with no city, recorded activity, or collected stamps and an original-art start panel offering city selection or GPS. Each different origin creates an automatic itinerary at zero. The map badge shows current journey distance; its caption keeps lifetime distance separate. A route-specific mock reading is prepared on selection and imported only on sync, so any supported origin can demonstrate its first arrival. The first successful sync also fills past activity and country stamps once, without spending that history on the new route. Country passport views follow the starting city by default while the calendar remains global.
 
 ## Capital milestone tier
 

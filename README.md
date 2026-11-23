@@ -20,8 +20,8 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 
 ## Try the daily moment
 
-- The page opens with no city selected. Choose a city or use browser location to start its automatic itinerary at zero.
-- Tap the sync icon beside Health Connect when ready to simulate enough new activity to unlock that route’s first stamp. Repeating sync does not add more distance. “Demo” identifies the source.
+- The page opens with no city selected, activity history, or collected stamps. Choose a city or use browser location to start its automatic itinerary at zero.
+- The first tap on the sync icon beside Health Connect populates months of past activity and stamps, then imports enough new activity to unlock that route’s first destination. Older distance does not advance the chosen route. Repeating sync does not add more distance. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
 - Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
