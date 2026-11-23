@@ -100,9 +100,8 @@ export default function Page() {
         <Icon name="footsteps" className="today-footsteps" />
         <div className="health-row">
           <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
-          <button ref={syncButton} className={hasSynced ? "icon-button light-icon" : "health-sync-button"} disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}>
+          <button ref={syncButton} className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}>
             <Icon name="sync" className={syncing ? "spinning" : ""} />
-            {!hasSynced && <span>{syncing ? "Syncing…" : "Sync activity"}</span>}
           </button>
         </div>
       </section>

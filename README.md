@@ -20,7 +20,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 
 ## Try the daily moment
 
-- The page opens before Alexandria is reached. Tap “Sync activity” when ready to simulate a Health Connect reading and unlock its stamp. “Demo” identifies the source.
+- The page opens before Alexandria is reached. Tap the sync icon beside Health Connect when ready to simulate a Health Connect reading and unlock its stamp. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
 - Explore the monthly calendar, swipe through the yearly grid, and expand the passport inline.
