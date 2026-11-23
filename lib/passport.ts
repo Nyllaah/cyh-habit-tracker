@@ -1,5 +1,5 @@
 import { countryCompletion, type CountryCompletion } from "./completion.ts";
-import { collectedStamps, routeMeters, type City, type JourneyState } from "./journey.ts";
+import { arrivedCities, nextCity, collectedStamps, routeMeters, type City, type JourneyState } from "./journey.ts";
 import { placeKey, regionCode } from "./places.ts";
 import { countryName, placeCountry } from "./countries.ts";
 
@@ -11,10 +11,14 @@ export function countryPassports(state: JourneyState): CountryPassport[] {
   const collected = collectedStamps(state).map((stamp) => stamp.city);
   const countries = new Set([...collected.map(placeCountry), ...state.route.map(placeCountry)]);
   return [...countries].sort().map((country) => {
-    const origin = state.route[0] && placeCountry(state.route[0]) === country ? state.route[0]
-      : state.previousJourneys.findLast((journey) => placeCountry(journey.route[0]) === country)?.route[0];
+    const journey = state.route[0] && placeCountry(state.route[0]) === country
+      ? { route: state.route, meters: routeMeters(state) }
+      : state.previousJourneys.findLast((journey) => placeCountry(journey.route[0]) === country);
+    // Follow the next itinerary leg rather than the original starting state.
+    const focus = journey && (nextCity(journey.route, journey.meters)
+      ?? arrivedCities(journey.route, journey.meters).at(-1) ?? journey.route[0]);
     return { country, name: countryName(country), collection: passportCollection(state, country),
-      completion: countryCompletion(collected, country), focusRegion: regionCode(origin?.region ?? "") };
+      completion: countryCompletion(collected, country), focusRegion: regionCode(focus?.region ?? "") };
   });
 }
 

@@ -378,3 +378,5 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
   *::-webkit-scrollbar-track { background: Canvas; }
   *::-webkit-scrollbar-thumb { background: CanvasText; border-color: Canvas; }
 }
+
+.completion-current { justify-self: center; padding: 3px 9px; border-radius: 999px; background: #D1E8E0; color: var(--ink); font-size: 10px; line-height: 1.4; }

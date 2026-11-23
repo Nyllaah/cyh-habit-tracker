@@ -21,6 +21,8 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
   </section>;
   const { collection, name } = selected;
   const { preview, moreCollected, moreUpcoming, arrivalCount } = collection;
+  const regionChallenge = selected.completion?.regions.find((badge) => badge.region === selected.focusRegion);
+  const isCurrentCountry = selected.country === currentCountry;
   const hasMore = moreCollected.length > 0 || moreUpcoming.length > 0;
   return (
     <section className="passport" aria-labelledby="passport-title">
@@ -39,8 +41,9 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
         {selected.completion && <div className="passport-milestones" aria-label="State and country challenges">
           <h3>Grand discoveries</h3>
           <div className="completion-grid">
-            {selected.completion.regions.filter((badge) => badge.earned || badge.region === selected.focusRegion).map((badge) => <CompletionBadge key={badge.id} badge={badge} />)}
-            <CompletionBadge badge={selected.completion.country} />
+            {regionChallenge && <CompletionBadge badge={regionChallenge} current={isCurrentCountry} />}
+            <CompletionBadge badge={selected.completion.country} current={isCurrentCountry} />
+            {selected.completion.regions.filter((badge) => badge.earned && badge.region !== selected.focusRegion).map((badge) => <CompletionBadge key={badge.id} badge={badge} />)}
           </div>
           {!selected.completion.country.supported && <p className="completion-coverage">{selected.completion.regions.filter((badge) => !badge.supported).map((badge) => badge.name).join(", ")} not yet supported</p>}
         </div>}

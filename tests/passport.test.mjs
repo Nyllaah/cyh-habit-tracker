@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initialJourney, journeyReducer, routeMeters } from '../lib/journey.ts';
-import { passportCollection } from '../lib/passport.ts';
+import { countryPassports, passportCollection } from '../lib/passport.ts';
 import { placeKey } from '../lib/places.ts';
 const sample = JSON.parse(readFileSync(new URL('../data/sample.json', import.meta.url)));
 const catalog = JSON.parse(readFileSync(new URL('../data/cities.json', import.meta.url))).places;
@@ -107,4 +107,38 @@ test('S6.29: when every known stamp fits the preview, there is nothing to disclo
   assert.equal(collection.preview.length, 3);
   assert.equal(collection.moreCollected.length, 0);
   assert.equal(collection.moreUpcoming.length, 0);
+});
+
+
+test('Grand discoveries follows the next state and retains completed districts', () => {
+  const state = move(initialJourney([], [], catalog), 'Brasília');
+  const passport = countryPassports(state).find(country => country.country === 'BR');
+  assert.equal(passport.focusRegion, 'GO');
+  assert.equal(passport.completion.regions.find(badge => badge.region === 'DF').earned, true);
+  assert.equal(passport.completion.regions.find(badge => badge.region === 'GO').earned, false);
+  assert.equal(passport.completion.country.completed, 1);
+});
+
+test('Grand discoveries tracks itinerary borders and rolls back with corrections', () => {
+  const route = [
+    { ...city('Washington'), cumulativeMeters: 0 },
+    { ...city('Alexandria'), cumulativeMeters: 11000 },
+    { id:'baltimore', name:'Baltimore', region:'MD', country:'US', latitude:39.29, longitude:-76.61, cumulativeMeters:80000 },
+  ];
+  let state = initialJourney([], route, route);
+  assert.equal(countryPassports(state)[0].focusRegion, 'VA');
+  state = journeyReducer(state, { type:'correct-day', date:sample.today, meters:12000 });
+  assert.equal(countryPassports(state)[0].focusRegion, 'MD');
+  state = journeyReducer(state, { type:'correct-day', date:sample.today, meters:0 });
+  assert.equal(countryPassports(state)[0].focusRegion, 'VA');
+});
+
+test('archived countries keep their last itinerary state without borrowing the active country', () => {
+  let state = move(initialJourney([], [], catalog), 'Brasília');
+  state = move(state, 'Washington');
+  const passports = countryPassports(state);
+  assert.equal(passports.find(country => country.country === 'BR').focusRegion, 'GO');
+  assert.equal(passports.find(country => country.country === 'US').focusRegion, state.route[1].region);
+  const finished = initialJourney([{date:sample.today, importedMeters:200000}], sample.route, sample.route);
+  assert.equal(countryPassports(finished)[0].focusRegion, 'VA');
 });
