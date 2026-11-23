@@ -276,6 +276,8 @@ External assets and data require provenance. The local SVG artwork is original p
 
 48. WHEN a new stamp arrival opens THEN a brief, non-looping teal/orange/gold confetti burst SHALL celebrate it without intercepting interaction or replaying on repeated sync. Reduced-motion preferences SHALL hide the confetti while retaining the static stamp and controls.
 
+49. WHEN viewport space permits THEN the single page SHALL adapt beyond its phone layout: tablet content SHALL expand, and wide screens SHALL place journey/start content beside activity, history, and passport. The journey SHALL remain available while scrolling the desktop activity column. Phone order, readable target sizes, map resizing, and absence of horizontal page overflow SHALL be preserved.
+
 ### S6: Browse the passport and celebrate arrivals
 
 29. WHEN the passport is collapsed THEN it SHALL show at most three unique stamps, and an inline disclosure SHALL expose remaining collected and known upcoming stamps without navigation or duplicates.
@@ -421,6 +423,10 @@ The repository carries [three project-local skills](skills.md), including source
 - Stamp celebration increment: the existing arrival modal renders twenty-eight deterministic decorative pieces, styled with CSS transforms/opacity for a 1.4-second fall and short stagger. The overlay clips to the rounded dialog, never captures pointers, and ends transparent. It follows the existing keyed arrival lifecycle, so only a new arrival produces another burst. Reduced motion hides it completely. No animation library or generated image is added.
 
 - Stamp celebration validation: lint and production build pass. Chromium checks twenty-eight pieces, the finite animation and pointer-free overlay, hidden confetti under reduced motion, modal focus containment/restoration, Continue/Escape dismissal, short-screen fit, no replay on repeated sync, and no Axe WCAG 2 A/AA violations.
+
+- Responsive layout increment: base styles retain the stacked phone flow. At 600px the page expands to a 680px tablet column and a taller map. At 900px CSS Grid creates a 1.15:1 journey/activity composition with a full-width header; the start/map panel stays sticky beside today, history, and passport. Its existing ResizeObserver updates Leaflet after size changes. No second route, duplicate content, or device-specific state is added.
+
+- Responsive layout validation: lint and production build pass. Chromium checks fresh and populated states at 320/390/768/917/1024/1440 widths, stacked versus side-by-side geometry, map resize behavior, no horizontal overflow, desktop sticky journey while browsing Year, and no Axe WCAG 2 A/AA violations or page/duplicate-key errors. Start and populated desktop captures were visually inspected.
 
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
