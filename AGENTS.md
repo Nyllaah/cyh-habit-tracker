@@ -23,6 +23,12 @@ Build it in `app/page.tsx`. Hold to these constraints:
   The current visual references and asset handoff are in
   `design/journey/game/README.md`. Check progress before starting the next slice;
   open product choices remain explicit in the specification.
+- Keep `docs/plan.md` as the authoritative feature documentation: requirements,
+  product and technical decisions, brief rationale, open questions, implementation
+  status, and validation. Update it in the same commit as relevant code changes.
+  Revise superseded decisions in place so the current behavior is unambiguous.
+  Do not introduce separate ADR files or a parallel decision register. Linked
+  asset handoffs and skill manifests provide supporting detail.
 
 ## Branch and commit workflow
 

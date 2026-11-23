@@ -2,11 +2,40 @@
 
 **Status:** Implementation in progress. S1 (daily journey and simulated health sync) is implemented; later slices remain planned.
 
+This file is the feature's authoritative documentation. It holds requirements,
+product and technical decisions, rationale, open questions, implementation status,
+and validation. Keep it current alongside the code rather than creating separate
+ADRs or decision registers. Linked design handoffs and skill manifests supply
+supporting assets and provenance. Requirements describe intended behavior;
+Implementation progress identifies what is actually delivered. Proposals and open
+questions remain labeled until settled. When a decision changes, revise the
+affected sections and criteria together; Git records the previous version.
+
 ## Problem
 
 Repeated local walks accumulate distance without a lasting sense of discovery. A daily activity total provides immediate feedback, but little to collect or continue over several months. The product hypothesis is that a virtual journey through real places can make that accumulated effort more meaningful.
 
 The daily screen will show activity advancing a journey, the next destination, and a growing passport collection. Activity arrives through a simulated health connection and can be corrected manually. Distances are available in metric and imperial units.
+
+## Decision rationale
+
+| Area | Decision | Reason |
+| --- | --- | --- |
+| Habit and retention | Walking and running distance advances travel between real cities and collects city stamps | Turn repeated local activity into visible exploration and a collection that grows over months |
+| Daily interaction | Simulated automatic health totals plus manual replacement of a day's total | Reduce daily effort while allowing a clear correction without double-counting |
+| Units | Support metric and miles, including meter entry; store integer meters | Make the interface familiar across audiences and prevent display conversions from changing progress |
+| Rewards | Recalculate earned stamps from effective accumulated distance; track arrival announcements separately | Keep collection and progress consistent after corrections while avoiding repeated arrival dialogs on sync |
+| Origin and journey | Offer browser location and city selection; suggest nearby destinations first and extend automatically | Make the journey personal without requiring itinerary planning |
+| Presentation | One scrolling page with a prominent playful map, compact activity card, inline history and passport, and contextual sheets | Preserve the main daily moment on a phone while allowing deeper exploration on the same route |
+| Visual identity | Cool white, deep teal, turquoise, restrained orange, miniature landmarks, and collectible stamps | Give the journey a playful, modern, gender-neutral identity with concise interface copy |
+| History | Monthly day squares and a continuous GitHub-style yearly grid, using green-to-orange distance intensity | Show daily consistency and accumulated activity at two time scales |
+| Architecture | Keep the scaffold, local JSON, in-memory React state, and independently testable distance rules | Keep the app small, runnable without accounts or services, and straightforward to extend live |
+| Graphics | Use the finished local SVG assets; retain PNGs as design references | Preserve scalable artwork while rendering live labels and controls from application state |
+| Styling | Plain CSS with shared tokens and a local font fallback | Keep visual rules explicit and avoid adding a component framework or build-time font download |
+| Delivery | One feature branch and incremental commits with relevant checks | Keep each change reviewable and its behavior easy to explain |
+
+Detailed behavior and remaining choices are specified below. These decisions do
+not imply that every planned capability is already implemented.
 
 ## Shape
 
@@ -121,7 +150,7 @@ when implementing and update that comparison artifact during visual integration.
 
 ### Activity history
 
-- Add a monthly calendar after the passport, with one square per calendar day. A Month / Year switch offers a GitHub-style contribution grid: seven weekday rows and continuous week columns, with month labels across the top. The year never restarts into separate monthly calendars. The grid scrolls horizontally inside its own mobile container; the page itself stays within the viewport.
+- Add a monthly calendar after today's activity and before the passport, with one square per calendar day. A Month / Year switch offers a GitHub-style contribution grid: seven weekday rows and continuous week columns, with month labels across the top. The year never restarts into separate monthly calendars. The grid scrolls horizontally inside its own mobile container; the page itself stays within the viewport.
 - The proposed six-band scale goes from pale green through yellow-green and amber to orange: `#C9E9D9`, `#9ED5BA`, `#CFDF95`, `#EDCD7B`, `#EF9A59`, `#E87C3B`. Use equal distance bands from zero to the maximum effective daily meters in the displayed month or year; one scale applies throughout the displayed period. A revised maximum may recolor the period. Unit switching cannot recolor it. This is distance intensity, not goal completion.
 - Confirmed zero is neutral; future dates are outlined. Missing records remain unrecorded, not inferred zero. Guard periods with no positive values against division by zero. Use a short Less / More key and a selected-day date/distance readout.
 - Keep day numbers and a selected outline. Monthly squares expose date and distance through accessible names and keyboard navigation. The yearly grid uses roving keyboard focus and arrow-key date selection with an exact date/distance readout. Keep a monthly view for precise touch selection; do not assign overlapping 44px targets to densely packed yearly cells. Use a seven-column roving-focus calendar on narrow screens rather than making the page wider.
@@ -226,7 +255,7 @@ The repository carries [three project-local skills](skills.md), including source
 ### Implementation progress
 
 - Foundation: `f78bba9` records the skills, design assets, and technical guidance together before application implementation.
-- S1: the page composes the original landmark/scenery SVGs with live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total automatically. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
+- S1: `5904704` implements the page with original landmark/scenery SVGs, live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total automatically. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
 - Styling uses plain CSS with shared tokens. The unused Tailwind CSS loader was removed from `next.config.ts`; no component framework or new runtime dependency was added. The font stack uses Ubuntu Sans when available and local sans-serif fallbacks, avoiding a build-time font download.
 - Verification for S1: five rule tests pass, ESLint passes, production build passes, and the running page was exercised at 360px, 390px, and 1024px. Browser checks cover automatic import, new-city arrival, unchanged re-sync, Escape dismissal, reduced motion, and absence of page runtime errors. Later slices and the final independent review are still pending.
 
