@@ -7,6 +7,7 @@ import { DailyTotalEditor } from "@/app/components/daily-total-editor";
 import { ActivityHistory } from "@/app/components/activity-history";
 import { CityPicker } from "@/app/components/city-picker";
 import { Arrival } from "@/app/components/arrival";
+import { SegmentedControl } from "@/app/components/segmented-control";
 import { Passport } from "@/app/components/passport";
 import { countryPassports, passportCollection } from "@/lib/passport";
 import { placeCountry } from "@/lib/countries";
@@ -121,10 +122,10 @@ export default function Page() {
       <header className="home-header">
         <div className="brand-mark" aria-hidden="true"><Icon name="passport" /></div>
         <h1>Your journey</h1>
-        <div className="unit-switch" role="group" aria-label="Distance units">
-          <button type="button" aria-label="Kilometers" aria-pressed={unit === "metric"} onClick={() => setUnit("metric")}>km</button>
-          <button type="button" aria-label="Miles" aria-pressed={unit === "miles"} onClick={() => setUnit("miles")}>mi</button>
-        </div>
+        <SegmentedControl<DistanceUnit> label="Distance units" value={unit} onChange={setUnit} compact options={[
+          { value: "metric", label: "km", ariaLabel: "Kilometers" },
+          { value: "miles", label: "mi", ariaLabel: "Miles" },
+        ]} />
       </header>
 
       {!state.route.length ? <section className="journey-start view-reveal" aria-labelledby="journey-start-title">

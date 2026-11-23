@@ -2,6 +2,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
 import { addDays, dateLabel, distanceColors, monthDates, navigateHistory, periodActivity, shiftMonth, weekdayIndex, yearDates, type HistoryView, type ActivityCell } from "@/lib/history";
 import { formatImportedDistance, type DistanceUnit } from "@/lib/distance";
+import { SegmentedControl } from "@/app/components/segmented-control";
 import { YearActivityGrid } from "@/app/components/year-activity-grid";
 import type { Day } from "@/lib/journey";
 
@@ -39,10 +40,9 @@ export function ActivityHistory({ days, today, unit }: { days: Day[]; today: str
   return (
     <section className="activity-history" aria-labelledby="history-title">
       <div className="section-heading"><h2 id="history-title">Your rhythm</h2>
-        <div className="history-view-switch" role="group" aria-label="Activity history view">
-          <button type="button" aria-pressed={view === "month"} onClick={() => setView("month")}>Month</button>
-          <button type="button" aria-pressed={view === "year"} onClick={() => setView("year")}>Year</button>
-        </div>
+        <SegmentedControl<HistoryView> label="Activity history view" value={view} onChange={setView} options={[
+          { value: "month", label: "Month" }, { value: "year", label: "Year" },
+        ]} />
       </div>
       <div className="history-period">
         <h3 id="history-period-title">{periodTitle}</h3>
