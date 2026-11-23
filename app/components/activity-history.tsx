@@ -1,6 +1,6 @@
 import { useRef, useState, type KeyboardEvent } from "react";
 import Image from "next/image";
-import { dateLabel, distanceColors, monthDates, navigateHistory, periodActivity, shiftMonth, weekdayIndex, yearDates, type HistoryView, type ActivityCell } from "@/lib/history";
+import { addDays, dateLabel, distanceColors, monthDates, navigateHistory, periodActivity, shiftMonth, weekdayIndex, yearDates, type HistoryView, type ActivityCell } from "@/lib/history";
 import { formatImportedDistance, type DistanceUnit } from "@/lib/distance";
 import { YearActivityGrid } from "@/app/components/year-activity-grid";
 import type { Day } from "@/lib/journey";
@@ -12,7 +12,7 @@ function activityValue(cell: ActivityCell, unit: DistanceUnit): string {
 }
 
 export function ActivityHistory({ days, today, unit }: { days: Day[]; today: string; unit: DistanceUnit }) {
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState(() => addDays(today, -1));
   const [view, setView] = useState<HistoryView>("month");
   const calendar = useRef<HTMLDivElement>(null);
   const cells = periodActivity(view === "month" ? monthDates(selectedDate) : yearDates(selectedDate), days, today);
@@ -22,7 +22,7 @@ export function ActivityHistory({ days, today, unit }: { days: Day[]; today: str
   function select(date: string, focus = false) {
     setSelectedDate(date);
     // Navigation can render a different period before its day is focused.
-    if (focus) requestAnimationFrame(() => calendar.current?.querySelector<HTMLButtonElement>(`[data-date="${date}"]`)?.focus({ preventScroll: true }));
+    if (focus) requestAnimationFrame(() => calendar.current?.querySelector<HTMLButtonElement>(`[data-date="${date}"]`)?.focus());
   }
 
   function navigate(event: KeyboardEvent<HTMLButtonElement>, date: string) {

@@ -57,12 +57,12 @@ test('S5.22-24/27: yearly colors share one maximum, use corrections, and disting
 });
 
 test('S5.26: year arrows follow physical grid directions, including year boundaries', () => {
-  assert.equal(navigateHistory('2026-11-22','ArrowLeft','year'), '2026-11-15');
-  assert.equal(navigateHistory('2026-11-22','ArrowRight','year'), '2026-11-29');
-  assert.equal(navigateHistory('2026-11-22','ArrowUp','year'), '2026-11-21');
-  assert.equal(navigateHistory('2026-11-22','ArrowDown','year'), '2026-11-23');
-  assert.equal(navigateHistory('2026-12-31','ArrowDown','year'), '2027-01-01');
-  assert.equal(navigateHistory('2026-01-01','ArrowUp','year'), '2025-12-31');
+  assert.equal(navigateHistory('2026-11-22','ArrowLeft','year'), '2026-11-21');
+  assert.equal(navigateHistory('2026-11-22','ArrowRight','year'), '2026-11-23');
+  assert.equal(navigateHistory('2026-11-22','ArrowUp','year'), '2026-11-15');
+  assert.equal(navigateHistory('2026-11-22','ArrowDown','year'), '2026-11-29');
+  assert.equal(navigateHistory('2026-12-31','ArrowRight','year'), '2027-01-01');
+  assert.equal(navigateHistory('2026-01-01','ArrowLeft','year'), '2025-12-31');
   assert.equal(navigateHistory('2026-11-22','Home','year'), '2026-11-16');
   assert.equal(navigateHistory('2026-11-18','End','year'), '2026-11-22');
   assert.equal(navigateHistory('2024-02-29','PageUp','year'), '2023-02-28');

@@ -163,20 +163,17 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .history-view-switch button { min-width: 65px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 24px; color: var(--muted); background: transparent; font-size: 13px; }
 .history-view-switch button[aria-pressed="true"] { color: var(--surface); background: var(--ink); }
 .activity-history .section-heading h2 { font-size: clamp(22px, 6vw, 24px); }
-.year-scroll { width: 100%; overflow-x: auto; padding: 4px 0 10px; scrollbar-width: thin; scrollbar-color: var(--teal) var(--line); }
-.year-strip { width: max-content; padding-right: 3px; }
-.year-months, .year-weekday { display: grid; grid-template-columns: 30px repeat(var(--week-count), 16px); gap: 4px; }
-.year-months { height: 26px; align-items: start; color: var(--muted); font-size: 11px; }
-.year-months span { overflow: visible; }
-.year-weekday + .year-weekday { margin-top: 4px; }
-.year-row-label { position: sticky; left: 0; z-index: 2; display: flex; align-items: center; background: var(--paper); color: var(--muted); font-size: 10px; box-shadow: 4px 0 var(--paper); }
-.year-day { display: block; width: 16px; height: 16px; padding: 0; border: 1px solid transparent; border-radius: 4px; background: #e2eae6; }
+.year-grid { display: grid; gap: 5px; width: 100%; }
+.year-week { display: grid; grid-template-columns: 30px repeat(7, minmax(0, 1fr)); gap: 5px; align-items: center; }
+.year-week > [role="gridcell"] { display: flex; justify-content: center; }
+.year-weekdays { min-height: 26px; color: var(--muted); font-size: 11px; text-align: center; }
+.year-month-label { color: var(--muted); font-size: 11px; }
+.year-day { display: block; width: 100%; max-width: 28px; aspect-ratio: 1; padding: 0; border: 1px solid transparent; border-radius: 5px; background: #e2eae6; }
 .year-day.day-unrecorded { background: transparent; border: 1px dashed var(--line); }
 .year-day.day-future { background: transparent; border-color: var(--line); }
 [aria-selected="true"] > .year-day { outline: 2px solid var(--ink); outline-offset: 1px; }
 .year-day:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
 .year-day[aria-current="date"] { border-color: var(--ink); }
-.year-scroll-hint { margin: 8px 6px 0; text-align: right; font-size: 11px; color: var(--muted); }
 
 .passport-more { margin-top: 16px; }
 .passport-more summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 8px 6px; list-style: none; cursor: pointer; color: var(--teal); font-size: 14px; font-weight: 700; }

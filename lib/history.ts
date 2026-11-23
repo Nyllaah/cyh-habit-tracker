@@ -77,10 +77,10 @@ export function yearColumns(date: string): (string | null)[][] {
 
 export function navigateHistory(date: string, key: string, view: HistoryView): string | null {
   switch (key) {
-    case "ArrowLeft": return addDays(date, view === "year" ? -7 : -1);
-    case "ArrowRight": return addDays(date, view === "year" ? 7 : 1);
-    case "ArrowUp": return addDays(date, view === "year" ? -1 : -7);
-    case "ArrowDown": return addDays(date, view === "year" ? 1 : 7);
+    case "ArrowLeft": return addDays(date, -1);
+    case "ArrowRight": return addDays(date, 1);
+    case "ArrowUp": return addDays(date, -7);
+    case "ArrowDown": return addDays(date, 7);
     case "Home": return addDays(date, -weekdayIndex(date));
     case "End": return addDays(date, 6 - weekdayIndex(date));
     case "PageUp": return shiftMonth(date, view === "year" ? -12 : -1);

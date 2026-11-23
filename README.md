@@ -27,7 +27,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
 - National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary always chooses the nearest unvisited city within the country, including across state borders.
 - Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
-- Explore the populated monthly calendar and swipe through the yearly grid. Activity history stays shared across countries.
+- Explore the populated monthly calendar and scroll down the vertical yearly grid. History initially selects yesterday. Activity history stays shared across countries.
 
 ## How it works
 
