@@ -489,6 +489,8 @@ The repository carries [three project-local skills](skills.md), including source
 
 - Quiet-start correction: choosing a city still counts its origin toward completion, but setup clears origin-only notices after recording their identities. Later map discovery/import cannot replay them. Existing activity-earned state/country celebrations remain unchanged. All ninety-seven rule tests, lint, and production build pass. Browser regression covers fresh load, Washington/Brasília selection, settled map discovery, a first-sync city arrival without a district follow-up, and refresh returning to the empty start.
 
+- Completion copy refinement: celebration headings use sentence case and exclamation marks (for example, “District complete!” and “Distrito Federal conquered!”), consistently across state/district/country rewards. Badge calculations and the silent setup policy remain unchanged. Lint passes; the heading strings were reviewed for all three reward kinds.
+
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
 No remote publishing or deployment is part of this phase.
