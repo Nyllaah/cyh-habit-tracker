@@ -79,6 +79,11 @@ export function searchLocalPlaces(places: Place[], query: string): Place[] {
   });
 }
 
+function stateKey(place: Place): string {
+  const region = normalized(regionCode(place.region));
+  return region ? `${placeCountry(place)}|${region}` : "";
+}
+
 // Preserve the route prefix; add the nearest unvisited place only when needed.
 export function extendRoute(route: City[], candidates: Place[], meters: number): City[] {
   const extended = [...route];
@@ -86,7 +91,13 @@ export function extendRoute(route: City[], candidates: Place[], meters: number):
   while (extended.filter((city) => city.cumulativeMeters > meters).length < 2) {
     const last = extended[extended.length - 1];
     if (!last) break;
-    const next = nearbyPlaces(last, candidates.filter((place) => !visited.has(placeKey(place))))[0];
+    const currentState = stateKey(last);
+    const completedStates = new Set(extended.slice(0, -1).map(stateKey).filter((state) => state && state !== currentState));
+    const remaining = candidates.filter((place) => !visited.has(placeKey(place)) && !completedStates.has(stateKey(place)));
+    const inState = currentState ? remaining.filter((place) => stateKey(place) === currentState && distanceMeters(last, place) >= 1000) : [];
+    // Finish known cities in this state first. If the next leg exceeds the
+    // distance bound, wait for closer candidates instead of skipping states.
+    const next = nearbyPlaces(last, inState.length ? inState : remaining)[0];
     if (!next) break;
     extended.push({ ...next, cumulativeMeters: last.cumulativeMeters + distanceMeters(last, next) });
     visited.add(placeKey(next));

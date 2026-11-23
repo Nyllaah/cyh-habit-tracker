@@ -20,15 +20,15 @@ test('past-day corrections update the same calendar, lifetime, and active journe
 });
 
 test('zero past correction recalculates active stamps, retains archived stamps, and restores the source without replay',()=>{
- let state=sync(chosen());const before=routeMeters(state);
+ let state=sync(chosen());const before=routeMeters(state),checkpointId=state.route[1].id;
  state=journeyReducer(state,{type:'dismiss-arrival'});
  state=journeyReducer(state,{type:'correct-day',date:'2026-11-21',meters:0});
  assert.equal(routeMeters(state),before-2800);
- assert.ok(!collectedStamps(state).some(s=>s.city.name==='Jersey City'));
+ assert.ok(!collectedStamps(state).some(s=>s.city.id===checkpointId));
  assert.ok(collectedStamps(state).some(s=>s.city.name==='Goiânia'));
  state=journeyReducer(state,{type:'use-imported',date:'2026-11-21'});
  assert.equal(routeMeters(state),before);
- assert.ok(collectedStamps(state).some(s=>s.city.name==='Jersey City'));
+ assert.ok(collectedStamps(state).some(s=>s.city.id===checkpointId));
  assert.deepEqual(state.arrivals,[]);
 });
 
