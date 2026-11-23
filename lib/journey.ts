@@ -1,5 +1,5 @@
 import { earnedCompletions, type CompletionBadge } from "./completion.ts";
-import { distinctPlaces, extendRoute, placeKey, routeFromOrigin, type City, type Place } from "./places.ts";
+import { distinctPlaces, extendRoute, placeKey, type City, type Place } from "./places.ts";
 export type { City, Place } from "./places.ts";
 
 export type Day = {
@@ -88,9 +88,19 @@ function availableCandidates(state: JourneyState, candidates: Place[]): Place[] 
   return candidates.filter((place) => !archived.has(placeKey(place)));
 }
 
+// Prefer new stamps, but allow an already collected city to connect a new
+// itinerary when excluding it would strand the traveler. Each active route
+// still visits a place at most once.
+function extendJourneyRoute(state: JourneyState, route: City[], candidates: Place[], meters: number, upcomingCount = 2): City[] {
+  const futureCount = route.filter((city) => city.cumulativeMeters > meters).length;
+  const target = Math.max(2, Math.min(futureCount + 12, Math.floor(upcomingCount)));
+  const uncollected = extendRoute(route, availableCandidates(state, candidates), meters, target);
+  return extendRoute(uncollected, candidates, meters, target);
+}
+
 export function routeForOrigin(state: JourneyState, origin: Place, candidates: Place[]): City[] {
   const previousJourneys = state.route.length ? [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] : state.previousJourneys;
-  return routeFromOrigin(origin, availableCandidates({ ...state, previousJourneys }, distinctPlaces([...state.candidates, ...candidates])), 0);
+  return extendJourneyRoute({ ...state, previousJourneys }, [{ ...origin, cumulativeMeters: 0 }], distinctPlaces([...state.candidates, ...candidates]), 0);
 }
 
 export type JourneyAction =
@@ -147,7 +157,7 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
     const meters = routeMeters(state);
     const target = action.appendCount === undefined ? action.upcomingCount
       : state.route.filter((city) => city.cumulativeMeters > meters).length + Math.max(0, Math.min(12, Math.floor(action.appendCount)));
-    const route = extendRoute(state.route, availableCandidates(state, candidates), meters, target);
+    const route = extendJourneyRoute(state, state.route, candidates, meters, target);
     if (route.length === state.route.length && candidates.length === state.candidates.length) return state;
     return reconcileJourney(state, state.days, route, candidates);
   }
@@ -168,14 +178,15 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
       return imported;
     });
   }
-  const route = extendRoute(state.route, availableCandidates(state, state.candidates), Math.max(0, totalMeters(days) - state.routeOffsetMeters));
+  const route = extendJourneyRoute(state, state.route, state.candidates, Math.max(0, totalMeters(days) - state.routeOffsetMeters));
   return reconcileJourney(state, days, route, state.candidates);
 }
 
 function reconcileJourney(state: JourneyState, days: Day[], route: City[], candidates: Place[]): JourneyState {
   const reached = arrivedCities(route, Math.max(0, totalMeters(days) - state.routeOffsetMeters));
+  const archived = new Set(state.previousJourneys.flatMap((journey) => [journey.route[0], ...arrivedCities(journey.route, journey.meters)]).map(placeKey));
   const newArrivals = reached
-    .filter((city) => !state.announcedCityIds.includes(city.id));
+    .filter((city) => !state.announcedCityIds.includes(city.id) && !archived.has(placeKey(city)));
   const updated = {
     ...state,
     days,

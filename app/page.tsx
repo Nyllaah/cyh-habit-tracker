@@ -10,10 +10,11 @@ import { CompletionArrival } from "@/app/components/completion-arrival";
 import { Arrival } from "@/app/components/arrival";
 import { SegmentedControl } from "@/app/components/segmented-control";
 import { Passport } from "@/app/components/passport";
+import { rememberCity } from "@/lib/saved-cities";
 import { countryPassports, passportCollection } from "@/lib/passport";
 import { placeCountry } from "@/lib/countries";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
-import { discoverNearby, readStartingLocation } from "@/lib/cities";
+import { discoverNearby, discoverNextCities, readStartingLocation } from "@/lib/cities";
 import { capitalKind, placeKey, type Place } from "@/lib/places";
 import { demoReadingForJourney, readDemoHealth } from "@/lib/health";
 import { routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters, type Day } from "@/lib/journey";
@@ -35,6 +36,7 @@ export default function Page() {
   const [unit, setUnit] = useState<DistanceUnit>("metric");
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const editing = editingDate !== null;
+  const [savedCities, setSavedCities] = useState<Place[]>([]);
   const [choosingCity, setChoosingCity] = useState(false);
   const [demoReading, setDemoReading] = useState<Day | null>(null);
   const [locating, setLocating] = useState(false);
@@ -52,14 +54,17 @@ export default function Page() {
   const today = state.days.find((day) => day.date === sample.today);
   const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
   const frontier = needsDestinations ? state.route[state.route.length - 1] : null;
-  const frontierKey = frontier ? `${state.route[0].id}|${frontier.id}` : "";
+  const [discoveryAttempt, setDiscoveryAttempt] = useState(0);
+  const discoveryRoute = useRef(state.route);
+  useEffect(() => { discoveryRoute.current = state.route; }, [state.route]);
+  const frontierKey = frontier ? `${state.route[0].id}|${frontier.id}|${discoveryAttempt}` : "";
   const [completedFrontier, setCompletedFrontier] = useState("");
   const discovering = !!frontier && completedFrontier !== frontierKey;
 
   useEffect(() => {
     if (!frontier) return;
     const controller = new AbortController();
-    discoverNearby(frontier, catalog, controller.signal).then((candidates) => {
+    discoverNextCities(discoveryRoute.current, catalog, controller.signal).then((candidates) => {
       if (!controller.signal.aborted) dispatch({ type: "extend-route", candidates });
     }).catch(() => {}).finally(() => {
       if (!controller.signal.aborted) setCompletedFrontier(frontierKey);
@@ -94,11 +99,16 @@ export default function Page() {
     setChoosingCity(true);
   }
 
+  function saveCity(origin: Place) {
+    setSavedCities((cities) => rememberCity(cities, origin));
+  }
+
   function startJourney(origin: Place, candidates: Place[]): boolean {
-    if (state.route[0] && placeKey(origin) === placeKey(state.route[0])) { setChoosingCity(false); return true; }
+    if (state.route[0] && placeKey(origin) === placeKey(state.route[0])) { saveCity(origin); setChoosingCity(false); return true; }
     const action = { type: "change-origin" as const, origin, candidates };
     const started = journeyReducer(state, action);
     if (started === state) return false;
+    saveCity(origin);
     syncRequest.current++;
     syncInFlight.current = false;
     setSyncing(false);
@@ -152,7 +162,10 @@ export default function Page() {
           <div><p className="eyebrow">{next && capitalKind(next) ? "Capital milestone" : "Next stop"}</p><h2 id="next-stop-title">{next?.name ?? "More cities ahead"}</h2></div>
           {next && <p className="remaining"><strong>{formatDistance(next.cumulativeMeters - meters, unit)}</strong><span>to go</span></p>}
         </div>
-        {frontier && !next && <p className="route-status" role="status">{discovering ? "Finding nearby cities…" : "Choose a city to explore another route."}</p>}
+        {frontier && !next && <div className="route-status">
+          <p role="status">{discovering ? "Finding nearby cities…" : "More cities not found yet."}</p>
+          {!discovering && <button type="button" className="route-retry" onClick={() => setDiscoveryAttempt((attempt) => attempt + 1)}>Find more cities</button>}
+        </div>}
         <div className="map-container">
           <JourneyMap route={state.route} meters={meters} onDiscoverCities={discoverRoute} />
           <p className="traveled"><Icon name="footsteps" />{formatDistance(meters, unit)} this journey</p>
@@ -178,9 +191,9 @@ export default function Page() {
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} onEdit={setEditingDate} />
 
-      <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state)} currentCountry={currentCountry} />
+      <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state, savedCities)} currentCountry={currentCountry} />
 
-      {choosingCity && <CityPicker catalog={catalog} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
+      {choosingCity && <CityPicker catalog={catalog} savedCities={savedCities} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
       {editingDate && <DailyTotalEditor key={`editor-${editingDate}`} date={editingDate} today={sample.today} meters={editingDay ? effectiveMeters(editingDay) : 0} importedMeters={editingHasImport ? editingDay?.importedMeters : undefined} hasCorrection={editingDay?.manualOverrideMeters !== undefined} unit={unit}
         onSave={(meters) => { dispatch({ type: "correct-day", date: editingDate, meters }); setEditingDate(null); }}
         onUseImported={() => { dispatch({ type: "use-imported", date: editingDate }); setEditingDate(null); }}

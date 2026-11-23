@@ -28,8 +28,7 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
     <section className="passport" aria-labelledby="passport-title">
       <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivalCount} {arrivalCount === 1 ? "arrival" : "arrivals"}</p></div>
       <PassportCountryPicker countries={countries} value={selected.country} currentCountry={currentCountry} onChange={setSelectedCountry} />
-      <div key={selected.country} role="region" aria-labelledby="passport-country-title">
-        <h3 id="passport-country-title" className="passport-country-title">{name}</h3>
+      <div key={selected.country} role="region" aria-label={name}>
         <StampGrid stamps={preview} />
         {hasMore && <details className="passport-more">
           <summary><span className="passport-expand-label">View all stamps</span><span className="passport-collapse-label">Show less</span><Image src="/journey/icons/chevron-down.svg" width={20} height={20} alt="" /></summary>
@@ -39,7 +38,7 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
           </div>
         </details>}
         {selected.completion && <div className="passport-milestones" aria-label="State and country challenges">
-          <h3>Grand discoveries</h3>
+          <h3 className="passport-country-title">Grand discoveries</h3>
           <div className="completion-grid">
             {regionChallenge && <CompletionBadge badge={regionChallenge} current={isCurrentCountry} />}
             <CompletionBadge badge={selected.completion.country} current={isCurrentCountry} />

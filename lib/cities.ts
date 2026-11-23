@@ -1,5 +1,5 @@
 import { isMunicipality } from "./municipalities.ts";
-import { distinctPlaces, nearbyPlaces, placeKey, regionCode, searchLocalPlaces, type Place } from "./places.ts";
+import { distinctPlaces, extendRoute, nearbyPlaces, placeKey, regionCode, searchLocalPlaces, type City, type Place } from "./places.ts";
 
 function object(value: unknown): Record<string, unknown> | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -12,11 +12,16 @@ export function normalizeCities(data: unknown, catalog: Place[]): Place[] {
   for (const feature of features) {
     const record = object(feature);
     const properties = object(record?.properties);
+    if (!properties) continue;
     const geometry = object(record?.geometry);
     const coordinates = geometry?.coordinates;
-    if (properties?.osm_key !== "place") continue;
+    const country = String(properties?.countrycode).toUpperCase();
+    const registryCountry = country === "BR" || country === "US";
+    const municipalRecord = registryCountry && properties?.type === "city"
+      && ((properties.osm_key === "place" && properties.osm_value === "municipality")
+        || (properties.osm_key === "boundary" && properties.osm_value === "administrative"));
     const settlementTypes = String(properties.countrycode).toUpperCase() === "US" ? ["city", "town", "village"] : ["city", "town"];
-    if (!settlementTypes.includes(String(properties.osm_value))) continue;
+    if (!municipalRecord && (properties?.osm_key !== "place" || !settlementTypes.includes(String(properties.osm_value)))) continue;
     if (typeof properties.name !== "string" || !properties.name.trim() || geometry?.type !== "Point" || !Array.isArray(coordinates)) continue;
     const [longitude, latitude] = coordinates;
     if (typeof longitude !== "number" || typeof latitude !== "number" || !Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) continue;
@@ -91,18 +96,40 @@ export async function discoverNearby(origin: Place, catalog: Place[], signal?: A
 
 // Explore from the itinerary end as well as the visible map. A larger bounded
 // result set helps avoid returning only cities already in the route.
-export async function discoverRouteCities(origin: Place, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+async function routeCityResult(origin: Place, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<MapCityResult> {
   const url = cityUrl("/reverse");
   url.searchParams.set("lat", String(origin.latitude));
   url.searchParams.set("lon", String(origin.longitude));
   url.searchParams.set("radius", "250");
   url.searchParams.set("limit", "100");
   try {
-    return nearbyPlaces(origin, [...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...catalog]);
+    return { places: nearbyPlaces(origin, [...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...catalog]), source: "network" };
   } catch (error) {
     if (signal?.aborted) throw error;
-    return nearbyPlaces(origin, catalog);
+    return { places: nearbyPlaces(origin, catalog), source: "local" };
   }
+}
+
+export async function discoverRouteCities(origin: Place, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+  return (await routeCityResult(origin, catalog, signal, fetcher)).places;
+}
+
+// Photon caps nearest results; a larger radius alone may repeat the same
+// visited cities. Only when a successful lookup cannot extend this route,
+// probe four nearby centers once. Do not fan out after a service failure.
+export async function discoverNextCities(route: City[], catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+  const tail = route.at(-1);
+  if (!tail) return [];
+  const found = await routeCityResult(tail, catalog, signal, fetcher);
+  if (found.source === "local" || extendRoute(route, found.places, 0, route.length).length > route.length) return found.places;
+  const latitudeStep = 60 / 111.2;
+  const longitudeStep = latitudeStep / Math.max(.1, Math.cos(tail.latitude * Math.PI / 180));
+  const centers = [[latitudeStep, 0], [-latitudeStep, 0], [0, longitudeStep], [0, -longitudeStep]];
+  const results = await Promise.all(centers.map(([latitude, longitude]) => routeCityResult({ ...tail,
+    latitude: Math.max(-89.9, Math.min(89.9, tail.latitude + latitude)),
+    longitude: ((tail.longitude + longitude + 540) % 360) - 180,
+  }, catalog, signal, fetcher)));
+  return nearbyPlaces(tail, [...found.places, ...results.flatMap((result) => result.places)]);
 }
 
 export function readStartingLocation(): Promise<Place> {

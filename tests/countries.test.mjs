@@ -59,3 +59,24 @@ test('country groups cover the passport exactly once and derive current country 
   assert.strictEqual(moved.days, state.days);
   assert.equal(passportCollection(moved, 'US').preview[0].city.name, 'Washington');
 });
+
+
+test('country options follow saved city choices rather than countries injected by demo history', () => {
+  const state=account();
+  const washington=catalog.find(city=>city.name==='Washington');
+  const brasilia=catalog.find(city=>city.name==='Brasília');
+  const goiania=catalog.find(city=>city.name==='Goiânia');
+  const snapshot=JSON.stringify(state);
+  assert.deepEqual(countryPassports(state,[washington]).map(group=>group.country),['US']);
+  const selected=countryPassports(state,[washington,brasilia,goiania,brasilia]);
+  assert.deepEqual(selected.map(group=>group.country),['BR','US']);
+  assert.equal(selected.find(group=>group.country==='BR').collection.arrivalCount,4);
+  assert.equal(JSON.stringify(state),snapshot);
+});
+
+test('fresh country options are empty and an active GPS country remains accessible', () => {
+  const state=initialJourney([],[],catalog);
+  assert.deepEqual(countryPassports(state,[]),[]);
+  const origin={id:'location-dc',name:'Current location',region:'',country:'',latitude:38.9042,longitude:-77.0165,cumulativeMeters:0};
+  assert.deepEqual(countryPassports(initialJourney([],[origin],catalog),[]).map(group=>group.country),['US']);
+});

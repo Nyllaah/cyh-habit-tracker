@@ -20,7 +20,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 
 ## Try the daily moment
 
-- The page opens with no city selected, activity history, or collected stamps. Choose a city or use browser location to start its automatic itinerary at zero.
+- The page opens with no city selected, activity history, collected stamps, or saved cities. Typing a city searches automatically; selecting it saves that city for reuse during the current session. Refresh clears saved choices. Choose a city or use browser location to start its automatic itinerary at zero.
 - The first tap on the sync icon beside Health Connect populates months of past activity and stamps, then imports enough new activity to unlock that route’s first destination. Older distance does not advance the chosen route. Repeating sync does not add more distance. “Demo” identifies the source.
 - Edit today's total or choose a past calendar day and tap the readout’s edit icon. Corrections update history, lifetime distance, and current-journey progress; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
@@ -28,7 +28,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - Collected map cities have orange checks, including when their illustrations collapse to dots.
 - Grand discoveries awards special state/district and country badges against the full municipality registries. Origins count; old journey stamps remain valid. Hawaii is not yet supported, so US country completion stays locked.
 - National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary visits the nearest eligible city within the current state first, then crosses to another state once its available city catalog is exhausted. It does not return to departed states.
-- Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
+- The passport country dropdown grows from cities you select, with one option per country. Demo backfill alone does not add unselected countries. The current country follows your starting city. Passport browsing does not change the map or active journey.
 - Explore the populated monthly calendar and scroll down the vertical yearly grid. History initially selects yesterday. Activity history stays shared across countries.
 
 ## How it works
@@ -39,7 +39,7 @@ route progress, history colors, and the passport; components render those result
 Changes flow through the reducer, so the map, calendar, and rewards share the same
 activity records. There is no backend or separate history store.
 
-City lookup uses Photon with a four-second timeout and a local fallback. Brazilian results also match a bundled IBGE municipality name/state list, excluding Brasília’s administrative regions even when the provider labels them as cities. Fonte: [IBGE municipality API](https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome), retrieved November 23, 2026. US results match a bundled [Census municipal registry](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html), including municipal towns and excluding unincorporated census-designated communities. Both eligibility checks work offline. Location
+City lookup uses Photon with a four-second timeout and a local fallback. Brazilian results also match a bundled IBGE municipality name/state list, excluding Brasília’s administrative regions even when the provider labels them as cities. Fonte: [IBGE municipality API](https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome), retrieved November 23, 2026. US results match a bundled [Census municipal registry](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html), including municipal towns and excluding unincorporated census-designated communities. Both eligibility checks work offline. City-layer municipality/boundary records pass these checks too; the saved catalog includes a São Paulo cluster for offline search. Lookup results are bounded and separate from the map tile labels. Endpoint lookahead tries surrounding areas when nearest results repeat known stops; “Find more cities” retries an exhausted lookup. Archived collected cities can connect a new itinerary without awarding duplicate stamps. Location
 chooses the origin; it does not measure walks. City-to-city distances are straight-line
 virtual segments on a geographic map, not walking directions. Leaflet supplies map interaction; OpenStreetMap street tiles need no key. Local US/Brazil outlines and route markers remain available if tiles fail. Browser geolocation needs
 permission and a secure context (localhost works).

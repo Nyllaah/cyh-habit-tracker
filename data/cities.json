@@ -505,6 +505,70 @@
       "country": "BR",
       "latitude": -15.7392283,
       "longitude": -48.2793357
+    },
+    {
+      "id": "osm-R-298285",
+      "name": "São Paulo",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.5506507,
+      "longitude": -46.6333824
+    },
+    {
+      "id": "osm-R-298170",
+      "name": "São Caetano do Sul",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.6195923,
+      "longitude": -46.5688323
+    },
+    {
+      "id": "osm-R-298165",
+      "name": "Guarulhos",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.4675941,
+      "longitude": -46.5277704
+    },
+    {
+      "id": "osm-R-298242",
+      "name": "Diadema",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.6866428,
+      "longitude": -46.6246935
+    },
+    {
+      "id": "osm-R-298086",
+      "name": "Santo André",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.6533509,
+      "longitude": -46.5279039
+    },
+    {
+      "id": "osm-R-298470",
+      "name": "Osasco",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.5324859,
+      "longitude": -46.7916801
+    },
+    {
+      "id": "osm-R-298389",
+      "name": "Taboão da Serra",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.6121912,
+      "longitude": -46.7790539
+    },
+    {
+      "id": "osm-R-297968",
+      "name": "São Bernardo do Campo",
+      "region": "SP",
+      "country": "BR",
+      "latitude": -23.7080345,
+      "longitude": -46.5506747
     }
   ],
   "sources": [

@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
-import { citiesInView, discoverMapCities, discoverRouteCities, type MapCityResult, type MapCityView } from "@/lib/cities";
-import { distinctPlaces, type Place } from "@/lib/places";
+import { citiesInView, discoverMapCities, discoverNextCities, type MapCityResult, type MapCityView } from "@/lib/cities";
+import { distinctPlaces, type City, type Place } from "@/lib/places";
 
 type Props = {
   api: { map: Leaflet.Map; library: typeof Leaflet } | null;
   country: string;
-  frontier: Place;
+  route: City[];
   catalog: Place[];
   onDiscover: (places: Place[]) => void;
 };
 
 // One batch per settled movement. Route updates must not trigger another lookup.
-export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }: Props) {
+export function MapCityDiscovery({ api, country, route, catalog, onDiscover }: Props) {
   const [loading, setLoading] = useState(false);
   const cache = useRef(new Map<string, Place[]>());
-  const latestFrontier = useRef(frontier);
-  useEffect(() => { latestFrontier.current = frontier; }, [frontier]);
+  const latestRoute = useRef(route);
+  useEffect(() => { latestRoute.current = route; }, [route]);
   useEffect(() => {
     if (!api) return;
     const { map } = api;
@@ -49,12 +49,12 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
         setLoading(true);
         controller = new AbortController();
         const signal = controller.signal;
-        const tail = latestFrontier.current;
+        const itinerary = latestRoute.current;
         try {
           const [visible, onward] = await Promise.all([
             zoom < 5 ? Promise.resolve(citiesInView(catalog, view))
               : cached(`view|${viewKey}`, () => discoverMapCities(view, catalog, signal), request),
-            discoverRouteCities(tail, catalog, signal),
+            discoverNextCities(itinerary, catalog, signal),
           ]);
           if (request !== version || signal.aborted || popupOpen) return;
           // Merge both results once: cached views still allow a fresh tail to grow.
