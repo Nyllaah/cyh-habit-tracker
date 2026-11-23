@@ -6,6 +6,7 @@ import { JourneyMap } from "@/app/components/journey-map";
 import { DailyTotalEditor } from "@/app/components/daily-total-editor";
 import { ActivityHistory } from "@/app/components/activity-history";
 import { CityPicker } from "@/app/components/city-picker";
+import { CompletionArrival } from "@/app/components/completion-arrival";
 import { Arrival } from "@/app/components/arrival";
 import { SegmentedControl } from "@/app/components/segmented-control";
 import { Passport } from "@/app/components/passport";
@@ -185,6 +186,7 @@ export default function Page() {
         onUseImported={() => { dispatch({ type: "use-imported", date: editingDate }); setEditingDate(null); }}
         onClose={() => setEditingDate(null)} />}
       {!editing && !choosingCity && state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} arrivalCount={collection.arrivalCount} fallbackFocus={syncButton} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
+      {!editing && !choosingCity && !state.arrivals.length && state.completionArrivals[0] && <CompletionArrival key={`completion-${state.completionArrivals[0].id}`} badge={state.completionArrivals[0]} fallbackFocus={syncButton} onContinue={() => dispatch({ type: "dismiss-completion" })} />}
     </main>
   );
 }

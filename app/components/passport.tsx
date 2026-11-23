@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { CompletionBadge } from "@/app/components/completion-badge";
 import { useState } from "react";
 import { PassportCountryPicker } from "@/app/components/passport-country-picker";
 import { CityStamp } from "@/app/components/city-stamp";
@@ -35,6 +36,14 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
             {moreUpcoming.length > 0 && <div><h3>Next discoveries</h3><StampGrid stamps={moreUpcoming} /></div>}
           </div>
         </details>}
+        {selected.completion && <div className="passport-milestones" aria-label="State and country challenges">
+          <h3>Grand discoveries</h3>
+          <div className="completion-grid">
+            {selected.completion.regions.filter((badge) => badge.earned || badge.region === selected.focusRegion).map((badge) => <CompletionBadge key={badge.id} badge={badge} />)}
+            <CompletionBadge badge={selected.completion.country} />
+          </div>
+          {!selected.completion.country.supported && <p className="completion-coverage">{selected.completion.regions.filter((badge) => !badge.supported).map((badge) => badge.name).join(", ")} not yet supported</p>}
+        </div>}
       </div>
     </section>
   );

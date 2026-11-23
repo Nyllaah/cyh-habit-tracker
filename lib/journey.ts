@@ -1,3 +1,4 @@
+import { earnedCompletions, type CompletionBadge } from "./completion.ts";
 import { distinctPlaces, extendRoute, placeKey, routeFromOrigin, type City, type Place } from "./places.ts";
 export type { City, Place } from "./places.ts";
 
@@ -42,6 +43,8 @@ export type JourneyState = {
   days: Day[];
   route: City[];
   announcedCityIds: string[];
+  announcedCompletionIds: string[];
+  completionArrivals: CompletionBadge[];
   arrivals: City[];
   candidates: Place[];
   routeOffsetMeters: number;
@@ -55,7 +58,8 @@ export function initialJourney(days: Day[], route: City[], candidates: Place[] =
   const previousJourneys = history.map((journey) => ({ route: journey.route, meters: totalMeters(journey.days) }));
   // Older journeys populate the same history without spending their distance twice.
   const allDays = [...history.flatMap((journey) => journey.days), ...days].sort((a, b) => a.date.localeCompare(b.date));
-  return { days: allDays, route, candidates, routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, demoHistoryLoaded: history.length > 0, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+  const state: JourneyState = { days: allDays, route, candidates, announcedCompletionIds: [], completionArrivals: [], routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, demoHistoryLoaded: history.length > 0, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+  return { ...state, announcedCompletionIds: earnedCompletions(collectedStamps(state).map((stamp) => stamp.city)).map((badge) => badge.id) };
 }
 
 // The active journey counts activity added after its starting offset.
@@ -96,7 +100,8 @@ export type JourneyAction =
   | { type: "use-imported"; date: string }
   | { type: "extend-route"; candidates: Place[]; upcomingCount?: number; appendCount?: number }
   | { type: "change-origin"; origin: Place; candidates: Place[] }
-  | { type: "dismiss-arrival" };
+  | { type: "dismiss-arrival" }
+  | { type: "dismiss-completion" };
 
 export function journeyReducer(state: JourneyState, action: JourneyAction): JourneyState {
   if (action.type === "demo-sync") {
@@ -115,8 +120,11 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
       routeOffsetMeters: state.routeOffsetMeters + historicalMeters,
       previousJourneys: [...action.history.map((journey) => ({ route: journey.route, meters: totalMeters(journey.days) })), ...state.previousJourneys],
     };
-    return journeyReducer(populated, { type: "import", reading: action.reading });
+    // Historical awards are visible without replaying old celebrations.
+    const historicalAwards = earnedCompletions(collectedStamps(populated).map((stamp) => stamp.city)).map((badge) => badge.id);
+    return journeyReducer({ ...populated, announcedCompletionIds: [...new Set([...state.announcedCompletionIds, ...historicalAwards])] }, { type: "import", reading: action.reading });
   }
+  if (action.type === "dismiss-completion") return { ...state, completionArrivals: state.completionArrivals.slice(1) };
   if (action.type === "dismiss-arrival") return { ...state, arrivals: state.arrivals.slice(1) };
   if (action.type === "change-origin") {
     if (state.route[0] && placeKey(action.origin) === placeKey(state.route[0])) return state;
@@ -127,6 +135,7 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
       routeOffsetMeters: totalMeters(state.days),
       previousJourneys: state.route.length ? [...state.previousJourneys, { route: state.route, meters: routeMeters(state) }] : state.previousJourneys,
       arrivals: [],
+      completionArrivals: [],
     };
     return reconcileJourney(moved, state.days, route, distinctPlaces([...state.candidates, ...action.candidates]));
   }
@@ -164,12 +173,18 @@ function reconcileJourney(state: JourneyState, days: Day[], route: City[], candi
   const reached = arrivedCities(route, Math.max(0, totalMeters(days) - state.routeOffsetMeters));
   const newArrivals = reached
     .filter((city) => !state.announcedCityIds.includes(city.id));
-  return {
+  const updated = {
     ...state,
     days,
     route,
     candidates,
     announcedCityIds: [...state.announcedCityIds, ...newArrivals.map((city) => city.id)],
     arrivals: [...state.arrivals.filter((city) => reached.some((current) => current.id === city.id)), ...newArrivals],
+  };
+  const earned = earnedCompletions(collectedStamps(updated).map((stamp) => stamp.city));
+  const newAwards = earned.filter((badge) => !state.announcedCompletionIds.includes(badge.id));
+  return { ...updated,
+    announcedCompletionIds: [...state.announcedCompletionIds, ...newAwards.map((badge) => badge.id)],
+    completionArrivals: [...state.completionArrivals.filter((badge) => earned.some((current) => current.id === badge.id)), ...newAwards],
   };
 }
