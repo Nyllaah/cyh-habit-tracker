@@ -141,7 +141,7 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
 
   return (
     <div className="interactive-map">
-      <MapCityDiscovery api={api} country={placeCountry(fullRoute[0])} frontier={fullRoute[fullRoute.length - 1]} catalog={catalog} onDiscover={onDiscoverCities} />
+      <MapCityDiscovery api={api} country={placeCountry(fullRoute[0])} route={fullRoute} catalog={catalog} onDiscover={onDiscoverCities} />
       <div ref={container} className="journey-map" role="region" aria-label={`Interactive journey map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
       <div className="map-framing">
         {country && <button type="button" onClick={showCountry} disabled={!api} aria-label={`Show ${country.properties.name} map`}>{country.properties.name}<span aria-hidden="true">↗</span></button>}

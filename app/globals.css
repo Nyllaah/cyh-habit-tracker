@@ -380,3 +380,6 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 }
 
 .completion-current { justify-self: center; padding: 3px 9px; border-radius: 999px; background: #D1E8E0; color: var(--ink); font-size: 10px; line-height: 1.4; }
+
+.route-status p { margin: 0; }
+.route-retry { min-height: 44px; margin-top: 8px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 700; }
