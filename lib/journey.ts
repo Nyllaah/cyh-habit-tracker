@@ -48,8 +48,13 @@ export type JourneyState = {
   previousJourneys: { route: City[]; meters: number }[];
 };
 
-export function initialJourney(days: Day[], route: City[], candidates: Place[] = route): JourneyState {
-  return { days, route, candidates, routeOffsetMeters: 0, previousJourneys: [], announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
+export type PastJourney = { days: Day[]; route: City[] };
+
+export function initialJourney(days: Day[], route: City[], candidates: Place[] = route, history: PastJourney[] = []): JourneyState {
+  const previousJourneys = history.map((journey) => ({ route: journey.route, meters: totalMeters(journey.days) }));
+  // Older journeys populate the same history without spending their distance twice.
+  const allDays = [...history.flatMap((journey) => journey.days), ...days].sort((a, b) => a.date.localeCompare(b.date));
+  return { days: allDays, route, candidates, routeOffsetMeters: previousJourneys.reduce((sum, journey) => sum + journey.meters, 0), previousJourneys, announcedCityIds: arrivedCities(route, totalMeters(days)).map((city) => city.id), arrivals: [] };
 }
 
 // Completed checkpoints consume distance; only the unfinished leg moves to a new origin.

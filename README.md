@@ -38,8 +38,7 @@ chooses the origin; it does not measure walks. City-to-city distances are straig
 segments on an illustrated map, not walking directions. Browser geolocation needs
 permission and a secure context (localhost works).
 
-The demo uses a fixed November 22, 2026 sample day, with three recorded days and an on-demand health reading. Earlier
-dates are unrecorded, and refreshing resets local state. Native health access,
+The demo uses a fixed November 22, 2026 sample day, with August–November activity from a completed Brazil journey, three days on the current Washington route, and an on-demand health reading. Lifetime distance and both history views use those same records. Refreshing resets local state. Native health access,
 persistence, authentication, and payments are outside the current implementation.
 
 Run `npm test`, `npm run lint`, and `npm run build` for verification. The complete

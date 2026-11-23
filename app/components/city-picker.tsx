@@ -17,7 +17,7 @@ export function CityPicker({ catalog, carryLabel, onSelect, onClose }: Props) {
   const [result, setResult] = useState<{ query: string; places: Place[]; saved: boolean } | null>(null);
   const [busy, setBusy] = useState<"search" | "location" | "route" | null>(null);
   const [message, setMessage] = useState("");
-  const featured = catalog.filter((place) => ["Washington", "New York", "Boston", "Seattle", "San Francisco"].includes(place.name));
+  const featured = catalog.filter((place) => ["Washington", "New York", "Boston", "Seattle", "San Francisco", "Brasília", "Goiânia"].includes(place.name));
   const local = query.trim() ? searchLocalPlaces(catalog, query) : featured;
   const matches = result?.query === query ? result.places : local;
 

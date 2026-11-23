@@ -13,6 +13,7 @@ export type City = Place & { cumulativeMeters: number };
 const regionCodes: Record<string, string> = {
   "District of Columbia": "DC", Virginia: "VA", "New York": "NY",
   "New Jersey": "NJ", Massachusetts: "MA", Washington: "WA", California: "CA",
+  "Federal District": "DF", "Distrito Federal": "DF", Goiás: "GO",
 };
 
 export function regionCode(region: string): string {
@@ -98,6 +99,6 @@ export function passportPreview(route: City[], meters: number): City[] {
 }
 
 export function cityArtwork(place: Place): string {
-  const known = ["washington", "alexandria", "occoquan", "fredericksburg", "richmond"];
+  const known = ["washington", "alexandria", "occoquan", "fredericksburg", "richmond", "brasilia", "goiania"];
   return known.includes(place.artwork ?? place.id) ? (place.artwork ?? place.id) : "generic-city";
 }

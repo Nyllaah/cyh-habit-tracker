@@ -24,7 +24,7 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
 }
 
 export default function Page() {
-  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route, catalog));
+  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route, catalog, sample.previousJourneys));
   const [syncing, setSyncing] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
   const [unit, setUnit] = useState<DistanceUnit>("metric");

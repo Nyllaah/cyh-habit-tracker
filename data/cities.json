@@ -1,5 +1,5 @@
 {
-  "attribution": "Sample place data: \u00a9 OpenStreetMap contributors via Photon; DC corridor coordinates: US Census",
+  "attribution": "Sample place data: © OpenStreetMap contributors via Photon; DC corridor coordinates: US Census; Brasília approximate city-center coordinates: IBGE Brazil in Figures / Statistical Yearbook",
   "license": "OpenStreetMap data: ODbL 1.0",
   "source": "https://photon.komoot.io",
   "places": [
@@ -463,6 +463,68 @@
       "country": "US",
       "latitude": 40.9821371,
       "longitude": -73.6840902
+    },
+    {
+      "id": "brasilia",
+      "name": "Brasília",
+      "region": "DF",
+      "country": "BR",
+      "latitude": -15.793889,
+      "longitude": -47.882778,
+      "artwork": "brasilia"
+    },
+    {
+      "id": "osm-R-334463",
+      "name": "Anápolis",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.3332828,
+      "longitude": -48.9525756
+    },
+    {
+      "id": "osm-R-334547",
+      "name": "Goiânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.680882,
+      "longitude": -49.2532691,
+      "artwork": "goiania"
+    },
+    {
+      "id": "osm-R-334525",
+      "name": "Luziânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.2535456,
+      "longitude": -47.9500276
+    },
+    {
+      "id": "osm-R-334565",
+      "name": "Formosa",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -15.5492443,
+      "longitude": -47.3301212
+    },
+    {
+      "id": "osm-R-334553",
+      "name": "Alexânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.0834049,
+      "longitude": -48.5077803
+    },
+    {
+      "id": "osm-R-334533",
+      "name": "Águas Lindas de Goiás",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -15.7392283,
+      "longitude": -48.2793357
     }
+  ],
+  "sources": [
+    "https://photon.komoot.io",
+    "https://anuario.ibge.gov.br/images/aeb/2024/s1/2_pdf/s1t1102.pdf"
   ]
 }

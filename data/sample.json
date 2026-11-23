@@ -71,5 +71,476 @@
       "country": "US",
       "artwork": "richmond"
     }
+  ],
+  "previousJourneys": [
+    {
+      "days": [
+        {
+          "date": "2026-08-01",
+          "importedMeters": 2454
+        },
+        {
+          "date": "2026-08-02",
+          "importedMeters": 2153
+        },
+        {
+          "date": "2026-08-03",
+          "importedMeters": 3618
+        },
+        {
+          "date": "2026-08-04",
+          "importedMeters": 5084
+        },
+        {
+          "date": "2026-08-05",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-08-06",
+          "importedMeters": 3205
+        },
+        {
+          "date": "2026-08-07",
+          "importedMeters": 4671
+        },
+        {
+          "date": "2026-08-08",
+          "importedMeters": 3093
+        },
+        {
+          "date": "2026-08-10",
+          "importedMeters": 4257
+        },
+        {
+          "date": "2026-08-11",
+          "importedMeters": 913
+        },
+        {
+          "date": "2026-08-12",
+          "importedMeters": 2379
+        },
+        {
+          "date": "2026-08-13",
+          "importedMeters": 3844
+        },
+        {
+          "date": "2026-08-14",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-08-15",
+          "importedMeters": 3732
+        },
+        {
+          "date": "2026-08-16",
+          "importedMeters": 3431
+        },
+        {
+          "date": "2026-08-17",
+          "importedMeters": 4896
+        },
+        {
+          "date": "2026-08-18",
+          "importedMeters": 1552
+        },
+        {
+          "date": "2026-08-19",
+          "importedMeters": 3018
+        },
+        {
+          "date": "2026-08-20",
+          "importedMeters": 4483
+        },
+        {
+          "date": "2026-08-21",
+          "importedMeters": 1139
+        },
+        {
+          "date": "2026-08-22",
+          "importedMeters": 4371
+        },
+        {
+          "date": "2026-08-23",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-08-24",
+          "importedMeters": 725
+        },
+        {
+          "date": "2026-08-25",
+          "importedMeters": 2191
+        },
+        {
+          "date": "2026-08-26",
+          "importedMeters": 3657
+        },
+        {
+          "date": "2026-08-27",
+          "importedMeters": 5122
+        },
+        {
+          "date": "2026-08-29",
+          "importedMeters": 5010
+        },
+        {
+          "date": "2026-08-30",
+          "importedMeters": 4709
+        },
+        {
+          "date": "2026-08-31",
+          "importedMeters": 1364
+        },
+        {
+          "date": "2026-09-01",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-09-02",
+          "importedMeters": 4296
+        },
+        {
+          "date": "2026-09-03",
+          "importedMeters": 951
+        },
+        {
+          "date": "2026-09-04",
+          "importedMeters": 2417
+        },
+        {
+          "date": "2026-09-05",
+          "importedMeters": 5649
+        },
+        {
+          "date": "2026-09-06",
+          "importedMeters": 5348
+        },
+        {
+          "date": "2026-09-07",
+          "importedMeters": 2004
+        },
+        {
+          "date": "2026-09-08",
+          "importedMeters": 3469
+        },
+        {
+          "date": "2026-09-09",
+          "importedMeters": 4935
+        },
+        {
+          "date": "2026-09-10",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-09-11",
+          "importedMeters": 3056
+        },
+        {
+          "date": "2026-09-12",
+          "importedMeters": 6288
+        },
+        {
+          "date": "2026-09-13",
+          "importedMeters": 1177
+        },
+        {
+          "date": "2026-09-14",
+          "importedMeters": 2643
+        },
+        {
+          "date": "2026-09-15",
+          "importedMeters": 4108
+        },
+        {
+          "date": "2026-09-17",
+          "importedMeters": 2229
+        },
+        {
+          "date": "2026-09-18",
+          "importedMeters": 3695
+        },
+        {
+          "date": "2026-09-19",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-09-20",
+          "importedMeters": 1816
+        },
+        {
+          "date": "2026-09-21",
+          "importedMeters": 3282
+        },
+        {
+          "date": "2026-09-22",
+          "importedMeters": 4747
+        },
+        {
+          "date": "2026-09-23",
+          "importedMeters": 1403
+        },
+        {
+          "date": "2026-09-24",
+          "importedMeters": 2868
+        },
+        {
+          "date": "2026-09-25",
+          "importedMeters": 4334
+        },
+        {
+          "date": "2026-09-26",
+          "importedMeters": 2756
+        },
+        {
+          "date": "2026-09-27",
+          "importedMeters": 2455
+        },
+        {
+          "date": "2026-09-28",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-09-29",
+          "importedMeters": 5386
+        },
+        {
+          "date": "2026-09-30",
+          "importedMeters": 2042
+        },
+        {
+          "date": "2026-10-01",
+          "importedMeters": 3507
+        },
+        {
+          "date": "2026-10-02",
+          "importedMeters": 4973
+        },
+        {
+          "date": "2026-10-03",
+          "importedMeters": 3396
+        },
+        {
+          "date": "2026-10-04",
+          "importedMeters": 3094
+        },
+        {
+          "date": "2026-10-06",
+          "importedMeters": 1215
+        },
+        {
+          "date": "2026-10-07",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-10-08",
+          "importedMeters": 4147
+        },
+        {
+          "date": "2026-10-09",
+          "importedMeters": 802
+        },
+        {
+          "date": "2026-10-10",
+          "importedMeters": 4035
+        },
+        {
+          "date": "2026-10-11",
+          "importedMeters": 3733
+        },
+        {
+          "date": "2026-10-12",
+          "importedMeters": 5199
+        },
+        {
+          "date": "2026-10-13",
+          "importedMeters": 1854
+        },
+        {
+          "date": "2026-10-14",
+          "importedMeters": 3320
+        },
+        {
+          "date": "2026-10-15",
+          "importedMeters": 4786
+        },
+        {
+          "date": "2026-10-16",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-10-17",
+          "importedMeters": 4674
+        },
+        {
+          "date": "2026-10-18",
+          "importedMeters": 4372
+        },
+        {
+          "date": "2026-10-19",
+          "importedMeters": 1028
+        },
+        {
+          "date": "2026-10-20",
+          "importedMeters": 2493
+        },
+        {
+          "date": "2026-10-21",
+          "importedMeters": 3959
+        },
+        {
+          "date": "2026-10-22",
+          "importedMeters": 5425
+        },
+        {
+          "date": "2026-10-23",
+          "importedMeters": 2080
+        },
+        {
+          "date": "2026-10-25",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-10-26",
+          "importedMeters": 1667
+        },
+        {
+          "date": "2026-10-27",
+          "importedMeters": 3132
+        },
+        {
+          "date": "2026-10-28",
+          "importedMeters": 4598
+        },
+        {
+          "date": "2026-10-29",
+          "importedMeters": 1254
+        },
+        {
+          "date": "2026-10-30",
+          "importedMeters": 2719
+        },
+        {
+          "date": "2026-10-31",
+          "importedMeters": 5952
+        },
+        {
+          "date": "2026-11-01",
+          "importedMeters": 840
+        },
+        {
+          "date": "2026-11-02",
+          "importedMeters": 2306
+        },
+        {
+          "date": "2026-11-03",
+          "importedMeters": 0
+        },
+        {
+          "date": "2026-11-04",
+          "importedMeters": 5237
+        },
+        {
+          "date": "2026-11-05",
+          "importedMeters": 1893
+        },
+        {
+          "date": "2026-11-06",
+          "importedMeters": 3358
+        },
+        {
+          "date": "2026-11-07",
+          "importedMeters": 6591
+        },
+        {
+          "date": "2026-11-08",
+          "importedMeters": 1479
+        },
+        {
+          "date": "2026-11-09",
+          "importedMeters": 2945
+        },
+        {
+          "date": "2026-11-10",
+          "importedMeters": 4411
+        },
+        {
+          "date": "2026-11-11",
+          "importedMeters": 1066
+        },
+        {
+          "date": "2026-11-13",
+          "importedMeters": 3997
+        },
+        {
+          "date": "2026-11-14",
+          "importedMeters": 7230
+        },
+        {
+          "date": "2026-11-15",
+          "importedMeters": 2118
+        },
+        {
+          "date": "2026-11-16",
+          "importedMeters": 3584
+        },
+        {
+          "date": "2026-11-17",
+          "importedMeters": 5050
+        },
+        {
+          "date": "2026-11-18",
+          "importedMeters": 1708
+        }
+      ],
+      "route": [
+        {
+          "id": "brasilia",
+          "name": "Brasília",
+          "region": "DF",
+          "country": "BR",
+          "latitude": -15.793889,
+          "longitude": -47.882778,
+          "artwork": "brasilia",
+          "cumulativeMeters": 0
+        },
+        {
+          "id": "osm-R-334565",
+          "name": "Formosa",
+          "region": "GO",
+          "country": "BR",
+          "latitude": -15.5492443,
+          "longitude": -47.3301212,
+          "cumulativeMeters": 65122
+        },
+        {
+          "id": "osm-R-334553",
+          "name": "Alexânia",
+          "region": "GO",
+          "country": "BR",
+          "latitude": -16.0834049,
+          "longitude": -48.5077803,
+          "cumulativeMeters": 204412
+        },
+        {
+          "id": "osm-R-334463",
+          "name": "Anápolis",
+          "region": "GO",
+          "country": "BR",
+          "latitude": -16.3332828,
+          "longitude": -48.9525756,
+          "cumulativeMeters": 259436
+        },
+        {
+          "id": "osm-R-334547",
+          "name": "Goiânia",
+          "region": "GO",
+          "country": "BR",
+          "latitude": -16.680882,
+          "longitude": -49.2532691,
+          "artwork": "goiania",
+          "cumulativeMeters": 309652
+        }
+      ]
+    }
   ]
 }

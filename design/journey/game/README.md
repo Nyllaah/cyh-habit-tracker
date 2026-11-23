@@ -39,7 +39,7 @@ Your rhythm follows the collection in the full-page study. Month is the default 
 
 The proposed intensity uses six equal distance bands from zero to the displayed period's maximum effective daily distance. One scale applies to the entire year in Year mode. Zero is neutral; future dates are outlined. Missing records must read as unrecorded, not inferred zero. Changed maxima may recolor a period; switching units cannot. Numbers and accessible names supply exact information alongside color. Streak counts and missed-day penalties are not introduced.
 
-`history-sample.json` is an independent visual fixture ending November 22, 2026. It demonstrates a populated history rather than reconciled lifetime journey totals. The runtime uses the short account in `data/sample.json` for both journey and history; this longer visual fixture is not loaded by the application. Actual views must derive from the same corrected daily records. The contribution-grid layout follows the requested yearly direction; detailed scale and interaction behavior remain review proposals.
+`history-sample.json` is an independent visual fixture ending November 22, 2026. It demonstrates a populated history rather than reconciled lifetime journey totals. Runtime history now uses the reconciled August–November account in `data/sample.json`, including a completed Brazil journey and the current Washington route; this independent visual fixture is not loaded by the application. Actual views must derive from the same corrected daily records. The contribution-grid layout follows the requested yearly direction; detailed scale and interaction behavior remain review proposals.
 
 ## Implementation handoff
 
@@ -78,3 +78,7 @@ remain design references rather than screenshots of the running app.
 All artwork is original SVG geometry created for the project. No stock art or generated raster model output is included. PNGs were rendered from the SVGs using librsvg/Cairo and visually inspected. City motifs are symbolic illustrations, not official seals. The application uses the finished assets directly and requires no Python tooling.
 
 The previous travel-journal study remains in the parent directory for comparison. This proposal is not yet an approved implementation reference.
+
+## Country expansion
+
+The populated account includes original Brasília and Goiânia motifs. Brasília references the National Congress towers and bowls; Goiânia uses symbolic Art Deco architecture rather than a named attraction. Washington references the Washington Monument. The remaining original motifs are city-inspired architecture or bridge illustrations, not verified replicas or landmark locations. Stamps place artwork at the city level, not at a tourist attraction’s coordinates. New city data is credited in `data/cities.json`; Brasília uses approximate city-center coordinates from IBGE’s capital tables.
