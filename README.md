@@ -23,7 +23,8 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - The page opens before Alexandria is reached. Tap the sync icon beside Health Connect when ready to simulate a Health Connect reading and unlock its stamp. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
-- Explore the monthly calendar, swipe through the yearly grid, and expand the passport inline.
+- Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
+- Explore the populated monthly calendar, swipe through the yearly grid, and expand the passport inline.
 
 ## How it works
 
@@ -35,7 +36,7 @@ activity records. There is no backend or separate history store.
 
 City lookup uses Photon with a four-second timeout and a local fallback. Location
 chooses the origin; it does not measure walks. City-to-city distances are straight-line
-segments on an illustrated map, not walking directions. Browser geolocation needs
+virtual segments on a geographic map, not walking directions. Leaflet supplies map interaction; OpenStreetMap street tiles need no key. Local US/Brazil outlines and route markers remain available if tiles fail. Browser geolocation needs
 permission and a secure context (localhost works).
 
 The demo uses a fixed November 22, 2026 sample day, with August–November activity from a completed Brazil journey, three days on the current Washington route, and an on-demand health reading. Lifetime distance and both history views use those same records. Refreshing resets local state. Native health access,
@@ -138,3 +139,5 @@ skip the write-up, that's how I get a feel for the way you think.
 Jamieson
 
 </details>
+
+Map sources and the Leaflet license are documented in the [asset handoff](design/journey/game/README.md#country-expansion).

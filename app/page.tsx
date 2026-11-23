@@ -90,7 +90,7 @@ export default function Page() {
           <JourneyMap route={state.route} meters={meters} />
           <p className="traveled"><Icon name="footsteps" />{formatDistance(totalMeters(state.days), unit)} traveled</p>
         </div>
-        <p className="city-credit map-credit">City data: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a></p>
+        <p className="city-credit map-credit">Virtual journey · straight-line distances</p>
       </section>
 
       <section className="today-card" aria-labelledby="today-title">

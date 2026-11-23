@@ -13,12 +13,14 @@
     "test": "node --experimental-strip-types --experimental-test-isolation=none --test tests/*.test.mjs"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

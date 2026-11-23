@@ -101,8 +101,6 @@ button.origin .origin-name { min-width: 0; overflow-wrap: anywhere; }
 button.origin .origin-chevron { width: 16px; height: 16px; }
 .destination-heading > div { min-width: 0; }
 .destination-heading h2 { overflow-wrap: anywhere; }
-.map-place-label { display: inline-block; max-width: 100%; padding: 6px 12px; border-radius: 14px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); font-size: 11px; font-weight: 700; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
-.map-place-next { background: var(--ink); color: var(--surface); }
 .city-stamp { position: relative; margin: 0; width: 100%; aspect-ratio: 144 / 184; }
 .city-stamp > svg { display: block; width: 100%; height: auto; }
 .city-stamp figcaption { position: absolute; left: 9%; right: 9%; bottom: 6%; text-align: center; }
@@ -201,3 +199,32 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
   .arrival-dialog .primary-button { margin-top: 20px; }
   .arrival-count { margin-top: 16px; }
 }
+
+/* The map contains its panes so markers never cover sheets or page controls. */
+.map-container { isolation: isolate; }
+.interactive-map { position: relative; z-index: 0; background: #DDEEE7; }
+.interactive-map .journey-map { height: 358px; aspect-ratio: auto; font-family: inherit; background: #DDEEE7; }
+.traveled { z-index: 1; bottom: 19px; pointer-events: none; }
+.map-framing, .map-zoom { position: absolute; z-index: 1000; display: flex; gap: 6px; }
+.map-framing { left: 12px; right: 12px; top: 12px; justify-content: space-between; pointer-events: none; }
+.map-framing button, .map-zoom button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1px solid #BCD7CD; border-radius: 14px; background: var(--surface); color: var(--ink); font: inherit; font-size: 12px; font-weight: 700; box-shadow: 0 2px 4px rgb(16 63 60 / 8%); pointer-events: auto; }
+.map-framing button:disabled, .map-zoom button:disabled { opacity: .6; }
+.map-zoom { right: 12px; bottom: 42px; flex-direction: column; gap: 1px; }
+.map-zoom button { padding: 0; font-size: 24px; line-height: 1; }
+.map-zoom button:first-child { border-radius: 14px 14px 0 0; }
+.map-zoom button:last-child { border-radius: 0 0 14px 14px; }
+.map-network-status { position: absolute; z-index: 1000; left: 12px; bottom: 57px; max-width: calc(100% - 80px); padding: 5px 8px; border-radius: 8px; background: var(--surface); color: var(--muted); font-size: 10px; pointer-events: none; }
+.interactive-map .leaflet-control-attribution { color: var(--muted); background: var(--surface); font-size: 9px; padding: 2px 6px; }
+.interactive-map .leaflet-control-attribution a { color: var(--ink); }
+.map-city-marker { background: transparent; border: 0; }
+.map-city-marker img { display: block; width: 48px; height: 48px; filter: drop-shadow(0 3px 2px rgb(16 63 60 / 16%)); }
+.interactive-map .map-city-label { margin-top: 0; background: var(--surface); color: var(--ink); border: 1px solid #BCD7CD; border-radius: 8px; padding: 3px 7px; box-shadow: none; font-family: inherit; font-weight: 700; font-size: 11px; }
+.interactive-map .map-city-upcoming { border-color: var(--teal); }
+.interactive-map .leaflet-tooltip-bottom::before { border-bottom-color: #BCD7CD; }
+.interactive-map .leaflet-popup-content-wrapper { border-radius: 14px; font-family: inherit; color: var(--ink); }
+.interactive-map .leaflet-popup-content p { margin: 4px 0 0; }
+.interactive-map .leaflet-popup-close-button { width: 44px; height: 44px; display: grid; place-items: center; color: var(--ink); }
+.interactive-map .leaflet-popup-content { margin-right: 38px; }
+/* Country-scale markers stay legible when nearby cities converge. */
+.map-overview .map-city-marker img, .map-overview .leaflet-tooltip { visibility: hidden; }
+.map-overview .map-city-marker::after { content: ""; position: absolute; left: 19px; top: 38px; width: 10px; height: 10px; border: 2px solid var(--surface); border-radius: 50%; background: var(--teal); }

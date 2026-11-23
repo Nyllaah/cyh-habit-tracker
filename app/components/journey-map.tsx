@@ -1,58 +1,125 @@
-import { legProgress, type City } from "@/lib/journey";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type * as Leaflet from "leaflet";
+import type { FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import countries from "@/data/country-maps.json";
+import { type City } from "@/lib/journey";
 import { cityArtwork, routeWindow } from "@/lib/places";
+import { insideRing, journeyPosition } from "@/lib/map";
 
-const stops = [{ x: 91, y: 94 }, { x: 126, y: 200 }, { x: 270, y: 296 }];
-const curves = [
-  { d: "M91 94C15 135 40 180 126 200", a: stops[0], b: { x: 15, y: 135 }, c: { x: 40, y: 180 }, z: stops[1] },
-  { d: "M126 200C160 240 220 264 270 296", a: stops[1], b: { x: 160, y: 240 }, c: { x: 220, y: 264 }, z: stops[2] },
-];
+type MapApi = { map: Leaflet.Map; library: typeof Leaflet };
+const outlines = countries as FeatureCollection<Polygon | MultiPolygon, { code: string; name: string }>;
 
-function pointOnCurve(index: number, t: number) {
-  const { a, b, c, z } = curves[index];
-  const u = 1 - t;
-  return {
-    x: u ** 3 * a.x + 3 * u ** 2 * t * b.x + 3 * u * t ** 2 * c.x + t ** 3 * z.x,
-    y: u ** 3 * a.y + 3 * u ** 2 * t * b.y + 3 * u * t ** 2 * c.y + t ** 3 * z.y,
-  };
+function countryForCity(city: City) {
+  return outlines.features.find((feature) => {
+    if (city.country) return feature.properties.code === city.country;
+    const polygons = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
+    return polygons.some((rings) => insideRing(city.longitude, city.latitude, rings[0]) && !rings.slice(1).some((ring) => insideRing(city.longitude, city.latitude, ring)));
+  });
 }
 
 export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters: number }) {
-  const route = routeWindow(fullRoute, meters);
-  const nextIndex = route.findIndex((city, index) => index > 0 && city.cumulativeMeters > meters);
-  const currentLeg = meters < route[1].cumulativeMeters ? 0 : 1;
-  const marker = pointOnCurve(currentLeg, legProgress(route, meters, currentLeg + 1));
+  const container = useRef<HTMLDivElement>(null);
+  const [api, setApi] = useState<MapApi | null>(null);
+  const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "offline">("loading");
+  const viewKey = useRef("");
+  const route = useMemo(() => routeWindow(fullRoute, meters), [fullRoute, meters]);
+  const country = countryForCity(fullRoute[0]);
+
+  useEffect(() => {
+    let disposed = false;
+    let map: Leaflet.Map | undefined;
+    let observer: ResizeObserver | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    import("leaflet").then((library) => {
+      if (disposed || !container.current) return;
+      viewKey.current = "";
+      map = library.map(container.current, { zoomSnap: 0.25, zoomControl: false, scrollWheelZoom: false, attributionControl: true, zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false });
+      const showOverviewMarkers = () => container.current?.classList.toggle("map-overview", (map?.getZoom() ?? 0) < 7);
+      map.on("zoomend", showOverviewMarkers);
+      map.attributionControl.setPrefix(false);
+      map.createPane("country").style.zIndex = "150";
+      library.geoJSON(outlines, { pane: "country", interactive: false, style: { color: "#69A99B", weight: 1.5, fillColor: "#CDE5CD", fillOpacity: 1 } }).addTo(map);
+      const tiles = library.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, minZoom: 2, keepBuffer: 0, updateWhenIdle: true,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://www.naturalearthdata.com/">Natural Earth</a>',
+      }).addTo(map);
+      let loaded = false;
+      const awaitTiles = () => {
+        loaded = false;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => { if (!disposed && !loaded) setTileStatus("offline"); }, 5000);
+      };
+      tiles.on("loading", awaitTiles);
+      tiles.on("tileload", () => {
+        if (disposed) return;
+        loaded = true;
+        clearTimeout(timeout);
+        setTileStatus("ready");
+      });
+      tiles.on("tileerror", () => { if (!disposed && !loaded) setTileStatus("offline"); });
+      awaitTiles();
+      observer = new ResizeObserver(() => map?.invalidateSize({ animate: false }));
+      observer.observe(container.current);
+      setApi({ map, library });
+    });
+    return () => { disposed = true; clearTimeout(timeout); observer?.disconnect(); map?.remove(); };
+  }, []);
+
+  useEffect(() => {
+    if (!api) return;
+    const { map, library: L } = api;
+    const layers = L.layerGroup().addTo(map);
+    const points = route.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    L.polyline(points, { color: "#FEFFFD", weight: 9, interactive: false }).addTo(layers);
+    L.polyline(points, { color: "#12786F", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
+    const position = journeyPosition(fullRoute, meters);
+    const reached = route.filter((city) => city.cumulativeMeters <= meters).map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    L.polyline([...reached, [position.latitude, position.longitude]], { color: "#12786F", weight: 5, interactive: false }).addTo(layers);
+    route.forEach((city) => {
+      const earned = city.cumulativeMeters <= meters;
+      const icon = L.divIcon({ className: "map-city-marker", html: `<img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt="">`, iconSize: [48, 48], iconAnchor: [24, 43] });
+      const marker = L.marker([city.latitude, city.longitude], { icon, title: city.name, alt: city.name, keyboard: true }).addTo(layers);
+      const label = document.createElement("span");
+      label.textContent = city.name;
+      marker.bindTooltip(label, { permanent: true, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
+      const content = document.createElement("div");
+      const title = document.createElement("strong"); title.textContent = city.name;
+      const status = document.createElement("p"); status.textContent = city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : "Up next";
+      content.append(title, status); marker.bindPopup(content);
+    });
+    L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
+    const key = `${fullRoute[0].id}|${route.map((city) => city.id).join("|")}`;
+    if (viewKey.current !== key) {
+      map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [50, 75], paddingBottomRight: [50, 85], maxZoom: 12, animate: false });
+      viewKey.current = key;
+    }
+    return () => { map.removeLayer(layers); };
+  }, [api, fullRoute, meters, route]);
+
+  function showRoute() {
+    if (!api) return;
+    api.map.fitBounds(api.library.latLngBounds(route.map((city) => [city.latitude, city.longitude])), { paddingTopLeft: [50, 75], paddingBottomRight: [50, 85], maxZoom: 12, animate: false });
+  }
+
+  function showCountry() {
+    if (!api || !country) return;
+    // Frame the contiguous US; Alaska and Hawaii remain available by panning.
+    const bounds: Leaflet.LatLngBoundsExpression = country.properties.code === "US" ? [[24, -125], [50, -66]] : [[-34, -74], [6, -34]];
+    api.map.fitBounds(bounds, { padding: [15, 45], animate: false });
+  }
+
   return (
-    <svg className="journey-map" viewBox="0 0 358 358" role="img" aria-label={`Illustrated journey from ${route[0].name} through ${route[1].name} to ${route[2].name}. Decorative geography, not walking directions.`}>
-      <rect width="358" height="358" rx="28" fill="#E2F0E9" />
-      <path d="M0 42Q28 6 93 31T203 17Q268 0 310 42T358 67V283Q317 267 263 324T118 335Q52 304 0 337Z" fill="#D4E9D7" />
-      <path d="M-10 225Q51 200 79 245T170 273T282 220T375 250" fill="none" stroke="#B8DFD7" strokeWidth="50" />
-      <path d="M-10 225Q51 200 79 245T170 273T282 220T375 250" fill="none" stroke="#8CCFC8" strokeWidth="32" />
-      <path d="M-10 220Q51 195 79 240T170 268T282 215T375 245" fill="none" stroke="#C9EAE0" strokeWidth="2" />
-      {[[27, 56], [38, 84], [269, 52], [291, 76], [306, 49], [39, 285], [58, 306], [320, 183], [303, 168], [202, 329], [224, 311], [177, 124], [196, 145]].map(([x, y]) => (
-        <image key={`${x}-${y}`} href="/journey/game/scenery/tree.svg" x={x - 10} y={y - 12} width="22" height="28" />
-      ))}
-      {[[123, 68], [144, 90], [21, 150], [255, 133], [275, 152], [65, 320]].map(([x, y]) => (
-        <image key={`${x}-${y}`} href="/journey/game/scenery/house.svg" x={x} y={y} width="29" height="28" />
-      ))}
-      {curves.map((curve, index) => (
-        <g key={curve.d}>
-          <path d={curve.d} fill="none" stroke="#B6CDB8" strokeWidth="13" strokeLinecap="round" />
-          <path d={curve.d} fill="none" stroke="#FEFFFD" strokeWidth="10" strokeLinecap="round" />
-          <path d={curve.d} fill="none" stroke="#81AB96" strokeWidth="2" strokeDasharray="1 8" strokeLinecap="round" />
-          <path d={curve.d} pathLength="1" fill="none" stroke="#12786F" strokeWidth="6" strokeLinecap="round" strokeDasharray="1" strokeDashoffset={1 - legProgress(route, meters, index + 1)} />
-        </g>
-      ))}
-      {stops.map((stop, index) => <circle key={index} cx={stop.x} cy={stop.y} r="8" fill={meters >= route[index].cumulativeMeters ? "#12786F" : "#FEFFFD"} stroke="#FEFFFD" strokeWidth="3" />)}
-      <image href={`/journey/game/cities/${cityArtwork(route[0])}.svg`} x="55" y="7" width="79" height="79" />
-      <image href={`/journey/game/cities/${cityArtwork(route[1])}.svg`} x="65" y="119" width="79" height="79" />
-      <image href={`/journey/game/cities/${cityArtwork(route[2])}.svg`} x="222" y="206" width="96" height="96" />
-      <foreignObject x="130" y="22" width="174" height="44"><div className="map-place-label">{route[0].name}{route[0].region && `, ${route[0].region}`}</div></foreignObject>
-      <foreignObject x="157" y="159" width="174" height="44"><div className={`map-place-label ${nextIndex === 1 ? "map-place-next" : ""}`}>{route[1].name}</div></foreignObject>
-      <foreignObject x="215" y="313" width="130" height="42"><div className={`map-place-label ${nextIndex === 2 ? "map-place-next" : ""}`}>{route[2].name}</div></foreignObject>
-      <image href="/journey/game/traveler.svg" x={marker.x - 17} y={marker.y - 32} width="34" height="39" />
-      <text x="18" y="337" fontSize="7" fill="#506E68" letterSpacing="1">ILLUSTRATED MAP</text>
-      <text x="329" y="27" textAnchor="middle" fontSize="9" fill="#506E68">N</text>
-      <path d="M329 44V33m-3 3 3-4 3 4" fill="none" stroke="#506E68" strokeWidth="1.3" />
-    </svg>
+    <div className="interactive-map">
+      <div ref={container} className="journey-map" role="region" aria-label={`Interactive journey map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
+      <div className="map-framing">
+        {country && <button type="button" onClick={showCountry} disabled={!api} aria-label={`Show ${country.properties.name} map`}>{country.properties.name}<span aria-hidden="true">↗</span></button>}
+        <button type="button" onClick={showRoute} disabled={!api} aria-label="Show current route"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="2" fill="currentColor" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" strokeWidth="2" /></svg></button>
+      </div>
+      <div className="map-zoom" role="group" aria-label="Map zoom">
+        <button type="button" aria-label="Zoom in" disabled={!api} onClick={() => api?.map.zoomIn(undefined, { animate: false })}>+</button>
+        <button type="button" aria-label="Zoom out" disabled={!api} onClick={() => api?.map.zoomOut(undefined, { animate: false })}>−</button>
+      </div>
+      {tileStatus !== "ready" && <p className="map-network-status" role="status">{tileStatus === "loading" ? "Loading streets…" : "Offline · country outline"}</p>}
+    </div>
   );
 }
