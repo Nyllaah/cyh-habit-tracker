@@ -79,6 +79,12 @@ html:has(dialog[open]) { overflow: hidden; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .total-sheet { position: fixed; inset: 0; margin: auto auto 0; border: 0; width: min(100%,440px); max-width: none; max-height: calc(100dvh - 16px); padding: 12px 24px max(20px,env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; border-radius: 28px 28px 0 0; background: var(--surface); color: var(--ink); }
 .total-sheet::backdrop { background: rgb(16 63 60 / 40%); }
+.total-sheet[open] { animation: sheet-enter 320ms cubic-bezier(.22,1,.36,1) both; }
+.total-sheet[open]::backdrop { animation: content-fade 240ms ease-out both; }
+.total-sheet[open].is-closing { animation: sheet-leave 200ms cubic-bezier(.7,0,.84,0) both; }
+.total-sheet[open].is-closing::backdrop { animation: content-fade 200ms ease-in reverse both; }
+@keyframes sheet-enter { from { transform: translateY(calc(100% + 16px)); } to { transform: translateY(0); } }
+@keyframes sheet-leave { from { transform: translateY(0); } to { transform: translateY(calc(100% + 16px)); } }
 .sheet-handle { width: 48px; height: 4px; background: var(--line); border-radius: 4px; margin: 0 auto 22px; }
 .sheet-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .sheet-heading h2 { font-size: 27px; font-weight: 800; letter-spacing: -.7px; }

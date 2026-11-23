@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import Image from "next/image";
 import { dateLabel } from "@/lib/history";
 import { entryValue, formatImportedDistance, parseDistanceEntry, type DistanceUnit } from "@/lib/distance";
+import { useSheetMotion } from "./use-sheet-motion";
 
 type Props = {
   date: string;
@@ -19,6 +20,8 @@ export function DailyTotalEditor({ date, today, meters, importedMeters, hasCorre
   const title = date === today ? "Today's total" : dateLabel(date, { month: "short", day: "numeric", year: "numeric" });
   const inputLabel = date === today ? "Today's total" : `${dateLabel(date, { month: "long", day: "numeric", year: "numeric" })} distance`;
   const dialog = useRef<HTMLDialogElement>(null);
+  const { closing, finish } = useSheetMotion();
+  const close = () => finish(onClose);
   const input = useRef<HTMLInputElement>(null);
   const [originalMeters] = useState(meters);
   const [value, setValue] = useState(() => entryValue(meters, unit));
@@ -58,20 +61,20 @@ export function DailyTotalEditor({ date, today, meters, importedMeters, hasCorre
       input.current?.focus();
       return;
     }
-    onSave(result);
+    finish(() => onSave(result));
   }
 
   return (
-    <dialog ref={dialog} className="total-sheet" aria-labelledby="total-title" aria-describedby="total-description" onKeyDown={containTab} onCancel={onClose} onClick={(event) => {
+    <dialog ref={dialog} className={`total-sheet${closing ? " is-closing" : ""}`} inert={closing} aria-labelledby="total-title" aria-describedby="total-description" onKeyDown={containTab} onCancel={(event) => { event.preventDefault(); close(); }} onClick={(event) => {
       if (event.target !== event.currentTarget) return;
       const bounds = event.currentTarget.getBoundingClientRect();
-      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
     }}>
       <form onSubmit={save} noValidate>
         <div className="sheet-handle" aria-hidden="true" />
         <div className="sheet-heading">
           <h2 id="total-title">{title}</h2>
-          <button type="button" className="icon-button" aria-label="Close daily total editor" onClick={onClose}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button>
+          <button type="button" className="icon-button" aria-label="Close daily total editor" onClick={close}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button>
         </div>
         <p id="total-description" className="sheet-description">Replaces the imported total</p>
         <label className="distance-input" htmlFor="daily-total">
@@ -81,9 +84,9 @@ export function DailyTotalEditor({ date, today, meters, importedMeters, hasCorre
         </label>
         {error && <p id="distance-error" className="input-error" role="alert">{error}</p>}
         <p className="imported-value">{importedMeters === undefined ? "Not synced yet" : `Imported: ${formatImportedDistance(importedMeters, unit)}`}</p>
-        {hasCorrection && importedMeters !== undefined && <button type="button" className="text-button" onClick={onUseImported}>Use imported total</button>}
+        {hasCorrection && importedMeters !== undefined && <button type="button" className="text-button" onClick={() => finish(onUseImported)}>Use imported total</button>}
         <button type="submit" className="primary-button">Save total</button>
-        <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
+        <button type="button" className="cancel-button" onClick={close}>Cancel</button>
       </form>
     </dialog>
   );

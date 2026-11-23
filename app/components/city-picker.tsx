@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useCallback, useMemo, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { discoverNearby, readStartingLocation, searchCities } from "@/lib/cities";
 import { distinctPlaces, searchLocalPlaces, type Place } from "@/lib/places";
+import { useSheetMotion } from "./use-sheet-motion";
 
 type Props = {
   catalog: Place[];
@@ -12,6 +13,7 @@ type Props = {
 
 export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const { closing, finish } = useSheetMotion();
   const requests = useRef({ id: 0, controller: null as AbortController | null });
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [query, setQuery] = useState("");
@@ -64,6 +66,13 @@ export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
     return () => { if (searchTimer.current) clearTimeout(searchTimer.current); };
   }, [query, runSearch]);
 
+  function close() {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    requests.current.id++;
+    requests.current.controller?.abort();
+    finish(onClose);
+  }
+
   function search(event: FormEvent) {
     event.preventDefault();
     void runSearch(query);
@@ -78,7 +87,11 @@ export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
       const place = origin ?? await readStartingLocation();
       if (id !== requests.current.id) return;
       const candidates = await discoverNearby(place, searchCatalog, signal);
-      if (id === requests.current.id && !onSelect(place, candidates)) setMessage("Nearby cities unavailable. Choose a saved city.");
+      if (id === requests.current.id) finish(() => {
+        const accepted = onSelect(place, candidates);
+        if (!accepted) setMessage("Nearby cities unavailable. Choose a saved city.");
+        return accepted;
+      });
     } catch {
       if (id === requests.current.id) setMessage("Location unavailable. Choose a city.");
     } finally {
@@ -95,13 +108,13 @@ export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
   }
 
   return (
-    <dialog ref={dialog} className="total-sheet city-sheet" aria-labelledby="city-picker-title" onCancel={onClose} onKeyDown={containTab} onClick={(event) => {
+    <dialog ref={dialog} className={`total-sheet city-sheet${closing ? " is-closing" : ""}`} inert={closing} aria-labelledby="city-picker-title" onCancel={(event) => { event.preventDefault(); close(); }} onKeyDown={containTab} onClick={(event) => {
       if (event.target !== event.currentTarget) return;
       const bounds = event.currentTarget.getBoundingClientRect();
-      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
     }}>
       <div className="sheet-handle" aria-hidden="true" />
-      <div className="sheet-heading"><h2 id="city-picker-title">Start somewhere</h2><button type="button" className="icon-button" aria-label="Close city picker" onClick={onClose}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button></div>
+      <div className="sheet-heading"><h2 id="city-picker-title">Start somewhere</h2><button type="button" className="icon-button" aria-label="Close city picker" onClick={close}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button></div>
       <p className="city-status">New journey · history and stamps kept</p>
       <button type="button" className="primary-button locate-button" disabled={busy === "location" || busy === "route"} onClick={() => choose()}><Image src="/journey/icons/locate.svg" width={22} height={22} alt="" />{busy === "location" ? "Finding your location…" : "Use my location"}</button>
       <form className="city-search" role="search" onSubmit={search}>
