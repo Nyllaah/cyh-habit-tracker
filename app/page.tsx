@@ -10,6 +10,7 @@ import { CompletionArrival } from "@/app/components/completion-arrival";
 import { Arrival } from "@/app/components/arrival";
 import { SegmentedControl } from "@/app/components/segmented-control";
 import { Passport } from "@/app/components/passport";
+import { rememberCity } from "@/lib/saved-cities";
 import { countryPassports, passportCollection } from "@/lib/passport";
 import { placeCountry } from "@/lib/countries";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
@@ -35,6 +36,7 @@ export default function Page() {
   const [unit, setUnit] = useState<DistanceUnit>("metric");
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const editing = editingDate !== null;
+  const [savedCities, setSavedCities] = useState<Place[]>([]);
   const [choosingCity, setChoosingCity] = useState(false);
   const [demoReading, setDemoReading] = useState<Day | null>(null);
   const [locating, setLocating] = useState(false);
@@ -97,11 +99,16 @@ export default function Page() {
     setChoosingCity(true);
   }
 
+  function saveCity(origin: Place) {
+    setSavedCities((cities) => rememberCity(cities, origin));
+  }
+
   function startJourney(origin: Place, candidates: Place[]): boolean {
-    if (state.route[0] && placeKey(origin) === placeKey(state.route[0])) { setChoosingCity(false); return true; }
+    if (state.route[0] && placeKey(origin) === placeKey(state.route[0])) { saveCity(origin); setChoosingCity(false); return true; }
     const action = { type: "change-origin" as const, origin, candidates };
     const started = journeyReducer(state, action);
     if (started === state) return false;
+    saveCity(origin);
     syncRequest.current++;
     syncInFlight.current = false;
     setSyncing(false);
@@ -186,7 +193,7 @@ export default function Page() {
 
       <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state)} currentCountry={currentCountry} />
 
-      {choosingCity && <CityPicker catalog={catalog} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
+      {choosingCity && <CityPicker catalog={catalog} savedCities={savedCities} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
       {editingDate && <DailyTotalEditor key={`editor-${editingDate}`} date={editingDate} today={sample.today} meters={editingDay ? effectiveMeters(editingDay) : 0} importedMeters={editingHasImport ? editingDay?.importedMeters : undefined} hasCorrection={editingDay?.manualOverrideMeters !== undefined} unit={unit}
         onSave={(meters) => { dispatch({ type: "correct-day", date: editingDate, meters }); setEditingDate(null); }}
         onUseImported={() => { dispatch({ type: "use-imported", date: editingDate }); setEditingDate(null); }}

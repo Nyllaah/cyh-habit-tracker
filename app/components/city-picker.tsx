@@ -1,15 +1,16 @@
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { useCallback, useMemo, useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { discoverNearby, readStartingLocation, searchCities } from "@/lib/cities";
-import { searchLocalPlaces, type Place } from "@/lib/places";
+import { distinctPlaces, searchLocalPlaces, type Place } from "@/lib/places";
 
 type Props = {
   catalog: Place[];
+  savedCities: Place[];
   onSelect: (origin: Place, candidates: Place[]) => boolean;
   onClose: () => void;
 };
 
-export function CityPicker({ catalog, onSelect, onClose }: Props) {
+export function CityPicker({ catalog, savedCities, onSelect, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const requests = useRef({ id: 0, controller: null as AbortController | null });
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -17,8 +18,8 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
   const [result, setResult] = useState<{ query: string; places: Place[]; saved: boolean } | null>(null);
   const [busy, setBusy] = useState<"search" | "location" | "route" | null>(null);
   const [message, setMessage] = useState("");
-  const featured = catalog.filter((place) => ["Washington", "New York", "Boston", "Seattle", "San Francisco", "Brasília", "Goiânia"].includes(place.name));
-  const local = query.trim() ? searchLocalPlaces(catalog, query) : featured;
+  const searchCatalog = useMemo(() => distinctPlaces([...savedCities, ...catalog]), [savedCities, catalog]);
+  const local = query.trim() ? searchLocalPlaces(searchCatalog, query) : savedCities;
   const matches = result?.query === query ? result.places : local;
 
   useEffect(() => {
@@ -46,16 +47,16 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
     const { id, signal } = begin();
     setBusy("search");
     try {
-      const found = await searchCities(searchQuery, catalog, signal);
+      const found = await searchCities(searchQuery, searchCatalog, signal);
       if (id !== requests.current.id) return;
       setResult({ query: searchQuery, ...found });
-      setMessage(found.saved ? (found.places.length ? "Offline · saved cities" : "Search unavailable. Try again.") : found.places.length ? "" : "No matches. Try another city.");
+      setMessage(found.saved ? (found.places.length ? "Offline results" : "Search unavailable. Try again.") : found.places.length ? "" : "No matches. Try another city.");
     } catch {
       // A newer request or closing the sheet cancels this one.
     } finally {
       if (id === requests.current.id) setBusy(null);
     }
-  }, [begin, catalog]);
+  }, [begin, searchCatalog]);
 
   useEffect(() => {
     if (query.trim().length < 2) return;
@@ -76,7 +77,7 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
     try {
       const place = origin ?? await readStartingLocation();
       if (id !== requests.current.id) return;
-      const candidates = await discoverNearby(place, catalog, signal);
+      const candidates = await discoverNearby(place, searchCatalog, signal);
       if (id === requests.current.id && !onSelect(place, candidates)) setMessage("Nearby cities unavailable. Choose a saved city.");
     } catch {
       if (id === requests.current.id) setMessage("Location unavailable. Choose a city.");
@@ -109,9 +110,9 @@ export function CityPicker({ catalog, onSelect, onClose }: Props) {
         <button type="submit" className="icon-button" aria-label="Search cities"><Image src="/journey/icons/search.svg" width={22} height={22} alt="" /></button>
       </form>
       <p className="city-status" role="status">{searching ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>
-      <p className="eyebrow city-results-label">{query.trim() ? "Cities" : "Saved cities"}</p>
+      {(query.trim() || savedCities.length > 0) && <p className="eyebrow city-results-label">{query.trim() ? "Cities" : "Saved cities"}</p>}
       <ul className="city-results" aria-busy={searching}>
-        {matches.slice(0, 8).map((place) => <li key={place.id}>
+        {(query.trim() ? matches.slice(0, 8) : matches).map((place) => <li key={place.id}>
           <button type="button" disabled={busy === "route" || busy === "location"} onClick={() => choose(place)}>
             <span className="city-result-icon"><Image src="/journey/icons/city.svg" width={22} height={22} alt="" /></span>
             <span><strong>{place.name}</strong><span className="city-region">{[place.region, place.country].filter(Boolean).join(", ")}</span></span>
