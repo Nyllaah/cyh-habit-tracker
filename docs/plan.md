@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** Implementation in progress. S1 and S2 are implemented. S3 starting-city selection, nearby routing, dynamic artwork, and checkpoint carry are implemented and validated. The monthly activity slice is implemented and validated; the yearly contribution grid is implemented and validated.
+**Status:** Implementation in progress. S1 and S2 are implemented. S3 starting-city selection, nearby routing, dynamic artwork, and checkpoint carry are implemented and validated. The monthly activity slice is implemented and validated; the yearly contribution grid is implemented and validated. Passport browsing and arrival refinement are implemented and validated. Final mobile polish and the independent review remain.
 
 This file is the feature's authoritative documentation. It holds requirements,
 product and technical decisions, rationale, open questions, implementation status,
@@ -157,6 +157,14 @@ when implementing and update that comparison artifact during visual integration.
 - Stamps include earned and future variants. Long city names need readable wrapping or an adjacent HTML label, not arbitrarily shrinking text.
 - Map labels, landmark choices, and the three-stop map window follow the route and progress. Known sample cities reuse their original motifs; other places use the generic skyline. Runtime stamp frames compose the existing motif with the actual city label and earned state, avoiding static sample text for unrelated places.
 
+### Passport and arrivals
+
+- Keep the passport preview to at most three unique places: the current origin, latest collected destination other than that origin, then upcoming stops. Before any arrival, upcoming places fill the available slots. When no future destination is available, other collected stamps fill the preview. The count represents distinct destination arrivals, excluding origin-only stamps and upcoming places.
+- A native inline disclosure reveals remaining stamps, with separate “More collected” and “Next discoveries” groups where needed. Do not repeat stamps already in the preview. Keep the control absent when everything is already visible. Disclosure changes only presentation; the reducer remains the source of earned and archived rewards.
+- The page derives one passport model in `lib/passport.ts` from the current route, corrected activity, and archived journeys, then passes that model to the collection. The same destination count appears in the arrival overlay. Collapsing the collection does not change progress, rewards, or the history view.
+- Keep the existing stamp motifs, perforated frames, and explicit Origin/Collected/Up next labels. Allow two caption lines at the same readable size, extending the frame to avoid artwork overlap. Preserve full place names in accessible labels and native name tooltips. Unknown cities keep the generic skyline.
+- Arrival uses the existing brief stamp animation and restrained orange/turquoise sparks. A native modal shows the actual city and next destination, focuses “Continue journey,” contains Tab focus, and supports Escape. On dismissal, restore the previous connected control, falling back to the health-sync button for an automatic first arrival. Queued arrivals are shown in route order once; corrections remove notices no longer earned. Reduced motion shows the final stamp immediately. No XP, reward currency, or separate passport route is introduced.
+
 ### Activity history
 
 - Add a monthly calendar after today's activity and before the passport, with one square per calendar day. A Month / Year switch offers a GitHub-style contribution grid: seven weekday rows and continuous week columns, with month labels across the top. The year never restarts into separate monthly calendars. The grid scrolls horizontally inside its own mobile container; the page itself stays within the viewport.
@@ -222,6 +230,12 @@ External assets and data require provenance. The local SVG artwork is original p
 26. WHEN Year is selected THEN a continuous contribution grid SHALL arrange days in seven weekday rows and week columns, with month labels and horizontal scrolling confined to the grid; selected dates SHALL expose their distance through the readout.
 27. WHILE a day is future or unrecorded THEN it SHALL NOT appear as confirmed zero activity.
 
+### S6: Browse the passport and celebrate arrivals
+
+29. WHEN the passport is collapsed THEN it SHALL show at most three unique stamps, and an inline disclosure SHALL expose remaining collected and known upcoming stamps without navigation or duplicates.
+30. WHEN distance or origin changes THEN the collection and destination count SHALL follow active correction and archived-stamp retention rules, excluding origin-only and future stamps from the arrival count.
+31. WHEN multiple destinations are newly reached THEN arrival notices SHALL appear in route order once, with focus contained in each modal and restored to a connected page control after dismissal.
+
 ## Design artifacts
 
 These are design studies awaiting visual review, not a claim that the application is implemented.
@@ -286,6 +300,10 @@ The repository carries [three project-local skills](skills.md), including source
 - Verification for yearly activity: all forty-two rule tests pass, lint passes, and production build passes. Tests verify complete unique date coverage for ordinary/leap years, a fifty-four-column year, month starts within continuous weeks, shared year-wide bands, corrected zero/missing/future distinctions, and keyboard navigation including year boundaries and leap-day clamping. Browser checks verify seven rows and twelve labels, 20px week/day spacing, selected-week reveal, selection retained across Month/Year changes, meter/mile labels without recoloring, zero correction surviving re-sync, imported-value restoration, every navigation key, automatic year changes with focus retained, year controls, leap-day selection, and horizontal wheel scrolling inside the strip. Measurements at 360px/390px/1024px show no horizontal page overflow, and view controls meet 44px targets. Reduced-motion switching works and no page runtime errors were observed. The existing complete monthly browser workflow still passes; the final yearly phone capture was visually inspected.
 - Yearly tradeoffs: dense year cells are 16px with 4px gaps, supporting an overview; Month remains the precise touch-selection view with large targets. All 365/366 day buttons render directly for readable code, with only the selected one in the Tab sequence. The demonstration account still contains four recorded days; older squares remain unrecorded rather than importing an inconsistent visual fixture. The strip reveals selection using its own scroll position and does not request vertical page scrolling.
 
+- Passport slice (S6): `lib/passport.ts` derives one unique preview, additional collected/upcoming groups, and a destination count from the existing journey state. `app/page.tsx` passes that model to `Passport`, whose native disclosure stays on the same page. `Arrival` is a separate presentation component using the reducer's existing queue; it does not issue rewards. Its Continue/Escape dismissal advances the queue and restores page focus. The stamp frame grows from 172 to 184 design units, leaving room for two-line captions without shrinking text. A short-height layout reduces arrival artwork/padding so the complete overlay remains reachable on small phones. No runtime dependencies or reward mechanics were added.
+- Verification for S6: all fifty-two rule tests pass, lint passes without warnings, and production build passes. Added tests cover the three-place preview before/after arrival, earlier collected stamps, future exclusions, duplicate-free archival browsing, destination counts, exhausted routes, correction/retention behavior, repeated origins, ordered arrival queues, discarded unearned notices, and no-disclosure cases. Browser checks cover mouse/Enter/Space disclosure, retained open state during a city change, archived badges after a zero correction, native-modal Tab containment, Escape and Continue dismissal, ordered multiple arrivals, focus restoration to the sync or edit control, no replay on sync/restoration, and reduced motion. Layout checks cover 360px/390px/1024px without horizontal page overflow, a 44px disclosure control, and a fully fitting arrival at 360×500. A normalized external-city fixture verifies that “San Juan Capistrano” fits two lines at 11px without artwork overlap and uses the generic motif. Arrival and expanded-collection phone captures were visually inspected; the yearly-history browser workflow also still passes. No page runtime errors were observed.
+- Passport tradeoffs: native disclosure and modal controls keep local presentation state small and browser behavior familiar. Only known route destinations appear as upcoming stamps; no speculative cities are fabricated. Origin-only stamps are preserved but remain excluded from the destination count. Arrival animation remains the existing 400ms stamp entrance, and reduced motion reveals its final state immediately.
+
 Test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. A fresh review follows implementation; record actual results rather than anticipated passes.
 
 No remote publishing or deployment is part of this phase.
@@ -303,7 +321,7 @@ No remote publishing or deployment is part of this phase.
 
 Before the affected behavior is implemented: daily target, if included; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance. Active-route stamps recalculate after corrections; stamps archived when changing origin remain collected. The mockup's numbers and DC corridor are illustrative fixtures.
 
-Implementation proceeds in the documented slices. Mobile polish and complete passport browsing remain part of the delivery sequence.
+Implementation proceeds in the documented slices. Final mobile polish and the independent review remain part of the delivery sequence.
 
 ## Sources
 

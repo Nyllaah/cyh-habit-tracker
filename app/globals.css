@@ -102,7 +102,7 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .destination-heading h2 { overflow-wrap: anywhere; }
 .map-place-label { display: inline-block; max-width: 100%; padding: 6px 12px; border-radius: 14px; background: var(--surface); color: var(--ink); font-family: var(--font-sans); font-size: 11px; font-weight: 700; line-height: 1.25; text-align: center; overflow-wrap: anywhere; }
 .map-place-next { background: var(--ink); color: var(--surface); }
-.city-stamp { position: relative; margin: 0; width: 100%; aspect-ratio: 144 / 172; }
+.city-stamp { position: relative; margin: 0; width: 100%; aspect-ratio: 144 / 184; }
 .city-stamp > svg { display: block; width: 100%; height: auto; }
 .city-stamp figcaption { position: absolute; left: 9%; right: 9%; bottom: 6%; text-align: center; }
 .stamp-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; font-size: 11px; font-weight: 700; line-height: 1.05; }
@@ -177,3 +177,26 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .year-day:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
 .year-day[aria-current="date"] { border-color: var(--ink); }
 .year-scroll-hint { margin: 8px 6px 0; text-align: right; font-size: 11px; color: var(--muted); }
+
+.passport-more { margin-top: 16px; }
+.passport-more summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 8px 6px; list-style: none; cursor: pointer; color: var(--teal); font-size: 14px; font-weight: 700; }
+.passport-more summary::-webkit-details-marker { display: none; }
+.passport-more summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
+.passport-more summary img { flex-shrink: 0; }
+.passport-collapse-label, .passport-more[open] .passport-expand-label { display: none; }
+.passport-more[open] .passport-collapse-label { display: inline; }
+.passport-more[open] summary img { transform: rotate(180deg); }
+.passport-extra { display: grid; gap: 24px; padding-top: 12px; }
+.passport-extra h3 { margin: 0 6px 16px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.arrival-dialog h2, .arrival-next { overflow-wrap: anywhere; }
+.arrival-count { margin-top: 24px; font-size: 12px; color: var(--muted); }
+.spark-three { right: 12px; top: 16px; color: var(--turquoise); font-size: 17px; }
+.spark-four { left: 20px; bottom: 12px; color: var(--turquoise); font-size: 17px; }
+@media (max-height: 650px) {
+  .arrival-dialog { padding: 20px 24px; }
+  .arrival-eyebrow { font-size: 22px; }
+  .arrival-art { padding: 12px 0; }
+  .arrival-art > .arrival-stamp { width: 132px; }
+  .arrival-dialog .primary-button { margin-top: 20px; }
+  .arrival-count { margin-top: 16px; }
+}

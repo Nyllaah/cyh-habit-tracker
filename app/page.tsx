@@ -6,12 +6,14 @@ import { JourneyMap } from "@/app/components/journey-map";
 import { DailyTotalEditor } from "@/app/components/daily-total-editor";
 import { ActivityHistory } from "@/app/components/activity-history";
 import { CityPicker } from "@/app/components/city-picker";
-import { CityStamp } from "@/app/components/city-stamp";
+import { Arrival } from "@/app/components/arrival";
+import { Passport } from "@/app/components/passport";
+import { passportCollection } from "@/lib/passport";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
 import { discoverNearby } from "@/lib/cities";
 import { placeKey } from "@/lib/places";
 import { readDemoHealth } from "@/lib/health";
-import { checkpointCarry, collectedStamps, routeForOrigin, routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters, type City } from "@/lib/journey";
+import { checkpointCarry, routeForOrigin, routeMeters, effectiveMeters, initialJourney, journeyReducer, nextCity, totalMeters } from "@/lib/journey";
 import { formatDistance, type DistanceUnit } from "@/lib/distance";
 
 const sample = getJourneySample();
@@ -21,40 +23,17 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
   return <Image className={`icon ${className}`} src={`/journey/icons/${name}.svg`} width={24} height={24} alt="" />;
 }
 
-function Arrival({ city, next, onContinue }: { city: City; next?: City; onContinue: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const element = dialog.current;
-    element?.showModal();
-    return () => element?.close();
-  }, []);
-  return (
-    <dialog ref={dialog} className="arrival-dialog" aria-labelledby="arrival-title" onCancel={onContinue}>
-      <p className="arrival-eyebrow">A new place. Yours.</p>
-      <div className="arrival-art">
-        <span className="spark spark-one" aria-hidden="true">✦</span>
-        <div className="arrival-stamp"><CityStamp city={city} earned /></div>
-        <span className="spark spark-two" aria-hidden="true">✦</span>
-      </div>
-      <h2 id="arrival-title">{city.name} unlocked</h2>
-      {next && <p className="arrival-next">Next stop: {next.name}</p>}
-      <button className="primary-button" onClick={onContinue}>Continue journey</button>
-    </dialog>
-  );
-}
-
 export default function Page() {
   const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route, catalog));
   const [syncing, setSyncing] = useState(true);
   const [unit, setUnit] = useState<DistanceUnit>("metric");
   const [editing, setEditing] = useState(false);
   const [choosingCity, setChoosingCity] = useState(false);
+  const syncButton = useRef<HTMLButtonElement>(null);
   const syncInFlight = useRef(true);
   const meters = routeMeters(state);
   const next = nextCity(state.route, meters);
-  const stamps = collectedStamps(state);
-  const arrivals = stamps.filter((stamp) => !stamp.origin);
-  const upcoming = state.route.slice(1).find((city) => city.cumulativeMeters > meters && !stamps.some((stamp) => placeKey(stamp.city) === placeKey(city)));
+  const collection = passportCollection(state);
   const today = state.days.find((day) => day.date === sample.today);
   const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
   const frontier = needsDestinations ? state.route[state.route.length - 1] : null;
@@ -130,20 +109,13 @@ export default function Page() {
         <Icon name="footsteps" className="today-footsteps" />
         <div className="health-row">
           <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
-          <button className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
+          <button ref={syncButton} className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
         </div>
       </section>
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} />
 
-      <section className="passport" aria-labelledby="passport-title">
-        <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivals.length} {arrivals.length === 1 ? "arrival" : "arrivals"}</p></div>
-        <ul className="stamp-grid">
-          {[...stamps, ...(upcoming ? [{ city: upcoming, origin: false, upcoming: true }] : [])].map((stamp) => (
-            <li key={placeKey(stamp.city)}><CityStamp city={stamp.city} earned={!("upcoming" in stamp)} origin={stamp.origin} /></li>
-          ))}
-        </ul>
-      </section>
+      <Passport collection={collection} />
 
       {choosingCity && <CityPicker catalog={catalog} carryLabel={`${formatDistance(checkpointCarry(state), unit)} carries over · stamps kept`}
         onSelect={(origin, candidates) => {
@@ -154,7 +126,7 @@ export default function Page() {
         onSave={(meters) => { dispatch({ type: "correct-day", date: sample.today, meters }); setEditing(false); }}
         onUseImported={() => { dispatch({ type: "use-imported", date: sample.today }); setEditing(false); }}
         onClose={() => setEditing(false)} />}
-      {!editing && !choosingCity && state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
+      {!editing && !choosingCity && state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} arrivalCount={collection.arrivalCount} fallbackFocus={syncButton} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
     </main>
   );
 }
