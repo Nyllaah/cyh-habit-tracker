@@ -1,0 +1,303 @@
+{
+  "sao-paulo": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -46.6333824,
+            -23.5506507
+          ]
+        },
+        "properties": {
+          "name": "São Paulo",
+          "state": "São Paulo",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 298285,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -54.936466,
+            -28.0225895
+          ]
+        },
+        "properties": {
+          "name": "São Paulo das Missões",
+          "state": "Rio Grande do Sul",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 242703,
+          "type": "city"
+        }
+      }
+    ]
+  },
+  "brasilia": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.9243896,
+            -15.8002187
+          ]
+        },
+        "properties": {
+          "name": "Sudoeste e Octogonal",
+          "state": "Federal District",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "town",
+          "osm_type": "R",
+          "osm_id": 3359488,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.9374426,
+            -15.7907819
+          ]
+        },
+        "properties": {
+          "name": "Cruzeiro",
+          "state": "Federal District",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "town",
+          "osm_type": "R",
+          "osm_id": 3359467,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.9764907,
+            -16.0686394
+          ]
+        },
+        "properties": {
+          "name": "Valparaíso de Goiás",
+          "state": "Goiás",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 334496,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.3301212,
+            -15.5492443
+          ]
+        },
+        "properties": {
+          "name": "Formosa",
+          "state": "Goiás",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 334565,
+          "type": "city"
+        }
+      }
+    ]
+  },
+  "formosa": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.3301212,
+            -15.5492443
+          ]
+        },
+        "properties": {
+          "name": "Formosa",
+          "state": "Goiás",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 334565,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.6089024,
+            -15.4571536
+          ]
+        },
+        "properties": {
+          "name": "Planaltina",
+          "state": "Goiás",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 334514,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.6555703,
+            -15.6181947
+          ]
+        },
+        "properties": {
+          "name": "Planaltina",
+          "state": "Federal District",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "city",
+          "osm_type": "R",
+          "osm_id": 3359478,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.0906,
+            -16.0297
+          ]
+        },
+        "properties": {
+          "name": "Cabeceira Grande",
+          "state": "Minas Gerais",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 315196,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -47.7824312,
+            -14.9803368
+          ]
+        },
+        "properties": {
+          "name": "Água Fria de Goiás",
+          "state": "Goiás",
+          "countrycode": "BR",
+          "osm_key": "place",
+          "osm_value": "municipality",
+          "osm_type": "R",
+          "osm_id": 334459,
+          "type": "city"
+        }
+      }
+    ]
+  },
+  "washington": {
+    "features": [
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.0363849,
+            38.8950982
+          ]
+        },
+        "properties": {
+          "name": "Washington",
+          "state": "District of Columbia",
+          "countrycode": "US",
+          "osm_key": "place",
+          "osm_value": "city",
+          "osm_type": "R",
+          "osm_id": 5396194,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.0841585,
+            38.8903961
+          ]
+        },
+        "properties": {
+          "name": "Arlington",
+          "state": "Virginia",
+          "countrycode": "US",
+          "osm_key": "place",
+          "osm_value": "city",
+          "osm_type": "N",
+          "osm_id": 158591999,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -76.9596981,
+            38.9364848
+          ]
+        },
+        "properties": {
+          "name": "Mount Rainier",
+          "state": "Maryland",
+          "countrycode": "US",
+          "osm_key": "place",
+          "osm_value": "town",
+          "osm_type": "R",
+          "osm_id": 133368,
+          "type": "city"
+        }
+      },
+      {
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -77.0470229,
+            38.8051095
+          ]
+        },
+        "properties": {
+          "name": "Alexandria",
+          "state": "Virginia",
+          "countrycode": "US",
+          "osm_key": "place",
+          "osm_value": "city",
+          "osm_type": "R",
+          "osm_id": 206637,
+          "type": "city"
+        }
+      }
+    ]
+  }
+}

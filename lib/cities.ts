@@ -12,11 +12,16 @@ export function normalizeCities(data: unknown, catalog: Place[]): Place[] {
   for (const feature of features) {
     const record = object(feature);
     const properties = object(record?.properties);
+    if (!properties) continue;
     const geometry = object(record?.geometry);
     const coordinates = geometry?.coordinates;
-    if (properties?.osm_key !== "place") continue;
+    const country = String(properties?.countrycode).toUpperCase();
+    const registryCountry = country === "BR" || country === "US";
+    const municipalRecord = registryCountry && properties?.type === "city"
+      && ((properties.osm_key === "place" && properties.osm_value === "municipality")
+        || (properties.osm_key === "boundary" && properties.osm_value === "administrative"));
     const settlementTypes = String(properties.countrycode).toUpperCase() === "US" ? ["city", "town", "village"] : ["city", "town"];
-    if (!settlementTypes.includes(String(properties.osm_value))) continue;
+    if (!municipalRecord && (properties?.osm_key !== "place" || !settlementTypes.includes(String(properties.osm_value)))) continue;
     if (typeof properties.name !== "string" || !properties.name.trim() || geometry?.type !== "Point" || !Array.isArray(coordinates)) continue;
     const [longitude, latitude] = coordinates;
     if (typeof longitude !== "number" || typeof latitude !== "number" || !Number.isFinite(latitude) || !Number.isFinite(longitude) || Math.abs(latitude) > 90 || Math.abs(longitude) > 180) continue;
