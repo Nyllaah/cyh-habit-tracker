@@ -6,9 +6,9 @@ All skill files were installed unchanged from revision `d0c46bfad8b1a428035beb91
 
 | Skill | Version | Attribution | Role in this project |
 | --- | --- | --- | --- |
-| [TLC spec lean](../.agents/skills/tlc-spec-lean/SKILL.md) | 3.2.0 | Tech Leads Club; CC BY 4.0 | Planning structure, behavioral criteria, incremental vertical delivery; planning phase only so far |
+| [TLC spec lean](../.agents/skills/tlc-spec-lean/SKILL.md) | 3.2.0 | Tech Leads Club; CC BY 4.0 | Feature specification, behavioral criteria, and incremental delivery structure |
 | [Frontend design](../.agents/skills/frontend-design/SKILL.md) | 1.0.0 | Impeccable / Paul Bakaus, based on Anthropic frontend-design; upstream Apache 2.0 | Playful journey design, hierarchy, concise labels, typography, motion guidance |
-| [Best practices](../.agents/skills/best-practices/SKILL.md) | 1.0 | web-quality-skills / Addy Osmani; MIT | Installed and inspected for future implementation and quality checks; no application audit has been completed |
+| [Best practices](../.agents/skills/best-practices/SKILL.md) | 1.0 | web-quality-skills / Addy Osmani; MIT | Security, browser compatibility, and code-quality review; reproduced findings corrected and verified |
 
 The catalog directory for `best-practices` is `(quality)/web-best-practices`; the skill's declared name remains `best-practices`. The local directory follows that declared name. The frontend skill includes all seven references; TLC includes all references, scripts, and its validation fixture.
 
@@ -16,7 +16,7 @@ The catalog directory for `best-practices` is `(quality)/web-best-practices`; th
 
 The challenge constraints in `AGENTS.md` and the project requirements take precedence over generic examples. Use the repository-local frontend skill for this project when another installed skill has the same name. Skills guide judgment; their examples are not application requirements.
 
-Keep the specification in [plan.md](plan.md) focused on technical requirements and decisions. The current design is a review proposal. Installation does not constitute a completed implementation or quality audit.
+Keep the specification in [plan.md](plan.md) focused on technical requirements and decisions. Implemented behavior, completed reviews, and validation are recorded there. Installing a skill does not itself establish that its checks have been completed.
 
 During implementation, verify framework guidance against the installed Next.js docs. In particular, do not copy the best-practices skill's third-party polyfill loader, fixed sample CSP nonce, or blanket geolocation-denial policy into this app. Use needed browser capabilities directly, preserve the explicit location action, and evaluate any headers in the actual framework context. Do not add authentication, analytics, or an error-tracking service just because an example uses one.
 
