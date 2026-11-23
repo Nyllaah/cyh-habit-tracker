@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject, type CSSProperties } from "react";
 import { CityStamp } from "@/app/components/city-stamp";
 import type { City } from "@/lib/journey";
 import { capitalKind } from "@/lib/places";
@@ -46,6 +46,15 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
     <dialog ref={dialog} className={`arrival-dialog${closing ? " is-closing" : ""}`} aria-labelledby="arrival-title"
       onCancel={(event) => { event.preventDefault(); dismiss(); }}
       onKeyDown={(event) => { if (event.key === "Tab") { event.preventDefault(); continueButton.current?.focus(); } }}>
+      <div className="arrival-confetti" aria-hidden="true">
+        {Array.from({ length: 28 }, (_, index) => <i key={index} style={{
+          left: `${(index * 37) % 100}%`,
+          backgroundColor: ["#EF8852", "#20B8A6", "#E8C36B", "#12786F"][index % 4],
+          animationDelay: `${index % 7 * 40}ms`,
+          "--drift": `${index % 2 ? 35 + index : -35 - index}px`,
+          "--turn": `${180 + index * 31}deg`,
+        } as CSSProperties} />)}
+      </div>
       <p className="arrival-eyebrow">{capital ? "Capital milestone" : "A new place. Yours."}</p>
       <div className="arrival-art">
         <span className="spark spark-one" aria-hidden="true">✦</span>

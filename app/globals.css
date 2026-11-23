@@ -287,3 +287,14 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .map-discovery-marker { display: grid; place-items: center; background: transparent; border: 0; }
 .map-discovery-marker span { display: block; width: 12px; height: 12px; border: 2px solid var(--surface); border-radius: 50%; background: #448F86; box-shadow: 0 1px 4px #103F3C40; }
 .map-discovery-marker:focus-visible { outline: 3px solid var(--orange); outline-offset: -5px; border-radius: 50%; }
+
+.arrival-confetti { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.arrival-confetti i { position: absolute; top: -12px; width: 6px; height: 11px; border-radius: 2px; animation: confetti-fall 1400ms cubic-bezier(.2,.55,.5,1) both; }
+.arrival-confetti i:nth-child(3n) { width: 8px; height: 8px; border-radius: 50%; }
+.arrival-dialog > :not(.arrival-confetti) { position: relative; }
+@keyframes confetti-fall {
+  0% { opacity: 0; transform: translate(0, -12px) rotate(0deg); }
+  8%, 80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--drift), 560px) rotate(var(--turn)); }
+}
+@media (prefers-reduced-motion: reduce) { .arrival-confetti { display: none; } }
