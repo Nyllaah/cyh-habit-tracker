@@ -9,11 +9,11 @@ const washington=sample.route[0];
 const ny=catalog.find(place=>place.name==='New York');
 const feature=(name='New York',state='New York',lon=-74.006,lat=40.7128)=>({type:'Feature',geometry:{type:'Point',coordinates:[lon,lat]},properties:{name,state,countrycode:'us',osm_key:'place',osm_value:'city',osm_type:'N',osm_id:123}});
 
-test('geographic distance uses city coordinates and round-once origin distances',()=>{
+test('geographic distance uses city coordinates and round-once meter segments',()=>{
  assert.equal(distanceMeters(sample.route[0],sample.route[1]),11117);
  assert.equal(distanceMeters(ny,ny),0);
  const route=routeFromOrigin(ny,catalog,12400);
- for(let i=1;i<route.length;i++) assert.equal(route[i].distanceFromOriginMeters,distanceMeters(route[0],route[i]));
+ for(let i=1;i<route.length;i++) assert.equal(route[i].cumulativeMeters-route[i-1].cumulativeMeters,distanceMeters(route[i-1],route[i]));
 });
 
 test('S3.14: choose nearest unvisited places with deterministic ties, not catalog order',()=>{
@@ -34,7 +34,7 @@ test('S3.14: route extension preserves its prefix, excludes visits, and keeps tw
  const extended=extendRoute(initial,catalog,30000);
  assert.deepEqual(extended.slice(0,initial.length),initial);
  assert.equal(new Set(extended.map(placeKey)).size,extended.length);
- assert.ok(extended.filter(city=>city.distanceFromOriginMeters>30000).length>=2);
+ assert.ok(extended.filter(city=>city.cumulativeMeters>30000).length>=2);
  assert.equal(initial.length,3);
  assert.equal(extendRoute(initial,[],30000).length,initial.length);
 });
@@ -94,8 +94,8 @@ test('cancelled city requests propagate cancellation rather than replacing newer
 
 test('map window follows progress and passport preview shows origin, latest arrival, next city',()=>{
  const route=sample.route;
- assert.deepEqual(routeWindow(route,12400).map(city=>city.id),['washington','occoquan','fredericksburg']);
- assert.deepEqual(routeWindow(route,80000).map(city=>city.id),['washington','richmond']);
+ assert.deepEqual(routeWindow(route,12400).map(city=>city.id),['washington','alexandria','occoquan']);
+ assert.deepEqual(routeWindow(route,80000).map(city=>city.id),['occoquan','fredericksburg','richmond']);
  assert.deepEqual(passportPreview(route,80000).map(city=>city.id),['washington','fredericksburg','richmond']);
  assert.equal(cityArtwork({id:'new-place',artwork:'../washington'}),'generic-city');
 });

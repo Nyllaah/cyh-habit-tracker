@@ -40,7 +40,7 @@ test('S3.28: changing origin resets progress even when leaving an unfinished che
   assert.equal(routeMeters(state), 11117);
   state = move(state, 'New York');
   assert.equal(routeMeters(state), 0);
-  const checkpoint = state.route[1].distanceFromOriginMeters;
+  const checkpoint = state.route[1].cumulativeMeters;
   state = journeyReducer(state, { type: 'correct-day', date: sample.today, meters: 1117 + checkpoint + 700 });
   assert.equal(routeMeters(state), checkpoint + 700);
   const earned = state.route[1];
@@ -52,7 +52,7 @@ test('S3.28: changing origin resets progress even when leaving an unfinished che
 
 test('S2/S3.28: corrections recalculate active stamps but retain archived rewards and never create negative progress', () => {
   let state = move(imported(), 'New York');
-  const checkpoint = state.route[1].distanceFromOriginMeters;
+  const checkpoint = state.route[1].cumulativeMeters;
   state = journeyReducer(state, { type: 'correct-day', date: sample.today, meters: 2400 + checkpoint });
   const activeStamp = state.route[1];
   assert.ok(collectedStamps(state).some(stamp => placeKey(stamp.city) === placeKey(activeStamp)));

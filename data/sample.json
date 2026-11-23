@@ -27,9 +27,9 @@
       "region": "DC",
       "latitude": 38.9042429,
       "longitude": -77.0165243,
+      "cumulativeMeters": 0,
       "country": "US",
-      "artwork": "washington",
-      "distanceFromOriginMeters": 0
+      "artwork": "washington"
     },
     {
       "id": "alexandria",
@@ -37,9 +37,9 @@
       "region": "VA",
       "latitude": 38.8188148,
       "longitude": -77.0832273,
+      "cumulativeMeters": 11117,
       "country": "US",
-      "artwork": "alexandria",
-      "distanceFromOriginMeters": 11117
+      "artwork": "alexandria"
     },
     {
       "id": "occoquan",
@@ -47,9 +47,9 @@
       "region": "VA",
       "latitude": 38.681729,
       "longitude": -77.2618611,
+      "cumulativeMeters": 32850,
       "country": "US",
-      "artwork": "occoquan",
-      "distanceFromOriginMeters": 32623
+      "artwork": "occoquan"
     },
     {
       "id": "fredericksburg",
@@ -57,9 +57,9 @@
       "region": "VA",
       "latitude": 38.2992718,
       "longitude": -77.4866583,
+      "cumulativeMeters": 79662,
       "country": "US",
-      "artwork": "fredericksburg",
-      "distanceFromOriginMeters": 78703
+      "artwork": "fredericksburg"
     },
     {
       "id": "richmond",
@@ -67,9 +67,9 @@
       "region": "VA",
       "latitude": 37.531399,
       "longitude": -77.4760085,
+      "cumulativeMeters": 165051,
       "country": "US",
-      "artwork": "richmond",
-      "distanceFromOriginMeters": 157842
+      "artwork": "richmond"
     }
   ],
   "previousJourneys": [
@@ -501,7 +501,7 @@
           "latitude": -15.793889,
           "longitude": -47.882778,
           "artwork": "brasilia",
-          "distanceFromOriginMeters": 0
+          "cumulativeMeters": 0
         },
         {
           "id": "osm-R-334565",
@@ -510,7 +510,7 @@
           "country": "BR",
           "latitude": -15.5492443,
           "longitude": -47.3301212,
-          "distanceFromOriginMeters": 65122
+          "cumulativeMeters": 65122
         },
         {
           "id": "osm-R-334553",
@@ -519,7 +519,7 @@
           "country": "BR",
           "latitude": -16.0834049,
           "longitude": -48.5077803,
-          "distanceFromOriginMeters": 74175
+          "cumulativeMeters": 204412
         },
         {
           "id": "osm-R-334463",
@@ -528,7 +528,7 @@
           "country": "BR",
           "latitude": -16.3332828,
           "longitude": -48.9525756,
-          "distanceFromOriginMeters": 129090
+          "cumulativeMeters": 259436
         },
         {
           "id": "osm-R-334547",
@@ -538,7 +538,7 @@
           "latitude": -16.680882,
           "longitude": -49.2532691,
           "artwork": "goiania",
-          "distanceFromOriginMeters": 176450
+          "cumulativeMeters": 309652
         }
       ]
     }

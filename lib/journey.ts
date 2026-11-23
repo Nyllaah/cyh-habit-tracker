@@ -25,16 +25,17 @@ export function mergeImport(days: Day[], reading: Day): Day[] {
 }
 
 export function arrivedCities(route: City[], meters: number): City[] {
-  return route.slice(1).filter((city) => meters >= city.distanceFromOriginMeters);
+  return route.slice(1).filter((city) => meters >= city.cumulativeMeters);
 }
 
 export function nextCity(route: City[], meters: number): City | undefined {
-  return route.slice(1).find((city) => city.distanceFromOriginMeters > meters);
+  return route.slice(1).find((city) => city.cumulativeMeters > meters);
 }
 
-export function cityProgress(route: City[], meters: number, endIndex: number): number {
-  const target = route[endIndex].distanceFromOriginMeters;
-  return target === 0 ? 1 : Math.min(1, Math.max(0, meters / target));
+export function legProgress(route: City[], meters: number, endIndex: number): number {
+  const start = route[endIndex - 1].cumulativeMeters;
+  const end = route[endIndex].cumulativeMeters;
+  return Math.min(1, Math.max(0, (meters - start) / (end - start)));
 }
 
 export type JourneyState = {
@@ -133,7 +134,7 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
     const candidates = distinctPlaces([...state.candidates, ...action.candidates]);
     const meters = routeMeters(state);
     const target = action.appendCount === undefined ? action.upcomingCount
-      : state.route.filter((city) => city.distanceFromOriginMeters > meters).length + Math.max(0, Math.min(12, Math.floor(action.appendCount)));
+      : state.route.filter((city) => city.cumulativeMeters > meters).length + Math.max(0, Math.min(12, Math.floor(action.appendCount)));
     const route = extendRoute(state.route, availableCandidates(state, candidates), meters, target);
     if (route.length === state.route.length && candidates.length === state.candidates.length) return state;
     return reconcileJourney(state, state.days, route, candidates);

@@ -5,7 +5,7 @@ import { getCityCatalog } from "@/lib/data";
 import { countryMaps, placeCountry } from "@/lib/countries";
 import { nextCity, type City, type Place } from "@/lib/journey";
 import { capitalKind, cityArtwork, routeWindow } from "@/lib/places";
-import { reachGeometry } from "@/lib/map";
+import { journeyPosition } from "@/lib/map";
 
 const catalog = getCityCatalog();
 
@@ -65,14 +65,16 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
     if (!api) return;
     const { map, library: L } = api;
     const layers = L.layerGroup().addTo(map);
-    const reach = reachGeometry(fullRoute, meters);
-    L.circle(reach.center, { className: "map-reach-area", radius: reach.radius, color: "#9BE5D0", weight: 2, fillColor: "#20B8A6", fillOpacity: .13, interactive: false }).addTo(layers);
-    L.polyline(reach.nextLine, { color: "#103F3C", weight: 9, interactive: false }).addTo(layers);
-    L.polyline(reach.nextLine, { className: "map-route-line", color: "#9BE5D0", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
+    const points = fullRoute.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    L.polyline(points, { color: "#103F3C", weight: 9, interactive: false }).addTo(layers);
+    L.polyline(points, { className: "map-route-line", color: "#9BE5D0", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
+    const position = journeyPosition(fullRoute, meters);
+    const reached = fullRoute.filter((city) => city.cumulativeMeters <= meters).map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
+    L.polyline([...reached, [position.latitude, position.longitude]], { color: "#20B8A6", weight: 5, interactive: false }).addTo(layers);
     const next = nextCity(fullRoute, meters);
     const landmarks: { marker: Leaflet.Marker; city: City; size: number; priority: number }[] = [];
     fullRoute.forEach((city) => {
-      const earned = city.distanceFromOriginMeters <= meters;
+      const earned = city.cumulativeMeters <= meters;
       const capital = capitalKind(city);
       const isNext = city === next;
       const icon = L.divIcon({
@@ -89,22 +91,17 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
       marker.bindTooltip(label, { interactive: true, permanent: isNext, direction: "bottom", offset: [0, isNext ? 28 : 22], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
       const content = document.createElement("div");
       const title = document.createElement("strong"); title.textContent = city.name;
-      const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.distanceFromOriginMeters === 0 ? "Origin" : earned ? "Collected" : isNext ? "Next discovery" : "Beyond your reach"}`;
+      const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : isNext ? "Up next" : "Later stop"}`;
       content.append(title, status);
-      if (city !== fullRoute[0]) {
-        const fromOrigin = document.createElement("p");
-        fromOrigin.textContent = `${(city.distanceFromOriginMeters / 1000).toLocaleString("en-US", { maximumFractionDigits: 2 })} km from ${fullRoute[0].name}`;
-        content.append(fromOrigin);
-      }
       if (!earned) {
         const distance = document.createElement("p");
         distance.className = "map-city-distance";
-        distance.textContent = `${((city.distanceFromOriginMeters - meters) / 1000).toLocaleString("en-US", { maximumFractionDigits: 2 })} km to go`;
+        distance.textContent = `${((city.cumulativeMeters - meters) / 1000).toLocaleString("en-US", { maximumFractionDigits: 2 })} km to go`;
         content.append(distance);
       }
       marker.bindPopup(content);
     });
-    L.circleMarker(reach.center, { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
+    L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
     // Keep the next stop and earned landmarks prominent. Nearby illustrations
     // become dots until zooming gives each icon enough screen space.
     const ranked = landmarks.slice().sort((a, b) => a.priority - b.priority);
@@ -121,7 +118,7 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
       }
     }
     map.on("moveend zoomend resize", spaceLandmarks);
-    const key = fullRoute[0].id;
+    const key = `${fullRoute[0].id}|${route.map((city) => city.id).join("|")}`;
     if (viewKey.current !== key) {
       map.fitBounds(L.latLngBounds(route.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude])), { paddingTopLeft: [50, 75], paddingBottomRight: [50, 85], maxZoom: 12, animate: false });
       viewKey.current = key;
@@ -145,10 +142,10 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
   return (
     <div className="interactive-map">
       <MapCityDiscovery api={api} country={placeCountry(fullRoute[0])} frontier={fullRoute[fullRoute.length - 1]} catalog={catalog} onDiscover={onDiscoverCities} />
-      <div ref={container} className="journey-map" role="region" aria-label={`Interactive reach map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
+      <div ref={container} className="journey-map" role="region" aria-label={`Interactive journey map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
       <div className="map-framing">
         {country && <button type="button" onClick={showCountry} disabled={!api} aria-label={`Show ${country.properties.name} map`}>{country.properties.name}<span aria-hidden="true">↗</span></button>}
-        <button type="button" onClick={showRoute} disabled={!api} aria-label="Show current reach"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="2" fill="currentColor" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" strokeWidth="2" /></svg></button>
+        <button type="button" onClick={showRoute} disabled={!api} aria-label="Show current route"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="2" fill="currentColor" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3" stroke="currentColor" strokeWidth="2" /></svg></button>
       </div>
       <div className="map-zoom" role="group" aria-label="Map zoom">
         <button type="button" aria-label="Zoom in" disabled={!api} onClick={() => api?.map.zoomIn(undefined, { animate: false })}>+</button>

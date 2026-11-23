@@ -1,20 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { reachGeometry } from '../lib/map.ts';
+import { journeyPosition } from '../lib/map.ts';
 import { insideRing } from '../lib/countries.ts';
 const sample = JSON.parse(readFileSync(new URL('../data/sample.json', import.meta.url)));
 const outlines = JSON.parse(readFileSync(new URL('../data/country-maps.json', import.meta.url)));
 
-test('reach geometry keeps the selected origin centered and only connects it to the next discovery', () => {
- const route=sample.route, center=[route[0].latitude,route[0].longitude];
- for(const meters of [0,route[1].distanceFromOriginMeters,99999999]){
-  const geometry=reachGeometry(route,meters);
-  assert.deepEqual(geometry.center,center);assert.equal(geometry.radius,meters);
-  if(geometry.nextLine.length)assert.deepEqual(geometry.nextLine[0],center);
- }
- assert.deepEqual(reachGeometry(route,route[1].distanceFromOriginMeters).nextLine[1],[route[2].latitude,route[2].longitude]);
- assert.deepEqual(reachGeometry(route,99999999).nextLine,[]);
+test('virtual map progress matches real city coordinates at checkpoints and interpolates within a leg', () => {
+  const route = sample.route;
+  const first = journeyPosition(route, 0);
+  assert.equal(first.latitude, route[0].latitude);
+  assert.equal(first.longitude, route[0].longitude);
+  const arrived = journeyPosition(route, route[1].cumulativeMeters);
+  assert.equal(arrived.latitude, route[1].latitude);
+  assert.equal(arrived.longitude, route[1].longitude);
+  const halfway = journeyPosition(route, route[1].cumulativeMeters / 2);
+  assert.equal(halfway.latitude, (route[0].latitude + route[1].latitude) / 2);
+  assert.equal(halfway.longitude, (route[0].longitude + route[1].longitude) / 2);
+  assert.strictEqual(journeyPosition(route, 99999999), route.at(-1));
 });
 
 test('offline outlines distinguish Brazil and US coordinates, including a GPS origin without a country code', () => {
