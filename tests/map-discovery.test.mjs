@@ -16,12 +16,12 @@ test('map lookup uses bounded center/radius queries and municipality validation,
  const features=['Fairfax','Fake Neighborhood'].map(name=>({geometry:{type:'Point',coordinates:[-77.3,38.85]},properties:{name,state:'Virginia',countrycode:'US',osm_key:'place',osm_value:'city'}}));
  const fetched=await discoverMapCities({...view,radiusKm:2000},[city('Alexandria',38.82,-77.08)],undefined,async url=>{seen=new URL(url);return Response.json({features});});
  assert.equal(seen.searchParams.get('radius'),'500');assert.equal(seen.searchParams.get('limit'),'40');assert.equal(seen.searchParams.get('lat'),'38.9');
- assert.deepEqual(fetched.map(p=>p.name),['Fairfax','Alexandria']);
+ assert.deepEqual(fetched.places.map(p=>p.name),['Fairfax','Alexandria']);assert.equal(fetched.source,'network');
 });
 
 test('map service failure preserves visible local cities and cancellation remains cancellable',async()=>{
  const saved=[city('Alexandria')];
- assert.deepEqual(await discoverMapCities(view,saved,undefined,async()=>{throw new Error('offline');}),saved);
+ assert.deepEqual(await discoverMapCities(view,saved,undefined,async()=>{throw new Error('offline');}),{places:saved,source:'local'});
  const controller=new AbortController();controller.abort();
  await assert.rejects(discoverMapCities(view,saved,controller.signal,async(_url,{signal})=>signal.throwIfAborted()));
 });
@@ -37,4 +37,9 @@ test('onward discovery queries the route endpoint rather than the viewport, with
  assert.deepEqual(await discoverRouteCities(tail,[city('Alexandria',38.82,-77.08)],undefined,async()=>{throw new Error('offline');}),[city('Alexandria',38.82,-77.08)]);
  const controller=new AbortController();controller.abort();
  await assert.rejects(discoverRouteCities(tail,[],controller.signal,async(_url,{signal})=>signal.throwIfAborted()));
+});
+
+test('viewport lookup distinguishes a retryable HTTP failure from a successful empty result',async()=>{
+ assert.deepEqual(await discoverMapCities(view,[],undefined,async()=>new Response(null,{status:503})),{places:[],source:'local'});
+ assert.deepEqual(await discoverMapCities(view,[],undefined,async()=>Response.json({features:[]})),{places:[],source:'network'});
 });

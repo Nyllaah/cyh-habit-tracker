@@ -138,7 +138,9 @@ export function citiesInView(places: Place[], view: MapCityView): Place[] {
     && (width >= 360 || (place.longitude - west + 360) % 360 <= width));
 }
 
-export async function discoverMapCities(view: MapCityView, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+export type MapCityResult = { places: Place[]; source: "network" | "local" };
+
+export async function discoverMapCities(view: MapCityView, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<MapCityResult> {
   const local = citiesInView(catalog, view);
   const url = cityUrl("/reverse");
   url.searchParams.set("lat", String(view.latitude));
@@ -146,9 +148,9 @@ export async function discoverMapCities(view: MapCityView, catalog: Place[], sig
   url.searchParams.set("radius", String(Math.min(500, Math.max(5, view.radiusKm))));
   url.searchParams.set("limit", "40");
   try {
-    return citiesInView([...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...local], view);
+    return { places: citiesInView([...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...local], view), source: "network" };
   } catch (error) {
     if (signal?.aborted) throw error;
-    return local;
+    return { places: local, source: "local" };
   }
 }

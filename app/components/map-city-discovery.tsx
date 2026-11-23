@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
-import { citiesInView, discoverMapCities, discoverRouteCities, type MapCityView } from "@/lib/cities";
+import { citiesInView, discoverMapCities, discoverRouteCities, type MapCityResult, type MapCityView } from "@/lib/cities";
 import { distinctPlaces, type Place } from "@/lib/places";
 
 type Props = {
@@ -26,15 +26,16 @@ export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }
     let popupOpen = false;
 
     function cancel() { version++; clearTimeout(timer); controller?.abort(); setLoading(false); }
-    async function cached(key: string, load: () => Promise<Place[]>, request: number) {
+    async function cached(key: string, load: () => Promise<MapCityResult>, request: number) {
       const saved = cache.current.get(key);
       if (saved) return saved;
-      const places = await load();
-      if (request === version) {
+      const result = await load();
+      // A fallback keeps the map usable, but must not suppress a later retry.
+      if (request === version && result.source === "network") {
         if (cache.current.size >= 32) cache.current.delete(cache.current.keys().next().value!);
-        cache.current.set(key, places);
+        cache.current.set(key, result.places);
       }
-      return places;
+      return result.places;
     }
     function refresh() {
       cancel();
