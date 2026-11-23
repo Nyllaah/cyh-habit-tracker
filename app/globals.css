@@ -135,3 +135,26 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .city-credit a:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .map-credit { margin: 7px 6px 0; }
 .route-status { margin: 8px 6px; font-size: 12px; color: var(--muted); }
+
+.activity-history { margin-top: 32px; }
+.activity-history .section-heading { margin-bottom: 14px; }
+.history-period { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.history-period h3 { margin: 0 auto 0 6px; font-size: 20px; letter-spacing: -.3px; }
+.previous-period { transform: rotate(180deg); }
+.calendar-weekdays, .calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.calendar-weekdays { margin-bottom: 8px; text-align: center; font-size: 12px; color: var(--muted); }
+.calendar-weekdays span { padding: 8px 0; }
+.calendar-week + .calendar-week { margin-top: 3px; }
+.calendar-day { display: grid; place-items: center; width: 100%; aspect-ratio: 1; min-height: 44px; border: 1px solid transparent; border-radius: 10px; background: #e2eae6; color: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
+.calendar-day.day-unrecorded { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
+.calendar-day.day-future { background: transparent; border-color: var(--line); color: var(--muted); }
+[aria-selected="true"] > .calendar-day { outline: 2px solid var(--ink); outline-offset: -3px; font-weight: 700; }
+.calendar-day:focus-visible { outline: 3px solid var(--teal); outline-offset: 0; position: relative; z-index: 1; }
+.calendar-day[aria-current="date"] { font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
+.history-legend { display: flex; align-items: center; gap: 5px; margin: 16px 6px; font-size: 11px; color: var(--muted); }
+.history-legend i { width: 17px; height: 17px; border-radius: 4px; }
+.history-legend span:first-child { margin-right: 9px; }
+.history-legend span:last-child { margin-left: 9px; }
+.legend-zero { background: #e2eae6; }
+.history-readout { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; min-height: 58px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); font-size: 14px; }
+.history-readout strong { font-size: 20px; letter-spacing: -.4px; }

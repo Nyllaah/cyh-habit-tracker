@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useReducer, useRef, useState } from "react";
 import { JourneyMap } from "@/app/components/journey-map";
 import { DailyTotalEditor } from "@/app/components/daily-total-editor";
+import { ActivityHistory } from "@/app/components/activity-history";
 import { CityPicker } from "@/app/components/city-picker";
 import { CityStamp } from "@/app/components/city-stamp";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
@@ -132,6 +133,8 @@ export default function Page() {
           <button className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
         </div>
       </section>
+
+      <ActivityHistory days={state.days} today={sample.today} unit={unit} />
 
       <section className="passport" aria-labelledby="passport-title">
         <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivals.length} {arrivals.length === 1 ? "arrival" : "arrivals"}</p></div>
