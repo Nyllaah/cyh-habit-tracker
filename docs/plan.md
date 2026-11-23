@@ -521,6 +521,8 @@ The repository carries [three project-local skills](skills.md), including source
 
 - Stable city-search drawer: reserve a 218px results area for three standard 72px rows and their dividers, plus consistent heading/status space. Longer result lists scroll independently instead of resizing the sheet. Empty headings remain visually and accessibly hidden while retaining layout space. Existing search ranking, saved-city behavior, and slide animations remain intact. Lint and production build pass. Chromium and WebKit verify identical drawer geometry for empty, loading, populated, no-match, unavailable, and cleared queries; extra matches remain reachable by scrolling. Checks at 320px, a 430px-high viewport, and desktop confirm viewport fit without horizontal overflow. No Axe WCAG 2 A/AA violations or page errors were observed; the empty phone drawer was visually inspected. Short screens retain outer-drawer scrolling for controls outside the visible area.
 
+- Passport heading refinement: Grand discoveries shares the country heading typography, color, uppercase treatment, spacing, and alignment. Heading semantics remain unchanged. Lint and production build pass; Chromium confirms identical computed heading styles, and the phone capture was visually inspected.
+
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
 No remote publishing or deployment is part of this phase.

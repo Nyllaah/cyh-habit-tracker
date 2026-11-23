@@ -39,7 +39,7 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
           </div>
         </details>}
         {selected.completion && <div className="passport-milestones" aria-label="State and country challenges">
-          <h3>Grand discoveries</h3>
+          <h3 className="passport-country-title">Grand discoveries</h3>
           <div className="completion-grid">
             {regionChallenge && <CompletionBadge badge={regionChallenge} current={isCurrentCountry} />}
             <CompletionBadge badge={selected.completion.country} current={isCurrentCountry} />
