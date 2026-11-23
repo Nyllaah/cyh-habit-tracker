@@ -102,8 +102,12 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
   if (action.type === "demo-sync") {
     if (!state.route.length) return state;
     if (state.demoHistoryLoaded) return journeyReducer(state, { type: "import", reading: action.reading });
-    // Existing records win over the backfill, including any manual correction.
-    const byDate = new Map([...action.history.flatMap((journey) => journey.days), ...state.days].map((day) => [day.date, day]));
+    // Load source values while preserving corrections entered before first sync.
+    const byDate = new Map(action.history.flatMap((journey) => journey.days).map((day) => [day.date, day]));
+    for (const day of state.days) {
+      const historical = byDate.get(day.date);
+      byDate.set(day.date, historical ? { ...day, importedMeters: historical.importedMeters } : day);
+    }
     const days = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
     const historicalMeters = totalMeters(days) - totalMeters(state.days);
     const populated = {

@@ -21,6 +21,7 @@ import { formatDistance, type DistanceUnit } from "@/lib/distance";
 const sample = getJourneySample();
 const catalog = getCityCatalog();
 const demoHistory = [...sample.previousJourneys, { days: sample.days, route: sample.route }];
+const importedHistoryDates = new Set(demoHistory.flatMap((journey) => journey.days.map((day) => day.date)));
 
 function Icon({ name, className = "" }: { name: string; className?: string }) {
   return <Image className={`icon ${className}`} src={`/journey/icons/${name}.svg`} width={24} height={24} alt="" />;
@@ -31,7 +32,8 @@ export default function Page() {
   const [syncing, setSyncing] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
   const [unit, setUnit] = useState<DistanceUnit>("metric");
-  const [editing, setEditing] = useState(false);
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const editing = editingDate !== null;
   const [choosingCity, setChoosingCity] = useState(false);
   const [demoReading, setDemoReading] = useState<Day | null>(null);
   const [locating, setLocating] = useState(false);
@@ -44,6 +46,8 @@ export default function Page() {
   const next = nextCity(state.route, meters);
   const currentCountry = state.route[0] ? placeCountry(state.route[0]) : undefined;
   const collection = passportCollection(state, currentCountry);
+  const editingDay = state.days.find((day) => day.date === editingDate);
+  const editingHasImport = editingDate === sample.today ? hasSynced : state.demoHistoryLoaded && importedHistoryDates.has(editingDate ?? "");
   const today = state.days.find((day) => day.date === sample.today);
   const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
   const frontier = needsDestinations ? state.route[state.route.length - 1] : null;
@@ -156,7 +160,7 @@ export default function Page() {
 
       <section className="today-card" aria-labelledby="today-title">
         <h2 id="today-title">Today</h2>
-        <button type="button" className="icon-button light-icon edit-total" aria-label="Edit today's total" onClick={() => setEditing(true)}><Icon name="edit" /></button>
+        <button type="button" className="icon-button light-icon edit-total" aria-label="Edit today's total" onClick={() => setEditingDate(sample.today)}><Icon name="edit" /></button>
         <div className="today-distance-row">
           <p className="today-distance" aria-live="polite" aria-atomic="true">{formatDistance(today ? effectiveMeters(today) : 0, unit)}</p>
           <Icon name="footsteps" className="today-footsteps" />
@@ -169,15 +173,15 @@ export default function Page() {
         </div>
       </section>
 
-      <ActivityHistory days={state.days} today={sample.today} unit={unit} />
+      <ActivityHistory days={state.days} today={sample.today} unit={unit} onEdit={setEditingDate} />
 
       <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state)} currentCountry={currentCountry} />
 
       {choosingCity && <CityPicker catalog={catalog} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
-      {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={hasSynced ? today?.importedMeters : undefined} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}
-        onSave={(meters) => { dispatch({ type: "correct-day", date: sample.today, meters }); setEditing(false); }}
-        onUseImported={() => { dispatch({ type: "use-imported", date: sample.today }); setEditing(false); }}
-        onClose={() => setEditing(false)} />}
+      {editingDate && <DailyTotalEditor key={`editor-${editingDate}`} date={editingDate} today={sample.today} meters={editingDay ? effectiveMeters(editingDay) : 0} importedMeters={editingHasImport ? editingDay?.importedMeters : undefined} hasCorrection={editingDay?.manualOverrideMeters !== undefined} unit={unit}
+        onSave={(meters) => { dispatch({ type: "correct-day", date: editingDate, meters }); setEditingDate(null); }}
+        onUseImported={() => { dispatch({ type: "use-imported", date: editingDate }); setEditingDate(null); }}
+        onClose={() => setEditingDate(null)} />}
       {!editing && !choosingCity && state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} arrivalCount={collection.arrivalCount} fallbackFocus={syncButton} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
     </main>
   );

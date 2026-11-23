@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import Image from "next/image";
+import { dateLabel } from "@/lib/history";
 import { entryValue, formatImportedDistance, parseDistanceEntry, type DistanceUnit } from "@/lib/distance";
 
 type Props = {
+  date: string;
+  today: string;
   meters: number;
   importedMeters?: number;
   hasCorrection: boolean;
@@ -12,7 +15,9 @@ type Props = {
   onClose: () => void;
 };
 
-export function DailyTotalEditor({ meters, importedMeters, hasCorrection, unit, onSave, onUseImported, onClose }: Props) {
+export function DailyTotalEditor({ date, today, meters, importedMeters, hasCorrection, unit, onSave, onUseImported, onClose }: Props) {
+  const title = date === today ? "Today's total" : dateLabel(date, { month: "short", day: "numeric", year: "numeric" });
+  const inputLabel = date === today ? "Today's total" : `${dateLabel(date, { month: "long", day: "numeric", year: "numeric" })} distance`;
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const [originalMeters] = useState(meters);
@@ -65,12 +70,12 @@ export function DailyTotalEditor({ meters, importedMeters, hasCorrection, unit, 
       <form onSubmit={save} noValidate>
         <div className="sheet-handle" aria-hidden="true" />
         <div className="sheet-heading">
-          <h2 id="total-title">Today&apos;s total</h2>
+          <h2 id="total-title">{title}</h2>
           <button type="button" className="icon-button" aria-label="Close daily total editor" onClick={onClose}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button>
         </div>
         <p id="total-description" className="sheet-description">Replaces the imported total</p>
         <label className="distance-input" htmlFor="daily-total">
-          <span className="sr-only">{unit === "metric" ? "Today's total in meters" : "Today's total in miles"}</span>
+          <span className="sr-only">{`${inputLabel} in ${unit === "metric" ? "meters" : "miles"}`}</span>
           <input ref={input} id="daily-total" type="text" enterKeyHint="done" inputMode={unit === "metric" ? "numeric" : "decimal"} autoComplete="off" value={value} onChange={(event) => { setValue(event.target.value); setError(""); }} aria-invalid={!!error} aria-describedby={error ? "distance-error" : "total-description"} />
           <span aria-hidden="true">{unit === "metric" ? "m" : "mi"}</span>
         </label>

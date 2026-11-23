@@ -12,7 +12,7 @@ function activityValue(cell: ActivityCell, unit: DistanceUnit): string {
   return cell.status === "recorded" ? formatImportedDistance(cell.meters!, unit) : cell.status === "future" ? "Upcoming" : "Not recorded";
 }
 
-export function ActivityHistory({ days, today, unit }: { days: Day[]; today: string; unit: DistanceUnit }) {
+export function ActivityHistory({ days, today, unit, onEdit }: { days: Day[]; today: string; unit: DistanceUnit; onEdit: (date: string) => void }) {
   const [selectedDate, setSelectedDate] = useState(() => addDays(today, -1));
   const [view, setView] = useState<HistoryView>("month");
   const calendar = useRef<HTMLDivElement>(null);
@@ -69,7 +69,9 @@ export function ActivityHistory({ days, today, unit }: { days: Day[]; today: str
       </div>
       <div className="history-legend" aria-hidden="true"><span>Less</span><i className="legend-zero" />{distanceColors.map((color) => <i key={color} style={{ backgroundColor: color }} />)}<span>More</span></div>
       <p className="sr-only">Colors show distance from low to high within this {view}. Unrecorded and upcoming dates have no distance.</p>
-      <div className="history-readout" aria-live="polite" aria-atomic="true"><span>{dateLabel(selectedDate, { month: "short", day: "numeric" })}</span><strong>{activityValue(selected, unit)}</strong></div>
+      <div className="history-readout" aria-live="polite" aria-atomic="true"><span>{dateLabel(selectedDate, { month: "short", day: "numeric" })}</span><strong>{activityValue(selected, unit)}</strong>
+        {selectedDate <= today && <button type="button" className="icon-button" aria-label={`Edit ${dateLabel(selectedDate, { month: "long", day: "numeric", year: "numeric" })} distance`} onClick={() => onEdit(selectedDate)}><Image src="/journey/icons/edit.svg" width={24} height={24} alt="" /></button>}
+      </div>
     </section>
   );
 }
