@@ -289,14 +289,6 @@
       "longitude": -122.2173461
     },
     {
-      "id": "osm-N-150941204",
-      "name": "White Center",
-      "region": "WA",
-      "country": "US",
-      "latitude": 47.5164297,
-      "longitude": -122.355739
-    },
-    {
       "id": "osm-R-237332",
       "name": "Beaux Arts Village",
       "region": "WA",
@@ -407,14 +399,6 @@
       "country": "US",
       "latitude": 41.0550969,
       "longitude": -73.8201338
-    },
-    {
-      "id": "osm-N-9967045476",
-      "name": "Greenville",
-      "region": "NY",
-      "country": "US",
-      "latitude": 40.998643,
-      "longitude": -73.818978
     },
     {
       "id": "osm-R-174500",

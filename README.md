@@ -37,7 +37,7 @@ route progress, history colors, and the passport; components render those result
 Changes flow through the reducer, so the map, calendar, and rewards share the same
 activity records. There is no backend or separate history store.
 
-City lookup uses Photon with a four-second timeout and a local fallback. Brazilian results also match a bundled IBGE municipality name/state list, excluding Brasília’s administrative regions even when the provider labels them as cities. Fonte: [IBGE municipality API](https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome), retrieved November 23, 2026. Location
+City lookup uses Photon with a four-second timeout and a local fallback. Brazilian results also match a bundled IBGE municipality name/state list, excluding Brasília’s administrative regions even when the provider labels them as cities. Fonte: [IBGE municipality API](https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome), retrieved November 23, 2026. US results match a bundled [Census municipal registry](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html), including municipal towns and excluding unincorporated census-designated communities. Both eligibility checks work offline. Location
 chooses the origin; it does not measure walks. City-to-city distances are straight-line
 virtual segments on a geographic map, not walking directions. Leaflet supplies map interaction; OpenStreetMap street tiles need no key. Local US/Brazil outlines and route markers remain available if tiles fail. Browser geolocation needs
 permission and a secure context (localhost works).

@@ -77,10 +77,10 @@ test('S3.13: HTTP failures return usable local city matches and local nearby can
 
 test('S3.12: live city search normalizes data and nearby lookup uses latitude/longitude, not name search',async()=>{
  let seen;
- const fetcher=async url=>{seen=new URL(url);return Response.json({features:[feature('Remote City','Remote State',12,50)]});};
- const result=await searchCities('Remote City',catalog,undefined,fetcher);
- assert.equal(result.saved,false);assert.equal(result.places[0].name,'Remote City');
- assert.equal(seen.pathname,'/api/');assert.equal(seen.searchParams.get('q'),'Remote City');
+ const fetcher=async url=>{seen=new URL(url);return Response.json({features:[feature('Albany','New York',-73.7562,42.6526)]});};
+ const result=await searchCities('Albany',catalog,undefined,fetcher);
+ assert.equal(result.saved,false);assert.equal(result.places[0].name,'Albany');
+ assert.equal(seen.pathname,'/api/');assert.equal(seen.searchParams.get('q'),'Albany');
  await discoverNearby(ny,catalog,undefined,fetcher);
  assert.equal(seen.pathname,'/reverse');assert.equal(Number(seen.searchParams.get('lat')),ny.latitude);
  assert.equal(Number(seen.searchParams.get('lon')),ny.longitude);assert.equal(seen.searchParams.get('layer'),'city');
