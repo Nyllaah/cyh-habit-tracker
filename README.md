@@ -24,7 +24,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - The first tap on the sync icon beside Health Connect populates months of past activity and stamps, then imports enough new activity to unlock that route’s first destination. Older distance does not advance the chosen route. Repeating sync does not add more distance. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
-- Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
+- Drag or pinch the map to reveal more city markers. Tap a route city for kilometers remaining or a smaller exploration pin for direct distance; browsing does not change the itinerary. Use the country/route controls to reframe. Choose Brasília or Goiânia to try Brazil.
 - National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary always chooses the nearest unvisited city within the country, including across state borders.
 - Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
 - Explore the populated monthly calendar and scroll down the vertical yearly grid. History initially selects yesterday. Activity history stays shared across countries.

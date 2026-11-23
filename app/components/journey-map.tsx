@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
+import { MapCityDiscovery } from "@/app/components/map-city-discovery";
+import { getCityCatalog } from "@/lib/data";
 import { countryMaps, placeCountry } from "@/lib/countries";
 import { type City } from "@/lib/journey";
 import { capitalKind, cityArtwork, routeWindow } from "@/lib/places";
 import { journeyPosition } from "@/lib/map";
+
+const catalog = getCityCatalog();
 
 type MapApi = { map: Leaflet.Map; library: typeof Leaflet };
 
@@ -109,6 +113,7 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
 
   return (
     <div className="interactive-map">
+      <MapCityDiscovery api={api} route={fullRoute} meters={meters} country={placeCountry(fullRoute[0])} catalog={catalog} />
       <div ref={container} className="journey-map" role="region" aria-label={`Interactive journey map, ${country?.properties.name ?? fullRoute[0].name}. Drag to explore; use zoom controls or pinch to zoom.`} />
       <div className="map-framing">
         {country && <button type="button" onClick={showCountry} disabled={!api} aria-label={`Show ${country.properties.name} map`}>{country.properties.name}<span aria-hidden="true">↗</span></button>}

@@ -283,3 +283,7 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 @keyframes spark-reveal { from { opacity: 0; transform: scale(.65); } to { opacity: 1; transform: scale(1); } }
 
 .leaflet-popup-content .map-city-distance { color: var(--ink); font-size: 16px; font-weight: 700; margin: 10px 0 0; }
+
+.map-discovery-marker { display: grid; place-items: center; background: transparent; border: 0; }
+.map-discovery-marker span { display: block; width: 12px; height: 12px; border: 2px solid var(--surface); border-radius: 50%; background: #448F86; box-shadow: 0 1px 4px #103F3C40; }
+.map-discovery-marker:focus-visible { outline: 3px solid var(--orange); outline-offset: -5px; border-radius: 50%; }

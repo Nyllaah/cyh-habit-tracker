@@ -102,3 +102,37 @@ export function readStartingLocation(): Promise<Place> {
     }), reject, { timeout: 8000, maximumAge: 300000 });
   });
 }
+
+export type MapCityView = {
+  latitude: number;
+  longitude: number;
+  south: number;
+  west: number;
+  north: number;
+  east: number;
+  radiusKm: number;
+  country: string;
+};
+
+export function citiesInView(places: Place[], view: MapCityView): Place[] {
+  const width = view.east - view.west;
+  const west = ((view.west + 180) % 360 + 360) % 360 - 180;
+  return distinctPlaces(places).filter((place) => place.country === view.country
+    && place.latitude >= view.south && place.latitude <= view.north
+    && (width >= 360 || (place.longitude - west + 360) % 360 <= width));
+}
+
+export async function discoverMapCities(view: MapCityView, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+  const local = citiesInView(catalog, view);
+  const url = cityUrl("/reverse");
+  url.searchParams.set("lat", String(view.latitude));
+  url.searchParams.set("lon", String(((view.longitude + 180) % 360 + 360) % 360 - 180));
+  url.searchParams.set("radius", String(Math.min(500, Math.max(5, view.radiusKm))));
+  url.searchParams.set("limit", "40");
+  try {
+    return citiesInView([...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...local], view);
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    return local;
+  }
+}
