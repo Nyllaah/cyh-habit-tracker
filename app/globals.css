@@ -201,3 +201,7 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
   .arrival-dialog .primary-button { margin-top: 20px; }
   .arrival-count { margin-top: 16px; }
 }
+
+.health-sync-button { display: flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 14px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 700; }
+.health-sync-button .icon { width: 20px; height: 20px; }
+.health-sync-button:disabled { opacity: .75; }

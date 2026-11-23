@@ -20,7 +20,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 
 ## Try the daily moment
 
-- A simulated Health Connect reading advances the journey automatically. “Demo” identifies the source.
+- The page opens before Alexandria is reached. Tap “Sync activity” when ready to simulate a Health Connect reading and unlock its stamp. “Demo” identifies the source.
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
 - Explore the monthly calendar, swipe through the yearly grid, and expand the passport inline.
@@ -38,7 +38,7 @@ chooses the origin; it does not measure walks. City-to-city distances are straig
 segments on an illustrated map, not walking directions. Browser geolocation needs
 permission and a secure context (localhost works).
 
-The demo uses a fixed November 22, 2026 sample day with four activity records. Earlier
+The demo uses a fixed November 22, 2026 sample day, with three recorded days and an on-demand health reading. Earlier
 dates are unrecorded, and refreshing resets local state. Native health access,
 persistence, authentication, and payments are outside the current implementation.
 

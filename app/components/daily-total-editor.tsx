@@ -75,7 +75,7 @@ export function DailyTotalEditor({ meters, importedMeters, hasCorrection, unit, 
           <span aria-hidden="true">{unit === "metric" ? "m" : "mi"}</span>
         </label>
         {error && <p id="distance-error" className="input-error" role="alert">{error}</p>}
-        <p className="imported-value">{importedMeters === undefined ? "Importing activity…" : `Imported: ${formatImportedDistance(importedMeters, unit)}`}</p>
+        <p className="imported-value">{importedMeters === undefined ? "Not synced yet" : `Imported: ${formatImportedDistance(importedMeters, unit)}`}</p>
         {hasCorrection && importedMeters !== undefined && <button type="button" className="text-button" onClick={onUseImported}>Use imported total</button>}
         <button type="submit" className="primary-button">Save total</button>
         <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>

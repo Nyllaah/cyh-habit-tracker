@@ -25,12 +25,13 @@ function Icon({ name, className = "" }: { name: string; className?: string }) {
 
 export default function Page() {
   const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route, catalog));
-  const [syncing, setSyncing] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [hasSynced, setHasSynced] = useState(false);
   const [unit, setUnit] = useState<DistanceUnit>("metric");
   const [editing, setEditing] = useState(false);
   const [choosingCity, setChoosingCity] = useState(false);
   const syncButton = useRef<HTMLButtonElement>(null);
-  const syncInFlight = useRef(true);
+  const syncInFlight = useRef(false);
   const meters = routeMeters(state);
   const next = nextCity(state.route, meters);
   const collection = passportCollection(state);
@@ -52,17 +53,6 @@ export default function Page() {
     return () => controller.abort();
   }, [frontier, frontierKey]);
 
-  useEffect(() => {
-    let cancelled = false;
-    readDemoHealth(sample.healthImport).then((reading) => {
-      if (cancelled) return;
-      dispatch({ type: "import", reading });
-      syncInFlight.current = false;
-      setSyncing(false);
-    });
-    return () => { cancelled = true; };
-  }, []);
-
   async function syncHealth() {
     if (syncInFlight.current) return;
     syncInFlight.current = true;
@@ -70,6 +60,7 @@ export default function Page() {
     try {
       const reading = await readDemoHealth(sample.healthImport);
       dispatch({ type: "import", reading });
+      setHasSynced(true);
     } finally {
       syncInFlight.current = false;
       setSyncing(false);
@@ -109,7 +100,10 @@ export default function Page() {
         <Icon name="footsteps" className="today-footsteps" />
         <div className="health-row">
           <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
-          <button ref={syncButton} className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
+          <button ref={syncButton} className={hasSynced ? "icon-button light-icon" : "health-sync-button"} disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}>
+            <Icon name="sync" className={syncing ? "spinning" : ""} />
+            {!hasSynced && <span>{syncing ? "Syncing…" : "Sync activity"}</span>}
+          </button>
         </div>
       </section>
 
@@ -122,7 +116,7 @@ export default function Page() {
           if (placeKey(origin) !== placeKey(state.route[0]) && routeForOrigin(state, origin, candidates).length < 3) return false;
           dispatch({ type: "change-origin", origin, candidates }); setChoosingCity(false); return true;
         }} onClose={() => setChoosingCity(false)} />}
-      {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={today?.importedMeters} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}
+      {editing && <DailyTotalEditor meters={today ? effectiveMeters(today) : 0} importedMeters={hasSynced ? today?.importedMeters : undefined} hasCorrection={today?.manualOverrideMeters !== undefined} unit={unit}
         onSave={(meters) => { dispatch({ type: "correct-day", date: sample.today, meters }); setEditing(false); }}
         onUseImported={() => { dispatch({ type: "use-imported", date: sample.today }); setEditing(false); }}
         onClose={() => setEditing(false)} />}

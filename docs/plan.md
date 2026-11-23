@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** The planned core daily experience is implemented, validated, and independently reviewed. Optional product choices remain explicit below.
+**Status:** The core daily experience is implemented and was independently reviewed at `7dd23f8`. The presentation correction below makes the initial health import explicitly triggerable. Optional product choices remain explicit below.
 
 This file is the feature's authoritative documentation. It holds requirements,
 product and technical decisions, rationale, open questions, implementation status,
@@ -15,14 +15,14 @@ affected sections and criteria together; Git records the previous version.
 
 Repeated local walks accumulate distance without a lasting sense of discovery. A daily activity total provides immediate feedback, but little to collect or continue over several months. The product hypothesis is that a virtual journey through real places can make that accumulated effort more meaningful.
 
-The daily screen will show activity advancing a journey, the next destination, and a growing passport collection. Activity arrives through a simulated health connection and can be corrected manually. Distances are available in metric and imperial units.
+The daily screen will show activity advancing a journey, the next destination, and a growing passport collection. Activity arrives through a simulated health connection and can be corrected manually. The demo waits for “Sync activity” before importing its next reading, allowing the initial journey to be presented before an arrival. Distances are available in metric and imperial units.
 
 ## Decision rationale
 
 | Area | Decision | Reason |
 | --- | --- | --- |
 | Habit and retention | Walking and running distance advances travel between real cities and collects city stamps | Turn repeated local activity into visible exploration and a collection that grows over months |
-| Daily interaction | Simulated automatic health totals plus manual replacement of a day's total | Reduce daily effort while allowing a clear correction without double-counting |
+| Daily interaction | Simulated health totals triggered by demo sync, plus manual replacement of a day's total | Reduce daily effort while allowing a clear correction without double-counting |
 | Units | Support metric and miles, including meter entry; store integer meters | Make the interface familiar across audiences and prevent display conversions from changing progress |
 | Rewards | Recalculate active-route stamps from effective distance; archive earned stamps when changing origin; track arrival announcements separately | Keep collection and progress consistent after corrections while avoiding repeated arrival dialogs on sync |
 | Origin and journey | Offer browser location and city selection; suggest nearby destinations first and extend automatically | Make the journey personal without requiring itinerary planning |
@@ -122,7 +122,7 @@ when implementing. The asset handoff’s Runtime comparison records the implemen
 - Merge imports by source/day identity. Re-reading an identical source record cannot add distance or repeat an arrival.
 - Keep the imported value when a manual override exists. A later import must not silently remove the correction.
 - Formatting never writes back into stored distance. Repeated unit switches and unchanged saves must not introduce rounding drift.
-- The habit is walking and running distance. Health integration is a local simulation identified by a compact “Demo” label. It updates the journey without a second manual save.
+- The habit is walking and running distance. Health integration is a local simulation identified by a compact “Demo” label. After “Sync activity” is tapped, it updates the journey without a manual distance entry or second save. Loading the page alone does not request the demo reading.
 - Active-route stamps are recalculated from corrected accumulated distance. Stamps archived by an origin change remain collected. Arrival announcements are tracked separately so an identical re-sync cannot replay them.
 - The current default is metric, matching the existing design and first slice. Summaries show kilometers or miles to one decimal at most; metric editing uses whole meters, while miles editing shows up to three decimal places. The unit selection is in memory and affects presentation only.
 - The editor captures its starting value. Saving an unchanged displayed value, including equivalent numeric formatting, preserves the original integer meters instead of converting the rounded display back. A changed value is converted and rounded once on save. Empty, negative, non-numeric, fractional-meter, and unsafe-size entries remain unsaved with a short inline error.
@@ -232,6 +232,10 @@ External assets and data require provenance. The local SVG artwork is original p
 26. WHEN Year is selected THEN a continuous contribution grid SHALL arrange days in seven weekday rows and week columns, with month labels and horizontal scrolling confined to the grid; selected dates SHALL expose their distance through the readout.
 27. WHILE a day is future or unrecorded THEN it SHALL NOT appear as confirmed zero activity.
 
+### Presentation control
+
+32. WHEN the page loads THEN the demo SHALL remain at its existing 10,000m history with no arrival overlay; WHEN “Sync activity” is activated THEN the simulated reading SHALL advance it to 12,400m and unlock Alexandria. Repeated sync SHALL preserve distance and avoid replaying that arrival.
+
 ### S6: Browse the passport and celebrate arrivals
 
 29. WHEN the passport is collapsed THEN it SHALL show at most three unique stamps, and an inline disclosure SHALL expose remaining collected and known upcoming stamps without navigation or duplicates.
@@ -289,7 +293,7 @@ The repository carries [three project-local skills](skills.md), including source
 **Fix pass:** done — no application changes required. Review outcomes and additional compatibility verification are recorded below.
 
 - Foundation: `f78bba9` records the skills, design assets, and technical guidance together before application implementation.
-- S1: `5904704` implements the page with original landmark/scenery SVGs, live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total automatically. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
+- S1: `5904704` implements the page with original landmark/scenery SVGs, live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total; the initial automatic trigger was subsequently replaced by the presentation control below. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
 - Styling uses plain CSS with shared tokens. The unused Tailwind CSS loader was removed from `next.config.ts`; no component framework or new runtime dependency was added. The font stack uses Ubuntu Sans when available and local sans-serif fallbacks, avoiding a build-time font download.
 - Verification for S1: five rule tests pass, ESLint passes, production build passes, and the running page was exercised at 360px, 390px, and 1024px. Browser checks cover automatic import, new-city arrival, unchanged re-sync, Escape dismissal, reduced motion, and absence of page runtime errors. Subsequent slices and the completed independent review are recorded below.
 - S2: the header switches metric/miles throughout the page. A native-dialog bottom sheet edits today's distance, with imported-value context, replacement correction, and restoration of the imported value. Draft state belongs to the sheet; saved activity belongs to the reducer. Corrections and imports share the same arrival reconciliation, so stamps and progress recalculate together.
@@ -316,6 +320,10 @@ The repository carries [three project-local skills](skills.md), including source
 
 - Final independent review: no actionable defects were found. The reviewer independently ran all fifty-two tests, lint, and production build; compared each reference state and the documented runtime differences; and checked units, corrections, location/city selection, checkpoint carry, history, passport, ordered arrival dialogs, focus, narrow widths, and reduced motion. Axe reported no WCAG 2 A/AA violations in the four checked states. Rule tests cover calculations and reconciliation; DOM wiring, touch, focus, readable layout, and styling are verified separately in the browser rather than claimed as unit-test coverage.
 - Additional compatibility verification: WebKit passes the initial arrival, illustrated page, yearly strip, manual correction, and inline passport expansion at phone width. Chromium and WebKit checks use isolated automated browser contexts; physical-device and comprehensive assistive-technology testing are not claimed. The paid-preview content question remains open; no payment or new product flow was chosen during review.
+
+- Presentation correction: the demo no longer imports a new reading on mount. `app/page.tsx` starts with idle sync state and exposes “Sync activity” beside the health source. That action calls the same asynchronous adapter and reducer; imported totals, corrections, arrival thresholds, and duplicate protection are unchanged. After the first sync, the compact re-sync icon remains. Refresh restores the pre-arrival fixture for another presentation. This controls the timing of the simulated source rather than asking for manual distance entry.
+- Verification for the presentation correction: all fifty-two rule tests, lint, and production build pass. Browser checks wait beyond the former import delay and confirm no modal, 10km lifetime distance, and an enabled initial Sync activity control. Explicit sync imports 2,400m, reaches 12,400m and announces Alexandria once; rapid/repeated taps and subsequent sync cannot duplicate activity or replay the arrival. Refresh restores the quiet initial state. Manual zero entered before first sync survives the import, and restoring that imported total unlocks the stamp. The editor accurately says “Not synced yet” before any reading exists. Focus returns to the sync control, 44px controls fit 320px/360px/390px/1024px layouts, and no page runtime errors were observed. No calculation rules or dependencies changed.
+
 
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
