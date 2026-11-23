@@ -1,3 +1,61 @@
+# Journey
+
+A mobile-first walking and running tracker. Everyday distance advances a virtual
+journey between real cities and builds a passport of collectible stamps.
+
+The retention bet is the growing journey: the next city gives today's activity a
+nearby destination, while collected places and the activity calendar make return
+visits feel cumulative. The concept can be evaluated through repeat visits after
+the first arrival and sustained walking days; the demo does not collect analytics.
+
+## Run locally
+
+Use Node 22.21.1 or newer (`.nvmrc` pins the tested version), then:
+
+```bash
+npm install && npm run dev
+```
+
+Open [localhost:3000](http://localhost:3000). No account, API key, or setup service is required.
+
+## Try the daily moment
+
+- The page opens with no city selected, activity history, or collected stamps. Choose a city or use browser location to start its automatic itinerary at zero.
+- The first tap on the sync icon beside Health Connect populates months of past activity and stamps, then imports enough new activity to unlock that route’s first destination. Older distance does not advance the chosen route. Repeating sync does not add more distance. “Demo” identifies the source.
+- Edit today's total or choose a past calendar day and tap the readout’s edit icon. Corrections update history, lifetime distance, and current-journey progress; switch between meters/kilometers and miles.
+- Choose a starting city or use browser location. Previously earned stamps and activity remain; each different starting city begins a new journey at zero.
+- Drag or pinch the map to discover eligible cities and extend the connected itinerary ahead. Tap any planned stop for kilometers remaining; local views show frameless city illustrations over warm fading halos, with a larger next stop and gold capital halos. Crowded icons and country views use compact dots; zoom in for more illustrations. A dark teal map sets off the bright landmarks and mint route. Discovery preserves existing legs and distance already walked. Use the country/route controls to reframe. Choose Brasília or Goiânia to try Brazil.
+- Collected map cities have orange checks, including when their illustrations collapse to dots.
+- Grand discoveries awards special state/district and country badges against the full municipality registries. Origins count; old journey stamps remain valid. Hawaii is not yet supported, so US country completion stays locked.
+- National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary visits the nearest eligible city within the current state first, then crosses to another state once its available city catalog is exhausted. It does not return to departed states.
+- Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
+- Explore the populated monthly calendar and scroll down the vertical yearly grid. History initially selects yesterday. Activity history stays shared across countries.
+
+## How it works
+
+`app/page.tsx` holds one in-memory journey reducer. `lib/data.ts` loads the sample
+account and offline city catalog. Pure functions calculate effective daily distance,
+route progress, history colors, and the passport; components render those results.
+Changes flow through the reducer, so the map, calendar, and rewards share the same
+activity records. There is no backend or separate history store.
+
+City lookup uses Photon with a four-second timeout and a local fallback. Brazilian results also match a bundled IBGE municipality name/state list, excluding Brasília’s administrative regions even when the provider labels them as cities. Fonte: [IBGE municipality API](https://servicodados.ibge.gov.br/api/v1/localidades/municipios?orderBy=nome), retrieved November 23, 2026. US results match a bundled [Census municipal registry](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html), including municipal towns and excluding unincorporated census-designated communities. Both eligibility checks work offline. Location
+chooses the origin; it does not measure walks. City-to-city distances are straight-line
+virtual segments on a geographic map, not walking directions. Leaflet supplies map interaction; OpenStreetMap street tiles need no key. Local US/Brazil outlines and route markers remain available if tiles fail. Browser geolocation needs
+permission and a secure context (localhost works).
+
+The demo uses a fixed November 22, 2026 sample day, with August–November activity from a completed Brazil journey, three days on a past Washington route, and a route-specific on-demand health reading. Lifetime distance and both history views use those same records. Refreshing resets local state. Native health access,
+persistence, authentication, and payments are outside the current implementation.
+
+Run `npm test`, `npm run lint`, and `npm run build` for verification. The complete
+requirements, decisions, implementation notes, and validation are in [the feature
+plan](docs/plan.md). Original SVG artwork and design studies are documented in the
+[asset handoff](design/journey/game/README.md). Development assistance used Codex and
+project-local skills; [skill provenance and licenses](docs/skills.md) are retained.
+
+<details>
+<summary>Original challenge brief</summary>
+
 # Design Engineer take-home
 
 Thanks for making it this far. This is the part we care about most, and it's small
@@ -52,8 +110,8 @@ big fragile one every time.
 npm install && npm run dev
 ```
 
-It opens at http://localhost:3000 and reloads as you edit. Use Node 22 if you can
-(there's an `.nvmrc`).
+It opens at http://localhost:3000 and reloads as you edit. Use Node 22.21.1 or
+newer; `.nvmrc` pins the tested version.
 
 ## Sending it back
 
@@ -84,3 +142,7 @@ Have fun with it, and be creative. I'm excited to see what you come up with. And
 skip the write-up, that's how I get a feel for the way you think.
 
 Jamieson
+
+</details>
+
+Map sources and the Leaflet license are documented in the [asset handoff](design/journey/game/README.md#country-expansion).

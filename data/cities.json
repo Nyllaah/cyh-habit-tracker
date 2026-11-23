@@ -1,0 +1,514 @@
+{
+  "attribution": "Sample place data: © OpenStreetMap contributors via Photon; DC corridor coordinates: US Census; Brasília approximate city-center coordinates: IBGE Brazil in Figures / Statistical Yearbook",
+  "license": "OpenStreetMap data: ODbL 1.0",
+  "source": "https://photon.komoot.io",
+  "places": [
+    {
+      "id": "washington",
+      "name": "Washington",
+      "region": "DC",
+      "latitude": 38.9042429,
+      "longitude": -77.0165243,
+      "country": "US",
+      "artwork": "washington"
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "region": "VA",
+      "latitude": 38.8188148,
+      "longitude": -77.0832273,
+      "country": "US",
+      "artwork": "alexandria"
+    },
+    {
+      "id": "occoquan",
+      "name": "Occoquan",
+      "region": "VA",
+      "latitude": 38.681729,
+      "longitude": -77.2618611,
+      "country": "US",
+      "artwork": "occoquan"
+    },
+    {
+      "id": "fredericksburg",
+      "name": "Fredericksburg",
+      "region": "VA",
+      "latitude": 38.2992718,
+      "longitude": -77.4866583,
+      "country": "US",
+      "artwork": "fredericksburg"
+    },
+    {
+      "id": "richmond",
+      "name": "Richmond",
+      "region": "VA",
+      "latitude": 37.531399,
+      "longitude": -77.4760085,
+      "country": "US",
+      "artwork": "richmond"
+    },
+    {
+      "id": "osm-R-175905",
+      "name": "New York",
+      "region": "NY",
+      "country": "US",
+      "latitude": 40.7127281,
+      "longitude": -74.0060152
+    },
+    {
+      "id": "osm-R-170953",
+      "name": "Jersey City",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7215682,
+      "longitude": -74.047455
+    },
+    {
+      "id": "osm-R-170708",
+      "name": "Hoboken",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7433066,
+      "longitude": -74.0323752
+    },
+    {
+      "id": "osm-R-957238",
+      "name": "Weehawken",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7695457,
+      "longitude": -74.0204177
+    },
+    {
+      "id": "osm-R-170709",
+      "name": "Union City",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7795455,
+      "longitude": -74.0237512
+    },
+    {
+      "id": "osm-R-170706",
+      "name": "West New York",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7856117,
+      "longitude": -74.0093129
+    },
+    {
+      "id": "osm-R-170707",
+      "name": "Guttenberg",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7920454,
+      "longitude": -74.0037505
+    },
+    {
+      "id": "osm-R-170711",
+      "name": "Secaucus",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.7899291,
+      "longitude": -74.0566735
+    },
+    {
+      "id": "osm-R-957237",
+      "name": "North Bergen",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.8042674,
+      "longitude": -74.012084
+    },
+    {
+      "id": "osm-R-170504",
+      "name": "Bayonne",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.6687141,
+      "longitude": -74.1143091
+    },
+    {
+      "id": "osm-R-170616",
+      "name": "Fairview",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.8126006,
+      "longitude": -73.999028
+    },
+    {
+      "id": "osm-R-170592",
+      "name": "Cliffside Park",
+      "region": "NJ",
+      "country": "US",
+      "latitude": 40.8214894,
+      "longitude": -73.9876388
+    },
+    {
+      "id": "osm-R-2315704",
+      "name": "Boston",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3588336,
+      "longitude": -71.0578303
+    },
+    {
+      "id": "osm-R-1933745",
+      "name": "Cambridge",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3656347,
+      "longitude": -71.1040018
+    },
+    {
+      "id": "osm-R-2362263",
+      "name": "Chelsea",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3912241,
+      "longitude": -71.0369301
+    },
+    {
+      "id": "osm-R-1933746",
+      "name": "Somerville",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3875968,
+      "longitude": -71.0994968
+    },
+    {
+      "id": "osm-R-1842139",
+      "name": "Everett",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.4085897,
+      "longitude": -71.0542002
+    },
+    {
+      "id": "osm-R-2306361",
+      "name": "Brookline",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.332918,
+      "longitude": -71.1187829
+    },
+    {
+      "id": "osm-R-2362284",
+      "name": "Winthrop",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3746525,
+      "longitude": -70.9825807
+    },
+    {
+      "id": "osm-R-2362362",
+      "name": "Revere",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.4084302,
+      "longitude": -71.0119948
+    },
+    {
+      "id": "osm-R-1842140",
+      "name": "Malden",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.4268484,
+      "longitude": -71.0683741
+    },
+    {
+      "id": "osm-R-1931997",
+      "name": "Medford",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.4184296,
+      "longitude": -71.1061639
+    },
+    {
+      "id": "osm-R-1933055",
+      "name": "Arlington",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.4153739,
+      "longitude": -71.1564428
+    },
+    {
+      "id": "osm-R-1933719",
+      "name": "Watertown",
+      "region": "MA",
+      "country": "US",
+      "latitude": 42.3652576,
+      "longitude": -71.1843234
+    },
+    {
+      "id": "osm-R-237385",
+      "name": "Seattle",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.6038321,
+      "longitude": -122.330062
+    },
+    {
+      "id": "osm-R-237359",
+      "name": "Medina",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.620548,
+      "longitude": -122.2264453
+    },
+    {
+      "id": "osm-R-237360",
+      "name": "Mercer Island",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.5766324,
+      "longitude": -122.2276378
+    },
+    {
+      "id": "osm-R-237351",
+      "name": "Hunts Point",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.6434321,
+      "longitude": -122.230124
+    },
+    {
+      "id": "osm-R-237343",
+      "name": "Clyde Hill",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.631569,
+      "longitude": -122.2181054
+    },
+    {
+      "id": "osm-R-237352",
+      "name": "Yarrow Point",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.64621,
+      "longitude": -122.2173461
+    },
+    {
+      "id": "osm-R-237332",
+      "name": "Beaux Arts Village",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.5854704,
+      "longitude": -122.199768
+    },
+    {
+      "id": "osm-R-237868",
+      "name": "Bellevue",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.6144219,
+      "longitude": -122.192337
+    },
+    {
+      "id": "osm-R-237356",
+      "name": "Kirkland",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.6765382,
+      "longitude": -122.2070775
+    },
+    {
+      "id": "osm-R-237361",
+      "name": "Newcastle",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.5395736,
+      "longitude": -122.1563331
+    },
+    {
+      "id": "osm-R-237342",
+      "name": "Burien",
+      "region": "WA",
+      "country": "US",
+      "latitude": 47.469918,
+      "longitude": -122.3485274
+    },
+    {
+      "id": "osm-R-111968",
+      "name": "San Francisco",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.7879363,
+      "longitude": -122.4075201
+    },
+    {
+      "id": "osm-R-2834528",
+      "name": "Brisbane",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.687165,
+      "longitude": -122.402794
+    },
+    {
+      "id": "osm-R-112271",
+      "name": "Daly City",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.6904826,
+      "longitude": -122.47267
+    },
+    {
+      "id": "osm-R-2829689",
+      "name": "Sausalito",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.8590272,
+      "longitude": -122.485469
+    },
+    {
+      "id": "osm-R-2829690",
+      "name": "Tiburon",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.8775332,
+      "longitude": -122.460808
+    },
+    {
+      "id": "osm-R-2833529",
+      "name": "Emeryville",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.8314089,
+      "longitude": -122.2865266
+    },
+    {
+      "id": "osm-R-2833530",
+      "name": "Oakland",
+      "region": "CA",
+      "country": "US",
+      "latitude": 37.8044557,
+      "longitude": -122.271356
+    },
+    {
+      "id": "osm-R-174495",
+      "name": "White Plains",
+      "region": "NY",
+      "country": "US",
+      "latitude": 41.0339862,
+      "longitude": -73.7629097
+    },
+    {
+      "id": "osm-R-174894",
+      "name": "Elmsford",
+      "region": "NY",
+      "country": "US",
+      "latitude": 41.0550969,
+      "longitude": -73.8201338
+    },
+    {
+      "id": "osm-R-174500",
+      "name": "Scarsdale",
+      "region": "NY",
+      "country": "US",
+      "latitude": 40.9885221,
+      "longitude": -73.8085608
+    },
+    {
+      "id": "osm-R-175808",
+      "name": "Rye Brook",
+      "region": "NY",
+      "country": "US",
+      "latitude": 41.0192641,
+      "longitude": -73.6834621
+    },
+    {
+      "id": "osm-R-3306997",
+      "name": "Mount Pleasant",
+      "region": "NY",
+      "country": "US",
+      "latitude": 41.0962975,
+      "longitude": -73.7934355
+    },
+    {
+      "id": "osm-R-174903",
+      "name": "Ardsley",
+      "region": "NY",
+      "country": "US",
+      "latitude": 41.0114017,
+      "longitude": -73.8466414
+    },
+    {
+      "id": "osm-R-3307289",
+      "name": "Harrison",
+      "region": "NY",
+      "country": "US",
+      "latitude": 40.9689871,
+      "longitude": -73.71263
+    },
+    {
+      "id": "osm-R-174873",
+      "name": "Rye",
+      "region": "NY",
+      "country": "US",
+      "latitude": 40.9821371,
+      "longitude": -73.6840902
+    },
+    {
+      "id": "brasilia",
+      "name": "Brasília",
+      "region": "DF",
+      "country": "BR",
+      "latitude": -15.793889,
+      "longitude": -47.882778,
+      "artwork": "brasilia"
+    },
+    {
+      "id": "osm-R-334463",
+      "name": "Anápolis",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.3332828,
+      "longitude": -48.9525756
+    },
+    {
+      "id": "osm-R-334547",
+      "name": "Goiânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.680882,
+      "longitude": -49.2532691,
+      "artwork": "goiania"
+    },
+    {
+      "id": "osm-R-334525",
+      "name": "Luziânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.2535456,
+      "longitude": -47.9500276
+    },
+    {
+      "id": "osm-R-334565",
+      "name": "Formosa",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -15.5492443,
+      "longitude": -47.3301212
+    },
+    {
+      "id": "osm-R-334553",
+      "name": "Alexânia",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -16.0834049,
+      "longitude": -48.5077803
+    },
+    {
+      "id": "osm-R-334533",
+      "name": "Águas Lindas de Goiás",
+      "region": "GO",
+      "country": "BR",
+      "latitude": -15.7392283,
+      "longitude": -48.2793357
+    }
+  ],
+  "sources": [
+    "https://photon.komoot.io",
+    "https://anuario.ibge.gov.br/images/aeb/2024/s1/2_pdf/s1t1102.pdf"
+  ]
+}

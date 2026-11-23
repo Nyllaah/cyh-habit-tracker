@@ -15,6 +15,42 @@ Build it in `app/page.tsx`. Hold to these constraints:
 - Design craft is what's being judged. Help the candidate execute their taste;
   don't impose a generic look.
 
+## Project skills and design references
+
+- Project-local skills are in `.agents/skills/`; see `docs/skills.md` for provenance
+  and scope. Prefer the local `frontend-design` when another skill has that name.
+- The technical specification and implementation progress are in `docs/plan.md`.
+  The current visual references and asset handoff are in
+  `design/journey/game/README.md`. Check progress before starting the next slice;
+  open product choices remain explicit in the specification.
+- Keep `docs/plan.md` as the authoritative feature documentation: requirements,
+  product and technical decisions, brief rationale, open questions, implementation
+  status, and validation. Update it in the same commit as relevant code changes.
+  Revise superseded decisions in place so the current behavior is unambiguous.
+  Do not introduce separate ADR files or a parallel decision register. Linked
+  asset handoffs and skill manifests provide supporting detail.
+
+## Branch and commit workflow
+
+- Use the single implementation branch `feat/habit-tracker-home`. Do not create
+  branches with a `codex/` prefix or additional feature branches for this work.
+- Commit actual incremental work in small, cohesive steps as it is completed and
+  checked. Follow the delivery sequence in `docs/plan.md`; keep behavior and its
+  relevant verification together. Avoid one bulk implementation commit.
+- Use clear Conventional Commit messages describing the concrete change. Do not
+  add `Co-authored-by` trailers or automatic AI co-author credits. Preserve the
+  repository's configured Git author.
+- Keep skill attribution and third-party licenses in the repository documentation.
+  Commit-message co-authoring is separate from license attribution.
+- Each implementation slice needs a short explanation of what changed, why, how
+  data flows, how it was checked, and any tradeoff. Keep documentation focused on
+  technical decisions and validation.
+- Prefer readable functions, explicit state, and minimal dependencies so the
+  implementation can be explained and extended live. Explain unfamiliar concepts
+  in the handoff instead of hiding complexity behind abstractions.
+- Inspect the staged diff before committing. Push or deploy only when explicitly
+  requested.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

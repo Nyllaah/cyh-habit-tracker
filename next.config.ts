@@ -7,12 +7,6 @@ const nextConfig: NextConfig = {
   turbopack: {
     // Pin the project root so the build ignores any lockfiles above this folder.
     root: import.meta.dirname,
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
   },
 };
 

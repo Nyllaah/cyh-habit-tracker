@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local workspace files
+/design/journey/game/generate.py
+/docs/IMPLEMENTATION_PLAN.md
+/docs/PROJECT_WALKTHROUGH.md
+/.specs/
