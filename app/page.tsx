@@ -66,7 +66,7 @@ export default function Page() {
     return () => controller.abort();
   }, [frontier, frontierKey]);
 
-  const discoverRoute = useCallback((candidates: Place[]) => dispatch({ type: "extend-route", candidates, upcomingCount: 12 }), []);
+  const discoverRoute = useCallback((candidates: Place[]) => dispatch({ type: "extend-route", candidates, appendCount: 6 }), []);
 
   async function syncHealth() {
     if (syncInFlight.current || !demoReading) return;

@@ -86,7 +86,9 @@ function stateKey(place: Place): string {
 
 // Preserve the route prefix; add the nearest unvisited place only when needed.
 export function extendRoute(route: City[], candidates: Place[], meters: number, upcomingCount = 2): City[] {
-  const target = Math.max(2, Math.min(12, Math.floor(upcomingCount)));
+  const futureCount = route.filter((city) => city.cumulativeMeters > meters).length;
+  // Bound each batch, not the lifetime size of the itinerary.
+  const target = Math.max(2, Math.min(futureCount + 12, Math.floor(upcomingCount)));
   const extended = [...route];
   const visited = new Set(route.map(placeKey));
   while (extended.filter((city) => city.cumulativeMeters > meters).length < target) {

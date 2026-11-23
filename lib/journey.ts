@@ -94,7 +94,7 @@ export type JourneyAction =
   | { type: "demo-sync"; reading: Day; history: PastJourney[] }
   | { type: "correct-day"; date: string; meters: number }
   | { type: "use-imported"; date: string }
-  | { type: "extend-route"; candidates: Place[]; upcomingCount?: number }
+  | { type: "extend-route"; candidates: Place[]; upcomingCount?: number; appendCount?: number }
   | { type: "change-origin"; origin: Place; candidates: Place[] }
   | { type: "dismiss-arrival" };
 
@@ -132,7 +132,10 @@ export function journeyReducer(state: JourneyState, action: JourneyAction): Jour
   }
   if (action.type === "extend-route") {
     const candidates = distinctPlaces([...state.candidates, ...action.candidates]);
-    const route = extendRoute(state.route, availableCandidates(state, candidates), routeMeters(state), action.upcomingCount);
+    const meters = routeMeters(state);
+    const target = action.appendCount === undefined ? action.upcomingCount
+      : state.route.filter((city) => city.cumulativeMeters > meters).length + Math.max(0, Math.min(12, Math.floor(action.appendCount)));
+    const route = extendRoute(state.route, availableCandidates(state, candidates), meters, target);
     if (route.length === state.route.length && candidates.length === state.candidates.length) return state;
     return reconcileJourney(state, state.days, route, candidates);
   }

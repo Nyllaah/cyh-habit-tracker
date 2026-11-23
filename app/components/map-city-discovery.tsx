@@ -1,18 +1,21 @@
 import { useEffect, useRef } from "react";
 import type * as Leaflet from "leaflet";
-import { citiesInView, discoverMapCities, type MapCityView } from "@/lib/cities";
-import { type Place } from "@/lib/places";
+import { citiesInView, discoverMapCities, discoverRouteCities, type MapCityView } from "@/lib/cities";
+import { distinctPlaces, type Place } from "@/lib/places";
 
 type Props = {
   api: { map: Leaflet.Map; library: typeof Leaflet } | null;
   country: string;
+  frontier: Place;
   catalog: Place[];
   onDiscover: (places: Place[]) => void;
 };
 
-// Discovery supplies candidates; the reducer preserves and extends the itinerary.
-export function MapCityDiscovery({ api, country, catalog, onDiscover }: Props) {
+// One batch per settled movement. Route updates must not trigger another lookup.
+export function MapCityDiscovery({ api, country, frontier, catalog, onDiscover }: Props) {
   const cache = useRef(new Map<string, Place[]>());
+  const latestFrontier = useRef(frontier);
+  useEffect(() => { latestFrontier.current = frontier; }, [frontier]);
   useEffect(() => {
     if (!api) return;
     const { map } = api;
@@ -22,31 +25,43 @@ export function MapCityDiscovery({ api, country, catalog, onDiscover }: Props) {
     let popupOpen = false;
 
     function cancel() { version++; clearTimeout(timer); controller?.abort(); }
+    async function cached(key: string, load: () => Promise<Place[]>, request: number) {
+      const saved = cache.current.get(key);
+      if (saved) return saved;
+      const places = await load();
+      if (request === version) {
+        if (cache.current.size >= 32) cache.current.delete(cache.current.keys().next().value!);
+        cache.current.set(key, places);
+      }
+      return places;
+    }
     function refresh() {
       cancel();
       if (popupOpen) return;
       const center = map.getCenter(), bounds = map.getBounds();
       const view: MapCityView = { latitude: center.lat, longitude: center.lng, south: bounds.getSouth(), west: bounds.getWest(), north: bounds.getNorth(), east: bounds.getEast(), radiusKm: center.distanceTo(bounds.getNorthEast()) / 1000, country };
-      const key = [country, view.south, view.west, view.north, view.east].map((value) => typeof value === "number" ? value.toFixed(2) : value).join("|");
-      const saved = cache.current.get(key);
-      onDiscover(saved ?? citiesInView(catalog, view));
-      // Country/world views use saved markers; zoom in for bounded public lookups.
-      if (saved || map.getZoom() < 5) return;
+      const viewKey = [country, view.south, view.west, view.north, view.east].map((value) => typeof value === "number" ? value.toFixed(2) : value).join("|");
       const request = version;
+      const zoom = map.getZoom();
       timer = setTimeout(async () => {
         controller = new AbortController();
+        const signal = controller.signal;
+        const tail = latestFrontier.current;
         try {
-          const places = await discoverMapCities(view, catalog, controller.signal);
-          if (request !== version || controller.signal.aborted) return;
-          if (cache.current.size >= 16) cache.current.delete(cache.current.keys().next().value!);
-          cache.current.set(key, places);
-          if (!popupOpen) onDiscover(places);
+          const [visible, onward] = await Promise.all([
+            zoom < 5 ? Promise.resolve(citiesInView(catalog, view))
+              : cached(`view|${viewKey}`, () => discoverMapCities(view, catalog, signal), request),
+            discoverRouteCities(tail, catalog, signal),
+          ]);
+          if (request !== version || signal.aborted || popupOpen) return;
+          // Merge both results once: cached views still allow a fresh tail to grow.
+          onDiscover(distinctPlaces([...visible, ...onward]));
         } catch { /* New movement or unmount cancels obsolete results. */ }
       }, 650);
     }
 
     function openPopup() { popupOpen = true; cancel(); }
-    function closePopup() { popupOpen = false; refresh(); }
+    function closePopup() { popupOpen = false; }
     function closeForNavigation() { map.closePopup(); }
     map.on("popupopen", openPopup);
     map.on("popupclose", closePopup);

@@ -89,6 +89,22 @@ export async function discoverNearby(origin: Place, catalog: Place[], signal?: A
   }
 }
 
+// Explore from the itinerary end as well as the visible map. A larger bounded
+// result set helps avoid returning only cities already in the route.
+export async function discoverRouteCities(origin: Place, catalog: Place[], signal?: AbortSignal, fetcher: typeof fetch = fetch): Promise<Place[]> {
+  const url = cityUrl("/reverse");
+  url.searchParams.set("lat", String(origin.latitude));
+  url.searchParams.set("lon", String(origin.longitude));
+  url.searchParams.set("radius", "250");
+  url.searchParams.set("limit", "100");
+  try {
+    return nearbyPlaces(origin, [...normalizeCities(await requestCities(url, signal, fetcher), catalog), ...catalog]);
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    return nearbyPlaces(origin, catalog);
+  }
+}
+
 export function readStartingLocation(): Promise<Place> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation || !window.isSecureContext) {
