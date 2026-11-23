@@ -32,11 +32,11 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
       map.on("zoomend", showOverviewMarkers);
       map.attributionControl.setPrefix(false);
       map.createPane("country").style.zIndex = "150";
-      library.geoJSON(countryMaps, { pane: "country", interactive: false, style: { color: "#9CBFAF", weight: 1.5, fillColor: "#E8F0E7", fillOpacity: 1 } }).addTo(map);
+      library.geoJSON(countryMaps, { pane: "country", interactive: false, style: { color: "#35766A", weight: 1.5, fillColor: "#174E47", fillOpacity: 1 } }).addTo(map);
       const tiles = library.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19, minZoom: 2, keepBuffer: 0, updateWhenIdle: true,
-        // Soften street detail beneath the fully opaque journey layers.
-        opacity: 0.5,
+        // Blend street detail into the dark teal base below the bright journey.
+        opacity: 0.3,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://www.naturalearthdata.com/">Natural Earth</a>',
       }).addTo(map);
       let loaded = false;
@@ -66,11 +66,11 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
     const { map, library: L } = api;
     const layers = L.layerGroup().addTo(map);
     const points = fullRoute.map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
-    L.polyline(points, { color: "#FEFFFD", weight: 9, interactive: false }).addTo(layers);
-    L.polyline(points, { className: "map-route-line", color: "#12786F", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
+    L.polyline(points, { color: "#103F3C", weight: 9, interactive: false }).addTo(layers);
+    L.polyline(points, { className: "map-route-line", color: "#9BE5D0", weight: 4, dashArray: "5 8", interactive: false }).addTo(layers);
     const position = journeyPosition(fullRoute, meters);
     const reached = fullRoute.filter((city) => city.cumulativeMeters <= meters).map((city): Leaflet.LatLngTuple => [city.latitude, city.longitude]);
-    L.polyline([...reached, [position.latitude, position.longitude]], { color: "#12786F", weight: 5, interactive: false }).addTo(layers);
+    L.polyline([...reached, [position.latitude, position.longitude]], { color: "#20B8A6", weight: 5, interactive: false }).addTo(layers);
     const next = nextCity(fullRoute, meters);
     const landmarks: { marker: Leaflet.Marker; city: City; size: number; priority: number }[] = [];
     fullRoute.forEach((city) => {
@@ -79,7 +79,7 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
       const isNext = city === next;
       const icon = L.divIcon({
         className: `map-city-marker${isNext ? " map-city-next" : ""}${capital ? " map-capital-marker" : ""}${earned ? " is-collected" : ""}`,
-        html: `<span class="map-landmark-card"><img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt=""></span>${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}<span class="route-city-dot" aria-hidden="true"></span>`,
+        html: `<span class="map-landmark"><img src="/journey/game/cities/${cityArtwork(city)}.svg" width="48" height="48" alt=""></span>${capital ? '<span class="map-capital-emblem" aria-hidden="true">★</span>' : ""}<span class="route-city-dot" aria-hidden="true"></span>`,
         iconSize: isNext ? [56, 56] : [44, 44], iconAnchor: isNext ? [28, 28] : [22, 22],
         popupAnchor: isNext ? [0, -28] : [0, -22],
       });
@@ -103,7 +103,7 @@ export function JourneyMap({ route: fullRoute, meters, onDiscoverCities }: { rou
     });
     L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
     // Keep the next stop and earned landmarks prominent. Nearby illustrations
-    // become dots until zooming gives each badge enough screen space.
+    // become dots until zooming gives each icon enough screen space.
     const ranked = landmarks.slice().sort((a, b) => a.priority - b.priority);
     function spaceLandmarks() {
       const occupied: { point: Leaflet.Point; size: number }[] = [];
