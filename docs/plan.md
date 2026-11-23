@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** Design review draft. Application implementation has not started.
+**Status:** Implementation in progress. S1 (daily journey and simulated health sync) is implemented; later slices remain planned.
 
 ## Problem
 
@@ -93,7 +93,8 @@ when implementing and update that comparison artifact during visual integration.
 - Merge imports by source/day identity. Re-reading an identical source record cannot add distance or repeat an arrival.
 - Keep the imported value when a manual override exists. A later import must not silently remove the correction.
 - Formatting never writes back into stored distance. Repeated unit switches and unchanged saves must not introduce rounding drift.
-- Health integration is a local simulation identified by a compact “Demo” label. It updates the journey without a second manual save.
+- The habit is walking and running distance. Health integration is a local simulation identified by a compact “Demo” label. It updates the journey without a second manual save.
+- Earned stamps are recalculated from corrected accumulated distance. Arrival announcements are tracked separately so an identical re-sync cannot replay them.
 
 ### Origin and city discovery
 
@@ -222,6 +223,13 @@ and architecture guidance in the repository documentation.
 
 The repository carries [three project-local skills](skills.md), including source revision and attribution. The current work uses TLC's planning structure and frontend-design guidance; the best-practices skill is available for implementation. Installation does not constitute a completed audit or an approved build plan.
 
+### Implementation progress
+
+- Foundation: `f78bba9` records the skills, design assets, and technical guidance together before application implementation.
+- S1: the page composes the original landmark/scenery SVGs with live route progress, daily distance, and stamp states. A local asynchronous health adapter imports a daily total automatically. Pure functions in `lib/journey.ts` calculate distance and arrivals; a reducer prevents duplicate imports and arrival replay. `lib/data.ts` loads the local JSON fixture.
+- Styling uses plain CSS with shared tokens. The unused Tailwind CSS loader was removed from `next.config.ts`; no component framework or new runtime dependency was added. The font stack uses Ubuntu Sans when available and local sans-serif fallbacks, avoiding a build-time font download.
+- Verification for S1: five rule tests pass, ESLint passes, production build passes, and the running page was exercised at 360px, 390px, and 1024px. Browser checks cover automatic import, new-city arrival, unchanged re-sync, Escape dismissal, reduced motion, and absence of page runtime errors. Later slices and the final independent review are still pending.
+
 Test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. A fresh review follows implementation; record actual results rather than anticipated passes.
 
 No remote publishing or deployment is part of this phase.
@@ -237,9 +245,9 @@ No remote publishing or deployment is part of this phase.
 
 ## Open decisions
 
-Before the affected behavior is implemented: final walking/running/steps definition; daily target; default unit and metric summary formatting; city catalog and destination pacing bounds; treatment of a changed origin; stamp retention after downward corrections; persistence; weekly/monthly goals; paid-feature preview content. The mockup's numbers and DC corridor are illustrative fixtures.
+Before the affected behavior is implemented: daily target, if included; default unit and metric summary formatting; city catalog and destination pacing bounds; treatment of a changed origin; persistence; weekly/monthly goals; paid-feature preview content. The habit is walking/running distance, and stamps recalculate after corrections. The mockup's numbers and DC corridor are illustrative fixtures.
 
-The current phase delivers reviewable graphics and a technical draft. No full-plan approval or completed implementation is recorded.
+Implementation proceeds in the documented slices. The initial screen does not yet include unit switching, daily correction, origin selection, or activity history; these remain part of the delivery sequence.
 
 ## Sources
 

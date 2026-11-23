@@ -45,4 +45,4 @@ Sample coordinates come from the [US Census Virginia place table](https://tigerw
 
 A separate [Canva portrait exploration](https://canva.link/15830ispzmw7buz) was generated through the Canva connector using the selected palette and concise journey-screen brief. It is independently editable in Canva and is not an exported source for the local graphics. The connector did not expose a general stock-icon search or asset-export tool. An earlier square Canva study is superseded by the portrait study.
 
-No application code has been changed, and the design is not yet approved as an implementation reference.
+Application progress and the current implementation scope are recorded in `docs/plan.md`. The game-map handoff supersedes these earlier studies.

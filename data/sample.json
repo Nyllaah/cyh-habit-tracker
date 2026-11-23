@@ -1,18 +1,65 @@
 {
-  "_comment": "This is placeholder data so the scaffold has something to render. Replace all of it to fit the daily goal you choose. Keep it a local file in this repo. Do not add a backend or a database.",
-  "goalTitle": "Sample daily goal",
-  "goalSubtitle": "Swap this content for whatever your daily moment needs",
-  "streakDays": 4,
-  "history": [
-    { "date": "2026-11-13", "done": true },
-    { "date": "2026-11-14", "done": true },
-    { "date": "2026-11-15", "done": false },
-    { "date": "2026-11-16", "done": true },
-    { "date": "2026-11-17", "done": false }
+  "habit": "Walking and running",
+  "today": "2026-11-22",
+  "timeZone": "America/New_York",
+  "days": [
+    {
+      "date": "2026-11-19",
+      "importedMeters": 3200
+    },
+    {
+      "date": "2026-11-20",
+      "importedMeters": 4000
+    },
+    {
+      "date": "2026-11-21",
+      "importedMeters": 2800
+    }
   ],
-  "items": [
-    { "id": "a", "label": "First sample item", "detail": "e.g. a word to learn, an amount to save, a wind-down step" },
-    { "id": "b", "label": "Second sample item", "detail": "Shape this list around your goal" },
-    { "id": "c", "label": "Third sample item", "detail": "The scaffold just proves the data loads; the design is yours" }
+  "healthImport": {
+    "date": "2026-11-22",
+    "importedMeters": 2400
+  },
+  "route": [
+    {
+      "id": "washington",
+      "name": "Washington",
+      "region": "DC",
+      "latitude": 38.9042429,
+      "longitude": -77.0165243,
+      "cumulativeMeters": 0
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "region": "VA",
+      "latitude": 38.8188148,
+      "longitude": -77.0832273,
+      "cumulativeMeters": 11117
+    },
+    {
+      "id": "occoquan",
+      "name": "Occoquan",
+      "region": "VA",
+      "latitude": 38.681729,
+      "longitude": -77.2618611,
+      "cumulativeMeters": 32850
+    },
+    {
+      "id": "fredericksburg",
+      "name": "Fredericksburg",
+      "region": "VA",
+      "latitude": 38.2992718,
+      "longitude": -77.4866583,
+      "cumulativeMeters": 79662
+    },
+    {
+      "id": "richmond",
+      "name": "Richmond",
+      "region": "VA",
+      "latitude": 37.531399,
+      "longitude": -77.4760085,
+      "cumulativeMeters": 165051
+    }
   ]
 }

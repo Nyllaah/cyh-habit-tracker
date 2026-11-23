@@ -1,45 +1,117 @@
-// ============================================================================
-// This is your canvas.
-//
-// Replace everything in this component with the main daily moment of your app:
-// the screen where a person does the thing each day, marks it done, and feels a
-// small, satisfying pull to come back tomorrow.
-//
-// What's here now is just a starter message. Delete it and build your own thing.
-// Design mobile-first; make it responsive if you like. Full brief is in the
-// README. A sample data file is ready for you at data/sample.json, with a small
-// typed loader in lib/data.ts (import { getDailyGoal } from "@/lib/data").
-// ============================================================================
+"use client";
+
+import Image from "next/image";
+import { useEffect, useReducer, useRef, useState } from "react";
+import { JourneyMap } from "@/app/components/journey-map";
+import { getJourneySample } from "@/lib/data";
+import { readDemoHealth } from "@/lib/health";
+import { arrivedCities, effectiveMeters, formatKilometers, initialJourney, journeyReducer, nextCity, totalMeters, type City } from "@/lib/journey";
+
+const sample = getJourneySample();
+
+function Icon({ name, className = "" }: { name: string; className?: string }) {
+  return <Image className={`icon ${className}`} src={`/journey/icons/${name}.svg`} width={24} height={24} alt="" />;
+}
+
+function Arrival({ city, next, onContinue }: { city: City; next?: City; onContinue: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    element?.showModal();
+    return () => element?.close();
+  }, []);
+  return (
+    <dialog ref={dialog} className="arrival-dialog" aria-labelledby="arrival-title" onCancel={onContinue}>
+      <p className="arrival-eyebrow">A new place. Yours.</p>
+      <div className="arrival-art">
+        <span className="spark spark-one" aria-hidden="true">✦</span>
+        <Image className="arrival-stamp" src={`/journey/game/stamps/${city.id}-earned.svg`} width={173} height={206} alt={`${city.name}, ${city.region} collected stamp`} />
+        <span className="spark spark-two" aria-hidden="true">✦</span>
+      </div>
+      <h2 id="arrival-title">{city.name} unlocked</h2>
+      {next && <p className="arrival-next">Next stop: {next.name}</p>}
+      <button className="primary-button" onClick={onContinue}>Continue journey</button>
+    </dialog>
+  );
+}
 
 export default function Page() {
+  const [state, dispatch] = useReducer(journeyReducer, undefined, () => initialJourney(sample.days, sample.route));
+  const [syncing, setSyncing] = useState(true);
+  const syncInFlight = useRef(true);
+  const meters = totalMeters(state.days);
+  const next = nextCity(state.route, meters);
+  const arrivals = arrivedCities(state.route, meters);
+  const today = state.days.find((day) => day.date === sample.today);
+
+  useEffect(() => {
+    let cancelled = false;
+    readDemoHealth(sample.healthImport).then((reading) => {
+      if (cancelled) return;
+      dispatch({ type: "import", reading });
+      syncInFlight.current = false;
+      setSyncing(false);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  async function syncHealth() {
+    if (syncInFlight.current) return;
+    syncInFlight.current = true;
+    setSyncing(true);
+    try {
+      const reading = await readDemoHealth(sample.healthImport);
+      dispatch({ type: "import", reading });
+    } finally {
+      syncInFlight.current = false;
+      setSyncing(false);
+    }
+  }
+
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-6 px-6 text-center">
-      <span className="rounded-full border border-neutral-200 px-3 py-1 text-xs font-medium uppercase tracking-wide text-neutral-500">
-        Starter scaffold
-      </span>
+    <main className="home">
+      <header className="home-header">
+        <div className="brand-mark" aria-hidden="true"><Icon name="passport" /></div>
+        <h1>Your journey</h1>
+        <span className="habit-label">Walk + run</span>
+      </header>
 
-      <div className="flex flex-col gap-3">
-        <h1 className="text-2xl font-semibold text-neutral-900">
-          This screen is your canvas
-        </h1>
-        <p className="text-base leading-relaxed text-neutral-600">
-          Build the main daily moment here, in{" "}
-          <code className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[0.85em] text-neutral-700">
-            app/page.tsx
-          </code>
-          . The full brief is in the{" "}
-          <code className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[0.85em] text-neutral-700">
-            README
-          </code>
-          .
-        </p>
-      </div>
+      <p className="origin"><Icon name="location" /> {state.route[0].name}, {state.route[0].region}</p>
 
-      <p className="text-sm text-neutral-400">
-        There&apos;s a sample data file at{" "}
-        <code className="font-mono">data/sample.json</code> to build from. Reshape
-        it to fit your goal.
-      </p>
+      <section className="journey-section" aria-labelledby="next-stop-title">
+        <div className="destination-heading">
+          <div><p className="eyebrow">Next stop</p><h2 id="next-stop-title">{next?.name ?? "Journey complete"}</h2></div>
+          {next && <p className="remaining"><strong>{formatKilometers(next.cumulativeMeters - meters)}</strong><span>to go</span></p>}
+        </div>
+        <div className="map-container">
+          <JourneyMap route={state.route} meters={meters} />
+          <p className="traveled"><Icon name="footsteps" />{formatKilometers(meters)} traveled</p>
+        </div>
+      </section>
+
+      <section className="today-card" aria-labelledby="today-title">
+        <h2 id="today-title">Today</h2>
+        <p className="today-distance" aria-live="polite" aria-atomic="true">{formatKilometers(today ? effectiveMeters(today) : 0)}</p>
+        <Icon name="footsteps" className="today-footsteps" />
+        <div className="health-row">
+          <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : "Health Connect · Demo"}</p>
+          <button className="icon-button light-icon" disabled={syncing} aria-label="Sync health activity" onClick={syncHealth}><Icon name="sync" className={syncing ? "spinning" : ""} /></button>
+        </div>
+      </section>
+
+      <section className="passport" aria-labelledby="passport-title">
+        <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivals.length} {arrivals.length === 1 ? "arrival" : "arrivals"}</p></div>
+        <ul className="stamp-grid">
+          {state.route.slice(0, 3).map((city, index) => {
+            const earned = index === 0 || meters >= city.cumulativeMeters;
+            return <li key={city.id}>
+              <Image src={`/journey/game/stamps/${city.id}-${earned ? "earned" : "future"}.svg`} width={144} height={172} alt={`${city.name}, ${city.region}: ${index === 0 ? "starting city" : earned ? "collected" : "up next"}`} />
+            </li>;
+          })}
+        </ul>
+      </section>
+
+      {state.arrivals[0] && <Arrival key={state.arrivals[0].id} city={state.arrivals[0]} next={next} onContinue={() => dispatch({ type: "dismiss-arrival" })} />}
     </main>
   );
 }

@@ -19,9 +19,10 @@ Build it in `app/page.tsx`. Hold to these constraints:
 
 - Project-local skills are in `.agents/skills/`; see `docs/skills.md` for provenance
   and scope. Prefer the local `frontend-design` when another skill has that name.
-- The technical draft is `docs/plan.md`. The current visual proposal and asset
-  handoff are in `design/journey/game/README.md`. Application implementation has
-  not started; proposal graphics do not imply approval of open product choices.
+- The technical specification and implementation progress are in `docs/plan.md`.
+  The current visual references and asset handoff are in
+  `design/journey/game/README.md`. Check progress before starting the next slice;
+  open product choices remain explicit in the specification.
 
 ## Branch and commit workflow
 

@@ -1,16 +1,75 @@
-@import "tailwindcss";
-
-@theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --paper: #f5f8f7;
+  --surface: #fefffd;
+  --ink: #103f3c;
+  --teal: #12786f;
+  --turquoise: #20b8a6;
+  --orange: #ef8852;
+  --muted: #506e68;
+  --line: #d4e2dd;
+  --font-sans: "Ubuntu Sans", "Trebuchet MS", sans-serif;
 }
 
-/* Neutral base. The look is yours to define, restyle freely. */
-html,
-body {
-  height: 100%;
-}
-
-body {
-  font-family: var(--font-sans), system-ui, sans-serif;
-}
+* { box-sizing: border-box; }
+html { min-height: 100%; background: var(--paper); }
+body { margin: 0; font-family: var(--font-sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+button { font: inherit; cursor: pointer; touch-action: manipulation; }
+button:disabled { cursor: wait; }
+button:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+button, a { -webkit-tap-highlight-color: transparent; }
+.home { width: 100%; max-width: 440px; margin: 0 auto; padding: 22px 16px 48px; }
+.home-header { display: flex; align-items: center; gap: 10px; }
+.brand-mark { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: var(--ink); transform: rotate(-12deg); }
+.brand-mark .icon { width: 21px; height: 21px; filter: invert(70%) sepia(50%) saturate(530%) hue-rotate(117deg); }
+h1,h2,p { margin: 0; }
+h1 { font-size: clamp(24px, 6.8vw, 29px); letter-spacing: -.9px; font-weight: 800; line-height: 1.15; }
+.habit-label { margin-left: auto; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.icon { display: inline-block; flex-shrink: 0; width: 24px; height: 24px; }
+.origin { display: flex; align-items: center; gap: 6px; margin: 20px 6px 25px; font-size: 14px; }
+.origin .icon { width: 18px; height: 18px; }
+.destination-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 6px 16px; }
+.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
+.destination-heading h2 { font-size: 30px; line-height: 1.12; letter-spacing: -.7px; font-weight: 800; }
+.remaining { text-align: right; white-space: nowrap; }
+.remaining strong { font-size: 23px; letter-spacing: -.6px; font-weight: 700; }
+.remaining span { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
+.map-container { position: relative; overflow: hidden; border-radius: 28px; }
+.journey-map { width: 100%; display: block; aspect-ratio: 1; overflow: hidden; fill: var(--ink); }
+.traveled { position: absolute; bottom: 8px; left: 12px; padding: 6px 12px 6px 9px; display: flex; align-items: center; gap: 6px; background: var(--surface); border-radius: 20px; font-size: 11px; font-weight: 600; }
+.traveled .icon { width: 15px; height: 15px; }
+.today-card { position: relative; margin-top: 22px; padding: 20px 20px 8px; border-radius: 24px; background: var(--ink); color: var(--surface); }
+.today-card h2 { font-size: 16px; font-weight: 500; }
+.today-distance { margin-top: 3px; font-size: 35px; letter-spacing: -1px; font-weight: 700; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.today-footsteps { position: absolute; right: 48px; top: 46px; width: 32px; height: 32px; filter: invert(70%) sepia(50%) saturate(530%) hue-rotate(117deg); transform: rotate(-12deg); }
+.health-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 12px; }
+.health-row p { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #c2e1d7; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--turquoise); }
+.icon-button { display: grid; place-items: center; width: 44px; height: 44px; background: transparent; border: 0; border-radius: 50%; }
+.light-icon .icon { filter: brightness(0) invert(1); }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 6px 20px; }
+.section-heading h2 { font-size: 23px; font-weight: 800; letter-spacing: -.5px; }
+.section-heading p { font-size: 12px; color: var(--muted); }
+.passport { margin-top: 30px; }
+.stamp-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stamp-grid img { width: 100%; height: auto; }
+.stamp-grid li:nth-child(3n + 1) { transform: rotate(-4deg); }
+.stamp-grid li:nth-child(3n + 2) { transform: rotate(3deg); }
+.stamp-grid li:nth-child(3n) { transform: rotate(-2deg); }
+html:has(dialog[open]) { overflow: hidden; }
+.arrival-dialog { border: 0; padding: 32px 24px; width: min(calc(100vw - 32px), 358px); max-height: calc(100dvh - 32px); margin: auto; border-radius: 28px; background: var(--paper); color: var(--ink); text-align: center; overflow-y: auto; }
+.arrival-dialog::backdrop { background: rgb(16 63 60 / 40%); }
+.arrival-eyebrow { font-size: 25px; letter-spacing: -.7px; font-weight: 800; }
+.arrival-art { position: relative; display: flex; justify-content: center; padding: 25px 0; }
+.arrival-stamp { transform: rotate(-7deg); animation: stamp-arrives 400ms cubic-bezier(.22,1,.36,1); }
+.spark { position: absolute; color: var(--orange); font-size: 28px; }
+.spark-one { left: 0; top: 50px; }
+.spark-two { right: 0; bottom: 40px; }
+.arrival-dialog h2 { font-size: 21px; font-weight: 700; letter-spacing: -.4px; }
+.arrival-next { color: var(--muted); font-size: 14px; margin-top: 9px; }
+.primary-button { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 17px; background: var(--teal); box-shadow: 0 4px 0 var(--ink); color: var(--surface); font-size: 16px; font-weight: 700; margin-top: 32px; padding: 12px 18px; transition: transform 120ms ease-out; }
+.primary-button:active { transform: translateY(2px); }
+.spinning { animation: spin 1.3s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes stamp-arrives { from { opacity: 0; transform: translateY(12px) rotate(-12deg) scale(.92); } to { opacity: 1; transform: rotate(-7deg) scale(1); } }
+@media (min-width: 600px) { body { padding: 24px 0; background: #e4ece8; } .home { padding: 24px 20px 48px; border-radius: 32px; background: var(--paper); box-shadow: 0 12px 60px rgb(16 63 60 / 6%); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
