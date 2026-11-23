@@ -40,7 +40,8 @@ h1 { font-size: clamp(24px, 6.8vw, 29px); letter-spacing: -.9px; font-weight: 80
 .today-card { position: relative; margin-top: 22px; padding: 20px 20px 8px; border-radius: 24px; background: var(--ink); color: var(--surface); }
 .today-card h2 { font-size: 16px; font-weight: 500; }
 .today-distance { margin-top: 3px; font-size: 35px; letter-spacing: -1px; font-weight: 700; line-height: 1.25; font-variant-numeric: tabular-nums; }
-.today-footsteps { position: absolute; right: 48px; top: 46px; width: 32px; height: 32px; filter: invert(70%) sepia(50%) saturate(530%) hue-rotate(117deg); transform: rotate(-12deg); }
+.today-distance-row { display: flex; align-items: center; gap: 12px; padding-right: 28px; }
+.today-footsteps { width: 24px; height: 24px; filter: invert(70%) sepia(50%) saturate(530%) hue-rotate(117deg); transform: rotate(-12deg); }
 .health-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 12px; }
 .health-row p { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #c2e1d7; }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--turquoise); }

@@ -155,8 +155,10 @@ export default function Page() {
       <section className="today-card" aria-labelledby="today-title">
         <h2 id="today-title">Today</h2>
         <button type="button" className="icon-button light-icon edit-total" aria-label="Edit today's total" onClick={() => setEditing(true)}><Icon name="edit" /></button>
-        <p className="today-distance" aria-live="polite" aria-atomic="true">{formatDistance(today ? effectiveMeters(today) : 0, unit)}</p>
-        <Icon name="footsteps" className="today-footsteps" />
+        <div className="today-distance-row">
+          <p className="today-distance" aria-live="polite" aria-atomic="true">{formatDistance(today ? effectiveMeters(today) : 0, unit)}</p>
+          <Icon name="footsteps" className="today-footsteps" />
+        </div>
         <div className="health-row">
           <p role="status"><span className="status-dot" />{syncing ? "Syncing · Demo" : today?.manualOverrideMeters !== undefined ? "Manual total · Demo" : "Health Connect · Demo"}</p>
           <button ref={syncButton} className="icon-button light-icon" disabled={syncing || !demoReading} aria-label="Sync health activity" title={!demoReading ? "Choose a starting city first" : "Sync health activity"} onClick={syncHealth}>

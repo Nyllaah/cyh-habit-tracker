@@ -353,6 +353,8 @@ The repository carries [three project-local skills](skills.md), including source
 
 - City-first validation: sixty-four rule tests, lint, and production build pass. Tests cover an empty active route with retained history/rewards, seven saved demo origins starting at zero, one route-specific checkpoint reached per first sync, repeat protection, later city changes, and manual-override precedence. Browser checks cover no selected city/active country, disabled initial sync, manual New York selection, Boston/Brazil resets, preservation of Year selection, stale-sync rejection, refresh reset, and 320/360/390/1024 widths. Initial and active states have no Axe WCAG 2 A/AA violations. Chromium checks initial GPS, denied permission/manual fallback, and an obsolete GPS result after manual city selection; WebKit checks initial GPS selection. Start-panel and zero-distance route captures were visually inspected. No new dependency was added.
 
+- Daily-total refinement: the decorative footsteps icon now sits in the distance row beside the number, using normal flex layout rather than an unrelated absolute position. It remains decorative; the live distance announcement and edit action are unchanged. Lint and phone/desktop layout checks verify the icon stays next to metric and mile values.
+
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 
 No remote publishing or deployment is part of this phase.
