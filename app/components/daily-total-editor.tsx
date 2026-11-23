@@ -57,7 +57,11 @@ export function DailyTotalEditor({ meters, importedMeters, hasCorrection, unit, 
   }
 
   return (
-    <dialog ref={dialog} className="total-sheet" aria-labelledby="total-title" aria-describedby="total-description" onKeyDown={containTab} onCancel={onClose} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <dialog ref={dialog} className="total-sheet" aria-labelledby="total-title" aria-describedby="total-description" onKeyDown={containTab} onCancel={onClose} onClick={(event) => {
+      if (event.target !== event.currentTarget) return;
+      const bounds = event.currentTarget.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+    }}>
       <form onSubmit={save} noValidate>
         <div className="sheet-handle" aria-hidden="true" />
         <div className="sheet-heading">
@@ -67,7 +71,7 @@ export function DailyTotalEditor({ meters, importedMeters, hasCorrection, unit, 
         <p id="total-description" className="sheet-description">Replaces the imported total</p>
         <label className="distance-input" htmlFor="daily-total">
           <span className="sr-only">{unit === "metric" ? "Today's total in meters" : "Today's total in miles"}</span>
-          <input ref={input} id="daily-total" type="text" inputMode={unit === "metric" ? "numeric" : "decimal"} autoComplete="off" value={value} onChange={(event) => { setValue(event.target.value); setError(""); }} aria-invalid={!!error} aria-describedby={error ? "distance-error" : "total-description"} />
+          <input ref={input} id="daily-total" type="text" enterKeyHint="done" inputMode={unit === "metric" ? "numeric" : "decimal"} autoComplete="off" value={value} onChange={(event) => { setValue(event.target.value); setError(""); }} aria-invalid={!!error} aria-describedby={error ? "distance-error" : "total-description"} />
           <span aria-hidden="true">{unit === "metric" ? "m" : "mi"}</span>
         </label>
         {error && <p id="distance-error" className="input-error" role="alert">{error}</p>}

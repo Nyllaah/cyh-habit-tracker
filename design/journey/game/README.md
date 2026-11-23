@@ -39,7 +39,7 @@ Your rhythm follows the collection in the full-page study. Month is the default 
 
 The proposed intensity uses six equal distance bands from zero to the displayed period's maximum effective daily distance. One scale applies to the entire year in Year mode. Zero is neutral; future dates are outlined. Missing records must read as unrecorded, not inferred zero. Changed maxima may recolor a period; switching units cannot. Numbers and accessible names supply exact information alongside color. Streak counts and missed-day penalties are not introduced.
 
-`history-sample.json` is an independent visual fixture ending November 22, 2026. It demonstrates a populated history rather than reconciled lifetime journey totals. Consolidate this and the earlier 12.4km route fixture into one consistent sample account before implementing. Actual views must derive from the same corrected daily records. The contribution-grid layout follows the requested yearly direction; detailed scale and interaction behavior remain review proposals.
+`history-sample.json` is an independent visual fixture ending November 22, 2026. It demonstrates a populated history rather than reconciled lifetime journey totals. The runtime uses the short account in `data/sample.json` for both journey and history; this longer visual fixture is not loaded by the application. Actual views must derive from the same corrected daily records. The contribution-grid layout follows the requested yearly direction; detailed scale and interaction behavior remain review proposals.
 
 ## Implementation handoff
 
@@ -53,6 +53,25 @@ The proposed intensity uses six equal distance bands from zero to the displayed 
 - At short phone heights, the passport continues below the fold. Keep the map, remaining distance, and today's activity in the main scroll flow. Sheets must fit the available viewport and scroll internally when the keyboard opens.
 - Typography uses Ubuntu Sans, with a heavy title weight and regular supporting text. No font binaries are bundled; choose a properly licensed font delivery method during implementation and check actual metrics.
 - Motion proposal: a 120ms press response and a 400ms stamp entrance using transform/opacity. Arrival happens once per newly reached city; re-sync cannot replay it. Reduced motion shows the final state immediately. No animation runtime is needed for these static assets.
+
+## Runtime comparison
+
+The implemented page follows `docs/plan.md`: map/next stop, today's activity,
+monthly or yearly history, then the passport. The full-page study above shows an
+earlier order with the passport before history. The header uses the selected city
+control and unit switch; it does not introduce a separate settings or information flow.
+
+The illustrations and palette remain the source for the interface. Runtime labels,
+route windows, and stamp states follow the selected cities and activity. Stamp frames
+are slightly taller (184 rather than 172 design units) to reserve space for two-line
+names. The arrival overlay keeps the illustrated stamp and sparks, with a compact
+layout for short phone heights. Passport browsing expands inline with native controls.
+
+The source history studies show an illustrative populated account. Runtime history
+shows only the shared sample's recorded days, distinguishing missing, zero, and future
+dates. Year is a continuous week grid with local horizontal scrolling. Browser
+comparisons and measurements are recorded in the feature plan; the static studies
+remain design references rather than screenshots of the running app.
 
 ## Validation and provenance
 

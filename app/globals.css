@@ -2,6 +2,7 @@
   --paper: #f5f8f7;
   --surface: #fefffd;
   --ink: #103f3c;
+  --ink-strong: #082e2b;
   --teal: #12786f;
   --turquoise: #20b8a6;
   --orange: #ef8852;
@@ -29,7 +30,7 @@ h1 { font-size: clamp(24px, 6.8vw, 29px); letter-spacing: -.9px; font-weight: 80
 .destination-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 6px 16px; }
 .eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700; color: var(--teal); margin-bottom: 6px; }
 .destination-heading h2 { font-size: 30px; line-height: 1.12; letter-spacing: -.7px; font-weight: 800; }
-.remaining { text-align: right; white-space: nowrap; }
+.remaining { flex-shrink: 0; text-align: right; white-space: nowrap; }
 .remaining strong { font-size: 23px; letter-spacing: -.6px; font-weight: 700; }
 .remaining span { display: block; font-size: 12px; color: var(--muted); margin-top: 3px; }
 .map-container { position: relative; overflow: hidden; border-radius: 28px; }
@@ -96,7 +97,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .input-error { margin-top: 12px; font-size: 14px; color: #943f27; }
 
 button.origin { min-height: 44px; max-width: calc(100% - 12px); padding: 0; border: 0; background: transparent; text-align: left; margin-top: 12px; margin-bottom: 18px; }
-button.origin > span { overflow-wrap: anywhere; }
+button.origin .origin-name { min-width: 0; overflow-wrap: anywhere; }
 button.origin .origin-chevron { width: 16px; height: 16px; }
 .destination-heading > div { min-width: 0; }
 .destination-heading h2 { overflow-wrap: anywhere; }
@@ -145,7 +146,7 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .calendar-weekdays { margin-bottom: 8px; text-align: center; font-size: 12px; color: var(--muted); }
 .calendar-weekdays span { padding: 8px 0; }
 .calendar-week + .calendar-week { margin-top: 3px; }
-.calendar-day { display: grid; place-items: center; width: 100%; aspect-ratio: 1; min-height: 44px; border: 1px solid transparent; border-radius: 10px; background: #e2eae6; color: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
+.calendar-day { display: grid; place-items: center; width: 100%; aspect-ratio: 1; min-height: 44px; border: 1px solid transparent; border-radius: 10px; background: #e2eae6; color: var(--ink-strong); font-size: 13px; font-variant-numeric: tabular-nums; }
 .calendar-day.day-unrecorded { background: transparent; border: 1px dashed var(--line); color: var(--muted); }
 .calendar-day.day-future { background: transparent; border-color: var(--line); color: var(--muted); }
 [aria-selected="true"] > .calendar-day { outline: 2px solid var(--ink); outline-offset: -3px; font-weight: 700; }

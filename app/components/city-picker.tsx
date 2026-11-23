@@ -81,14 +81,18 @@ export function CityPicker({ catalog, carryLabel, onSelect, onClose }: Props) {
   }
 
   return (
-    <dialog ref={dialog} className="total-sheet city-sheet" aria-labelledby="city-picker-title" onCancel={onClose} onKeyDown={containTab} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <dialog ref={dialog} className="total-sheet city-sheet" aria-labelledby="city-picker-title" onCancel={onClose} onKeyDown={containTab} onClick={(event) => {
+      if (event.target !== event.currentTarget) return;
+      const bounds = event.currentTarget.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+    }}>
       <div className="sheet-handle" aria-hidden="true" />
       <div className="sheet-heading"><h2 id="city-picker-title">Start somewhere</h2><button type="button" className="icon-button" aria-label="Close city picker" onClick={onClose}><Image src="/journey/icons/close.svg" width={24} height={24} alt="" /></button></div>
       <p className="city-status">{carryLabel}</p>
       <button type="button" className="primary-button locate-button" disabled={busy === "location" || busy === "route"} onClick={() => choose()}><Image src="/journey/icons/locate.svg" width={22} height={22} alt="" />{busy === "location" ? "Finding your location…" : "Use my location"}</button>
       <form className="city-search" role="search" onSubmit={search}>
         <label className="sr-only" htmlFor="city-search">City, state</label>
-        <input id="city-search" type="search" value={query} placeholder="City, state" autoComplete="off" onChange={(event) => { requests.current.controller?.abort(); requests.current.id++; setQuery(event.target.value); setBusy(null); setMessage(""); }} />
+        <input id="city-search" type="search" enterKeyHint="search" value={query} placeholder="City, state" autoComplete="off" onChange={(event) => { requests.current.controller?.abort(); requests.current.id++; setQuery(event.target.value); setBusy(null); setMessage(""); }} />
         <button type="submit" className="icon-button" aria-label="Search cities"><Image src="/journey/icons/search.svg" width={22} height={22} alt="" /></button>
       </form>
       <p className="city-status" role="status">{busy === "search" ? "Searching…" : busy === "route" ? "Finding nearby cities…" : message}</p>

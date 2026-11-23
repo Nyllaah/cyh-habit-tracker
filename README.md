@@ -1,3 +1,56 @@
+# Journey
+
+A mobile-first walking and running tracker. Everyday distance advances a virtual
+journey between real cities and builds a passport of collectible stamps.
+
+The retention bet is the growing journey: the next city gives today's activity a
+nearby destination, while collected places and the activity calendar make return
+visits feel cumulative. The concept can be evaluated through repeat visits after
+the first arrival and sustained walking days; the demo does not collect analytics.
+
+## Run locally
+
+Use Node 22, then:
+
+```bash
+npm install && npm run dev
+```
+
+Open [localhost:3000](http://localhost:3000). No account, API key, or setup service is required.
+
+## Try the daily moment
+
+- A simulated Health Connect reading advances the journey automatically. “Demo” identifies the source.
+- Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
+- Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
+- Explore the monthly calendar, swipe through the yearly grid, and expand the passport inline.
+
+## How it works
+
+`app/page.tsx` holds one in-memory journey reducer. `lib/data.ts` loads the sample
+account and offline city catalog. Pure functions calculate effective daily distance,
+route progress, history colors, and the passport; components render those results.
+Changes flow through the reducer, so the map, calendar, and rewards share the same
+activity records. There is no backend or separate history store.
+
+City lookup uses Photon with a four-second timeout and a local fallback. Location
+chooses the origin; it does not measure walks. City-to-city distances are straight-line
+segments on an illustrated map, not walking directions. Browser geolocation needs
+permission and a secure context (localhost works).
+
+The demo uses a fixed November 22, 2026 sample day with four activity records. Earlier
+dates are unrecorded, and refreshing resets local state. Native health access,
+persistence, authentication, and payments are outside the current implementation.
+
+Run `npm test`, `npm run lint`, and `npm run build` for verification. The complete
+requirements, decisions, implementation notes, and validation are in [the feature
+plan](docs/plan.md). Original SVG artwork and design studies are documented in the
+[asset handoff](design/journey/game/README.md). Development assistance used Codex and
+project-local skills; [skill provenance and licenses](docs/skills.md) are retained.
+
+<details>
+<summary>Original challenge brief</summary>
+
 # Design Engineer take-home
 
 Thanks for making it this far. This is the part we care about most, and it's small
@@ -84,3 +137,5 @@ Have fun with it, and be creative. I'm excited to see what you come up with. And
 skip the write-up, that's how I get a feel for the way you think.
 
 Jamieson
+
+</details>

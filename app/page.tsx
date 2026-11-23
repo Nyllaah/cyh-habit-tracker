@@ -87,7 +87,7 @@ export default function Page() {
         </div>
       </header>
 
-      <button type="button" className="origin" aria-label="Change starting city" onClick={() => setChoosingCity(true)}><Icon name="location" /> {[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")} <span aria-hidden="true">⌄</span></button>
+      <button type="button" className="origin" aria-label="Change starting city" aria-describedby="origin-name" onClick={() => setChoosingCity(true)}><Icon name="location" /><span id="origin-name" className="origin-name">{[state.route[0].name, state.route[0].region].filter(Boolean).join(", ")}</span><Icon name="chevron-down" className="origin-chevron" /></button>
 
       <section className="journey-section" aria-labelledby="next-stop-title">
         <div className="destination-heading">
