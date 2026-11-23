@@ -1,0 +1,103 @@
+{
+  "sourceRepository": "https://github.com/tech-leads-club/agent-skills",
+  "sourceRevision": "d0c46bfad8b1a428035beb91c1ee70a6d7356536",
+  "installedOn": "2026-11-22",
+  "installer": "Codex skill-installer (GitHub helper)",
+  "destination": ".agents/skills",
+  "skills": [
+    {
+      "name": "frontend-design",
+      "sourcePath": "packages/skills-catalog/skills/(design)/frontend-design",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "gitBlobSha1": "41c03c416b008f9fec31d310ae6316a21965fa2c"
+        },
+        {
+          "path": "references/color-and-contrast.md",
+          "gitBlobSha1": "77aaf03296ef84f3699268dab9c605502c883938"
+        },
+        {
+          "path": "references/interaction-design.md",
+          "gitBlobSha1": "10a77564bc2d3e860fa9c78a45c29fda5cd2d28e"
+        },
+        {
+          "path": "references/motion-design.md",
+          "gitBlobSha1": "eff2788b4aea3b159f3819bdde97c827204fd32d"
+        },
+        {
+          "path": "references/responsive-design.md",
+          "gitBlobSha1": "74f5a10013f1f37e1938c20b9274be927d82db81"
+        },
+        {
+          "path": "references/spatial-design.md",
+          "gitBlobSha1": "27c8e74f3d6a3a52133d28d9e07f76b717bc67bc"
+        },
+        {
+          "path": "references/typography.md",
+          "gitBlobSha1": "8cce06a12774d8f0a72fe42e19e91ff50f62d938"
+        },
+        {
+          "path": "references/ux-writing.md",
+          "gitBlobSha1": "42109217a651769c6a9de4475a87cc2855581f6a"
+        }
+      ]
+    },
+    {
+      "name": "best-practices",
+      "sourcePath": "packages/skills-catalog/skills/(quality)/web-best-practices",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "gitBlobSha1": "ca75112ac117bffbd71ba7ad0ea7ff5b4bc1c77d"
+        }
+      ]
+    },
+    {
+      "name": "tlc-spec-lean",
+      "sourcePath": "packages/skills-catalog/skills/(development)/tlc-spec-lean",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "gitBlobSha1": "347d42650ca8d9f08f98db87216817de37b3a6b8"
+        },
+        {
+          "path": "references/build.md",
+          "gitBlobSha1": "16d888f8250eff1c78eb0633814d38140b30c268"
+        },
+        {
+          "path": "references/memory.md",
+          "gitBlobSha1": "d47ecac7c0ea1c8623955651208309c9afe7f6c3"
+        },
+        {
+          "path": "references/plan.md",
+          "gitBlobSha1": "5d61b1e86dcdf2267147a0bc048a70f61bced550"
+        },
+        {
+          "path": "references/review.md",
+          "gitBlobSha1": "bbe6a7d212f3ebaf65e6b990e217e65984dc67d9"
+        },
+        {
+          "path": "scripts/check_commit.py",
+          "gitBlobSha1": "1e419feb3e1d1f5cbafcf298fda898c697c052b7"
+        },
+        {
+          "path": "scripts/fixtures/plan.md",
+          "gitBlobSha1": "404746709e7e0f70a23dc6ca5b15abc2a48e8b1f"
+        },
+        {
+          "path": "scripts/lean_config.py",
+          "gitBlobSha1": "79713212a7a73ee51e7cb3d5ba92a1f9ef2acce7"
+        },
+        {
+          "path": "scripts/selftest.py",
+          "gitBlobSha1": "186a909fc01cbd30491b12d4208cea8d13ecc200"
+        },
+        {
+          "path": "scripts/validate_plan.py",
+          "gitBlobSha1": "746ae825269693209dbae674f75728acfa1e2380"
+        }
+      ]
+    }
+  ]
+}
