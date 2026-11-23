@@ -28,7 +28,7 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - Collected map cities have orange checks, including when their illustrations collapse to dots.
 - Grand discoveries awards special state/district and country badges against the full municipality registries. Origins count; old journey stamps remain valid. Hawaii is not yet supported, so US country completion stays locked.
 - National and state capitals have brighter gold milestone stamps; nearby ordinary cities retain standard stamps. The itinerary visits the nearest eligible city within the current state first, then crosses to another state once its available city catalog is exhausted. It does not return to departed states.
-- Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
+- The passport country dropdown grows from cities you select, with one option per country. Demo backfill alone does not add unselected countries. The current country follows your starting city. Passport browsing does not change the map or active journey.
 - Explore the populated monthly calendar and scroll down the vertical yearly grid. History initially selects yesterday. Activity history stays shared across countries.
 
 ## How it works

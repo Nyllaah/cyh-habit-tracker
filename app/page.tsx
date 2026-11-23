@@ -191,7 +191,7 @@ export default function Page() {
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} onEdit={setEditingDate} />
 
-      <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state)} currentCountry={currentCountry} />
+      <Passport key={`passport-${state.route[0]?.id ?? "unselected"}`} countries={countryPassports(state, savedCities)} currentCountry={currentCountry} />
 
       {choosingCity && <CityPicker catalog={catalog} savedCities={savedCities} onSelect={startJourney} onClose={() => setChoosingCity(false)} />}
       {editingDate && <DailyTotalEditor key={`editor-${editingDate}`} date={editingDate} today={sample.today} meters={editingDay ? effectiveMeters(editingDay) : 0} importedMeters={editingHasImport ? editingDay?.importedMeters : undefined} hasCorrection={editingDay?.manualOverrideMeters !== undefined} unit={unit}

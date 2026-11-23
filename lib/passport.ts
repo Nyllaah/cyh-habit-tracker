@@ -1,15 +1,19 @@
 import { countryCompletion, type CountryCompletion } from "./completion.ts";
 import { arrivedCities, nextCity, collectedStamps, routeMeters, type City, type JourneyState } from "./journey.ts";
-import { placeKey, regionCode } from "./places.ts";
+import { placeKey, regionCode, type Place } from "./places.ts";
 import { countryName, placeCountry } from "./countries.ts";
 
 export type PassportStamp = { city: City; origin: boolean; earned: boolean };
 export type PassportCollection = { preview: PassportStamp[]; moreCollected: PassportStamp[]; moreUpcoming: PassportStamp[]; arrivalCount: number };
 export type CountryPassport = { country: string; name: string; collection: PassportCollection; completion?: CountryCompletion; focusRegion?: string };
 
-export function countryPassports(state: JourneyState): CountryPassport[] {
+export function countryPassports(state: JourneyState, savedCities?: Place[]): CountryPassport[] {
   const collected = collectedStamps(state).map((stamp) => stamp.city);
-  const countries = new Set([...collected.map(placeCountry), ...state.route.map(placeCountry)]);
+  // The picker follows explicitly chosen cities, not countries in demo backfill.
+  // Keep the active country available for coordinate-only GPS journeys too.
+  const countries = new Set(savedCities
+    ? [...savedCities.map(placeCountry), ...(state.route[0] ? [placeCountry(state.route[0])] : [])]
+    : [...collected.map(placeCountry), ...state.route.map(placeCountry)]);
   return [...countries].sort().map((country) => {
     const journey = state.route[0] && placeCountry(state.route[0]) === country
       ? { route: state.route, meters: routeMeters(state) }
