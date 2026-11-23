@@ -288,14 +288,15 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 
 .leaflet-popup-content .map-city-distance { color: var(--ink); font-size: 16px; font-weight: 700; margin: 10px 0 0; }
 
-.arrival-confetti { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
-.arrival-confetti i { position: absolute; top: -12px; width: 6px; height: 11px; border-radius: 2px; animation: confetti-fall 1400ms cubic-bezier(.2,.55,.5,1) both; }
+.arrival-confetti { position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; overflow: hidden; pointer-events: none; }
+.arrival-confetti::backdrop { background: transparent; pointer-events: none; }
+.arrival-confetti i { position: absolute; top: -12px; width: 6px; height: 11px; border-radius: 2px; animation: confetti-fall 1600ms cubic-bezier(.2,.55,.5,1) both; }
 .arrival-confetti i:nth-child(3n) { width: 8px; height: 8px; border-radius: 50%; }
 .arrival-dialog > :not(.arrival-confetti) { position: relative; }
 @keyframes confetti-fall {
   0% { opacity: 0; transform: translate(0, -12px) rotate(0deg); }
   8%, 80% { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--drift), 560px) rotate(var(--turn)); }
+  100% { opacity: 0; transform: translate(var(--drift), calc(100dvh + 32px)) rotate(var(--turn)); }
 }
 @media (prefers-reduced-motion: reduce) { .arrival-confetti { display: none; } }
 

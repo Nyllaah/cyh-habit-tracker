@@ -16,13 +16,18 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
   const [closing, setClosing] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const continueButton = useRef<HTMLButtonElement>(null);
+  const confetti = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = dialog.current;
     const fallback = fallbackFocus.current;
     const previousFocus = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
     element?.showModal();
+    // A manual popover paints above the modal without being clipped by it.
+    const celebration = confetti.current;
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) celebration?.showPopover();
     continueButton.current?.focus();
     return () => {
+      celebration?.hidePopover();
       element?.close();
       const target = previousFocus?.isConnected ? previousFocus : fallback;
       target?.focus({ preventScroll: true });
@@ -46,8 +51,8 @@ export function Arrival({ city, next, arrivalCount, fallbackFocus, onContinue }:
     <dialog ref={dialog} className={`arrival-dialog${closing ? " is-closing" : ""}`} aria-labelledby="arrival-title"
       onCancel={(event) => { event.preventDefault(); dismiss(); }}
       onKeyDown={(event) => { if (event.key === "Tab") { event.preventDefault(); continueButton.current?.focus(); } }}>
-      <div className="arrival-confetti" aria-hidden="true">
-        {Array.from({ length: 28 }, (_, index) => <i key={index} style={{
+      <div ref={confetti} popover="manual" className="arrival-confetti" aria-hidden="true">
+        {Array.from({ length: 48 }, (_, index) => <i key={index} style={{
           left: `${(index * 37) % 100}%`,
           backgroundColor: ["#EF8852", "#20B8A6", "#E8C36B", "#12786F"][index % 4],
           animationDelay: `${index % 7 * 40}ms`,
