@@ -362,3 +362,19 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .completion-arrival-art .completion-badge figcaption { display: none; }
 
 .completion-coverage { margin: 16px 6px 0; color: var(--muted); font-size: 12px; text-align: center; }
+
+/* Keep native scrolling, with the same rounded teal treatment as the controls. */
+* { scrollbar-width: thin; scrollbar-color: var(--teal) #E3ECE8; }
+@supports selector(::-webkit-scrollbar) {
+  * { scrollbar-width: auto; scrollbar-color: auto; }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: #E3ECE8; border-radius: 999px; }
+  *::-webkit-scrollbar-thumb { background: var(--teal); border: 2px solid #E3ECE8; border-radius: 999px; }
+  *::-webkit-scrollbar-thumb:hover { background: var(--ink); }
+  *::-webkit-scrollbar-corner { background: var(--paper); }
+}
+@media (forced-colors: active) {
+  * { scrollbar-width: auto; scrollbar-color: auto; }
+  *::-webkit-scrollbar-track { background: Canvas; }
+  *::-webkit-scrollbar-thumb { background: CanvasText; border-color: Canvas; }
+}
