@@ -11,20 +11,25 @@ function StampGrid({ stamps }: { stamps: PassportStamp[] }) {
 }
 
 export function Passport({ countries, currentCountry }: { countries: CountryPassport[]; currentCountry?: string }) {
-  const [selectedCountry, setSelectedCountry] = useState(currentCountry ?? countries.find((country) => country.country === "US")?.country ?? countries[0].country);
+  const [selectedCountry, setSelectedCountry] = useState(currentCountry ?? countries.find((country) => country.country === "US")?.country ?? countries[0]?.country ?? "");
   const selected = countries.find((country) => country.country === selectedCountry) ?? countries[0];
+  if (!selected) return <section className="passport" aria-labelledby="passport-title">
+    <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>0 arrivals</p></div>
+    <p className="passport-empty">Your first stamp awaits</p>
+  </section>;
   const { collection, name } = selected;
   const { preview, moreCollected, moreUpcoming, arrivalCount } = collection;
   const hasMore = moreCollected.length > 0 || moreUpcoming.length > 0;
   return (
     <section className="passport" aria-labelledby="passport-title">
       <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivalCount} {arrivalCount === 1 ? "arrival" : "arrivals"}</p></div>
-      <div className="passport-country-switch" role="group" aria-label="Passport country">
-        {countries.map((country) => <button key={country.country} type="button" aria-pressed={country.country === selected.country}
-          aria-label={`View ${country.name} stamps${country.country === currentCountry ? ", current journey" : ""}`} onClick={() => setSelectedCountry(country.country)}>
-          <span>{country.name}</span>{country.country === currentCountry && <small>Current</small>}
-        </button>)}
-      </div>
+      <label className="passport-country-select">
+        <span className="sr-only">Passport country</span>
+        <select value={selected.country} onChange={(event) => setSelectedCountry(event.target.value)}>
+          {countries.map((country) => <option key={country.country} value={country.country}>{country.name}{country.country === currentCountry ? " · Current" : ""}</option>)}
+        </select>
+        <Image src="/journey/icons/chevron-down.svg" width={20} height={20} alt="" />
+      </label>
       <div key={selected.country} role="region" aria-labelledby="passport-country-title">
         <h3 id="passport-country-title" className="passport-country-title">{name}</h3>
         <StampGrid stamps={preview} />

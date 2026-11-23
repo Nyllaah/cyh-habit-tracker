@@ -230,12 +230,6 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .map-overview .map-city-marker img, .map-overview .leaflet-tooltip { visibility: hidden; }
 .map-overview .map-city-marker::after { content: ""; position: absolute; left: 19px; top: 38px; width: 10px; height: 10px; border: 2px solid var(--surface); border-radius: 50%; background: var(--teal); }
 
-.passport-country-switch { display: flex; gap: 4px; padding: 4px; margin: -4px 0 20px; border-radius: 18px; background: #E2ECE7; }
-.passport-country-switch button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 52px; padding: 8px 12px; border: 0; border-radius: 14px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
-.passport-country-switch button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
-.passport-country-switch small { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 500; }
-.passport-country-switch small::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #B95317; }
-.passport-country-switch button[aria-pressed="true"] small::before { background: var(--orange); }
 .passport-country-title { margin: 0 6px 16px; color: var(--teal); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
 
 .journey-start { margin-top: 24px; padding: 8px 24px 18px; border-radius: 28px; background: #E2EEE5; text-align: center; }
@@ -253,3 +247,9 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 .map-capital-emblem { position: absolute; top: 0; right: -2px; display: grid; place-items: center; width: 19px; height: 19px; border: 2px solid #FFF9EB; border-radius: 50%; background: #B95F13; color: #FFF1AD; font-size: 11px; line-height: 1; }
 .map-overview .map-capital-emblem { display: none; }
 .map-overview .map-capital-marker::after { background: #B95F13; }
+
+.passport-country-select { position: relative; display: block; margin: -4px 0 20px; }
+.passport-country-select select { appearance: none; width: 100%; min-height: 52px; padding: 12px 44px 12px 16px; border: 1px solid var(--line); border-radius: 16px; background: #E2ECE7; color: var(--ink); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.passport-country-select select:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+.passport-country-select > img { position: absolute; right: 16px; top: 16px; pointer-events: none; }
+.passport-empty { padding: 24px 16px; border: 1px dashed #A9C8BC; border-radius: 18px; color: var(--muted); font-size: 14px; text-align: center; }
