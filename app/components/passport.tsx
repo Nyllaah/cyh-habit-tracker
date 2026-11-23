@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useState } from "react";
+import { PassportCountryPicker } from "@/app/components/passport-country-picker";
 import { CityStamp } from "@/app/components/city-stamp";
 import type { CountryPassport, PassportStamp } from "@/lib/passport";
 import { placeKey } from "@/lib/places";
@@ -23,13 +24,7 @@ export function Passport({ countries, currentCountry }: { countries: CountryPass
   return (
     <section className="passport" aria-labelledby="passport-title">
       <div className="section-heading"><h2 id="passport-title">Your passport</h2><p>{arrivalCount} {arrivalCount === 1 ? "arrival" : "arrivals"}</p></div>
-      <label className="passport-country-select">
-        <span className="sr-only">Passport country</span>
-        <select value={selected.country} onChange={(event) => setSelectedCountry(event.target.value)}>
-          {countries.map((country) => <option key={country.country} value={country.country}>{country.name}{country.country === currentCountry ? " · Current" : ""}</option>)}
-        </select>
-        <Image src="/journey/icons/chevron-down.svg" width={20} height={20} alt="" />
-      </label>
+      <PassportCountryPicker countries={countries} value={selected.country} currentCountry={currentCountry} onChange={setSelectedCountry} />
       <div key={selected.country} role="region" aria-labelledby="passport-country-title">
         <h3 id="passport-country-title" className="passport-country-title">{name}</h3>
         <StampGrid stamps={preview} />
