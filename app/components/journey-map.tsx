@@ -1,21 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type * as Leaflet from "leaflet";
-import type { FeatureCollection, MultiPolygon, Polygon } from "geojson";
-import countries from "@/data/country-maps.json";
+import { countryMaps, placeCountry } from "@/lib/countries";
 import { type City } from "@/lib/journey";
 import { cityArtwork, routeWindow } from "@/lib/places";
-import { insideRing, journeyPosition } from "@/lib/map";
+import { journeyPosition } from "@/lib/map";
 
 type MapApi = { map: Leaflet.Map; library: typeof Leaflet };
-const outlines = countries as FeatureCollection<Polygon | MultiPolygon, { code: string; name: string }>;
-
-function countryForCity(city: City) {
-  return outlines.features.find((feature) => {
-    if (city.country) return feature.properties.code === city.country;
-    const polygons = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-    return polygons.some((rings) => insideRing(city.longitude, city.latitude, rings[0]) && !rings.slice(1).some((ring) => insideRing(city.longitude, city.latitude, ring)));
-  });
-}
 
 export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters: number }) {
   const container = useRef<HTMLDivElement>(null);
@@ -23,7 +13,7 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
   const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "offline">("loading");
   const viewKey = useRef("");
   const route = useMemo(() => routeWindow(fullRoute, meters), [fullRoute, meters]);
-  const country = countryForCity(fullRoute[0]);
+  const country = countryMaps.features.find((feature) => feature.properties.code === placeCountry(fullRoute[0]));
 
   useEffect(() => {
     let disposed = false;
@@ -38,7 +28,7 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
       map.on("zoomend", showOverviewMarkers);
       map.attributionControl.setPrefix(false);
       map.createPane("country").style.zIndex = "150";
-      library.geoJSON(outlines, { pane: "country", interactive: false, style: { color: "#69A99B", weight: 1.5, fillColor: "#CDE5CD", fillOpacity: 1 } }).addTo(map);
+      library.geoJSON(countryMaps, { pane: "country", interactive: false, style: { color: "#69A99B", weight: 1.5, fillColor: "#CDE5CD", fillOpacity: 1 } }).addTo(map);
       const tiles = library.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19, minZoom: 2, keepBuffer: 0, updateWhenIdle: true,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://www.naturalearthdata.com/">Natural Earth</a>',

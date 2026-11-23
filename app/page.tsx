@@ -8,7 +8,8 @@ import { ActivityHistory } from "@/app/components/activity-history";
 import { CityPicker } from "@/app/components/city-picker";
 import { Arrival } from "@/app/components/arrival";
 import { Passport } from "@/app/components/passport";
-import { passportCollection } from "@/lib/passport";
+import { countryPassports, passportCollection } from "@/lib/passport";
+import { placeCountry } from "@/lib/countries";
 import { getCityCatalog, getJourneySample } from "@/lib/data";
 import { discoverNearby } from "@/lib/cities";
 import { placeKey } from "@/lib/places";
@@ -34,7 +35,8 @@ export default function Page() {
   const syncInFlight = useRef(false);
   const meters = routeMeters(state);
   const next = nextCity(state.route, meters);
-  const collection = passportCollection(state);
+  const currentCountry = placeCountry(state.route[0]);
+  const collection = passportCollection(state, currentCountry);
   const today = state.days.find((day) => day.date === sample.today);
   const needsDestinations = state.route.filter((city) => city.cumulativeMeters > meters).length < 2;
   const frontier = needsDestinations ? state.route[state.route.length - 1] : null;
@@ -108,7 +110,7 @@ export default function Page() {
 
       <ActivityHistory days={state.days} today={sample.today} unit={unit} />
 
-      <Passport collection={collection} />
+      <Passport key={state.route[0].id} countries={countryPassports(state)} currentCountry={currentCountry} />
 
       {choosingCity && <CityPicker catalog={catalog} carryLabel={`${formatDistance(checkpointCarry(state), unit)} carries over · stamps kept`}
         onSelect={(origin, candidates) => {

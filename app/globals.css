@@ -228,3 +228,11 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 /* Country-scale markers stay legible when nearby cities converge. */
 .map-overview .map-city-marker img, .map-overview .leaflet-tooltip { visibility: hidden; }
 .map-overview .map-city-marker::after { content: ""; position: absolute; left: 19px; top: 38px; width: 10px; height: 10px; border: 2px solid var(--surface); border-radius: 50%; background: var(--teal); }
+
+.passport-country-switch { display: flex; gap: 4px; padding: 4px; margin: -4px 0 20px; border-radius: 18px; background: #E2ECE7; }
+.passport-country-switch button { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; min-height: 52px; padding: 8px 12px; border: 0; border-radius: 14px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+.passport-country-switch button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.passport-country-switch small { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 500; }
+.passport-country-switch small::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #B95317; }
+.passport-country-switch button[aria-pressed="true"] small::before { background: var(--orange); }
+.passport-country-title { margin: 0 6px 16px; color: var(--teal); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }

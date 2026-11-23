@@ -1,6 +1,6 @@
 # Journey activity tracker
 
-**Status:** The core daily experience was independently reviewed at `7dd23f8`. Subsequent increments add presentation controls, populated account history, and interactive country maps. Optional product choices remain explicit below.
+**Status:** The core daily experience was independently reviewed at `7dd23f8`. Subsequent increments add presentation controls, populated account history, interactive country maps, and country-organized passports. Optional product choices remain explicit below.
 
 This file is the feature's authoritative documentation. It holds requirements,
 product and technical decisions, rationale, open questions, implementation status,
@@ -164,7 +164,8 @@ when implementing. The asset handoff’s Runtime comparison records the implemen
 
 - Keep the passport preview to at most three unique places: the current origin, latest collected destination other than that origin, then upcoming stops. Before any arrival, upcoming places fill the available slots. When no future destination is available, other collected stamps fill the preview. The count represents distinct destination arrivals, excluding origin-only stamps and upcoming places.
 - A native inline disclosure reveals remaining stamps, with separate “More collected” and “Next discoveries” groups where needed. Do not repeat stamps already in the preview. Keep the control absent when everything is already visible. Disclosure changes only presentation; the reducer remains the source of earned and archived rewards.
-- The page derives one passport model in `lib/passport.ts` from the current route, corrected activity, and archived journeys, then passes that model to the collection. The same destination count appears in the arrival overlay. Collapsing the collection does not change progress, rewards, or the history view.
+- The page derives country passport models in `lib/passport.ts` from the current route, corrected activity, and archived journeys. A country filter applies to collected/future stamps and arrival counts. A foreign country previews its most recent archived origin and collected destinations; it never borrows stamps from the current route’s country. The arrival overlay uses the current country’s destination count.
+- The starting city remains the only control that changes the active journey/country. Country identity uses a known code or the bundled outlines for coordinate-only GPS origins. Inside the passport, a named country switch selects which collection to browse; the active journey’s country has a compact Current marker. Each view has a country heading and its own arrival count. Its three-stamp preview and inline disclosure remain independent of map exploration and the shared activity calendar. Passport UI state resets to the current country when the starting city changes; browsing stamps never dispatches a journey action. Collapsing the collection does not change progress, rewards, or the history view.
 - Keep the existing stamp motifs, perforated frames, and explicit Origin/Collected/Up next labels. Allow two caption lines at the same readable size, extending the frame to avoid artwork overlap. Preserve full place names in accessible labels and native name tooltips. Unknown cities keep the generic skyline.
 - Arrival uses the existing brief stamp animation and restrained orange/turquoise sparks. A native modal shows the actual city and next destination, focuses “Continue journey,” contains Tab focus, and supports Escape. On dismissal, restore the previous connected control, falling back to the health-sync button for an automatic first arrival. Queued arrivals are shown in route order once; corrections remove notices no longer earned. Reduced motion shows the final stamp immediately. No XP, reward currency, or separate passport route is introduced.
 
@@ -241,6 +242,8 @@ External assets and data require provenance. The local SVG artwork is original p
 
 33. WHEN the demo opens THEN August–November activity SHALL populate the same daily records used by the calendar and lifetime total, including recorded rest days and occasional unrecorded dates. The completed Brazil journey SHALL account for that older distance and supply previously collected stamps without arrival overlays.
 34. WHEN a US or Brazilian starting city is selected THEN the map SHALL show its geographic location and route, allow dragging and zooming, and offer country and route framing. Map-service failure SHALL retain local country outlines, route markers, distance, and city selection. The map SHALL NOT measure activity or imply road navigation.
+
+35. WHEN a starting city is selected THEN its country SHALL determine the current journey and map. The passport SHALL separate stamps and destination counts by country, default to the current country, and allow browsing another country without changing the route or activity. Month/Year history SHALL remain shared across countries. Changing the starting city SHALL return the passport to that city’s country.
 
 ### S6: Browse the passport and celebrate arrivals
 
@@ -337,6 +340,10 @@ The repository carries [three project-local skills](skills.md), including source
 - Backfill validation: fifty-four rule tests, lint, and production build pass. A phone-width browser check confirms the 319.7km lifetime display, prior Goiânia stamp, quiet initial load, and explicit Alexandria arrival. No additional runtime dependency is needed for this data increment.
 
 - Attribution-link correction: the city picker’s Photon credit points to the public project page rather than the demo-service root, which timed out during verification. The link keeps standard new-tab navigation and explicitly announces that behavior to assistive technology. City lookup continues using the existing API and local fallback. Lint and browser link activation are checked for this correction.
+
+- Country organization: `countryPassports` partitions the existing collection by country, and `Passport` owns only its selected-country UI state. The route, distance reducer, global daily records, and Month/Year selection remain shared and unchanged. `lib/countries.ts` centralizes code/name and GPS-boundary lookup previously local to the map. The page keys the passport by origin identity so selecting a starting city restores that country’s collection. This keeps country browsing separate from the explicit origin-change operation, with no new navigation, persistence, or dependency.
+
+- Country-passport validation: sixty rule tests, lint, and production build pass. Browser checks confirm US-only and Brazil-only stamps, correct country arrival counts, unchanged map and Year selection while browsing, and reset to Brazil after choosing Brasília. The named current-country control, country headings, inline expansion, and 320/360/390/1024 widths were checked. Axe reports no WCAG 2 A/AA violations in the checked country-passport state.
 
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 

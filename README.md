@@ -24,7 +24,8 @@ Open [localhost:3000](http://localhost:3000). No account, API key, or setup serv
 - Edit today's total to replace the imported distance; switch between meters/kilometers and miles.
 - Choose a starting city or use browser location. Previously earned stamps remain, and only unfinished checkpoint distance carries over.
 - Drag or pinch the map, tap a city symbol, and use the country/route controls to explore. Choose Brasília or Goiânia to try Brazil.
-- Explore the populated monthly calendar, swipe through the yearly grid, and expand the passport inline.
+- Browse stamps by country in the passport; the current country follows your starting city. Passport browsing does not change the map or active journey.
+- Explore the populated monthly calendar and swipe through the yearly grid. Activity history stays shared across countries.
 
 ## How it works
 
