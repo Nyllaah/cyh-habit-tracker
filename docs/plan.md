@@ -270,6 +270,8 @@ External assets and data require provenance. The local SVG artwork is original p
 
 45. WHEN US settlements are normalized for search or nearby discovery THEN they SHALL match the Census municipal eligibility registry, retaining incorporated cities/towns/villages and qualifying municipal towns/townships while excluding neighborhoods and unincorporated CDPs. Ambiguous same-state names SHALL use reference coordinates to distinguish a municipality from a different CDP. Saved candidates SHALL obey the same policy. Washington, DC SHALL remain available as the federal capital.
 
+46. WHEN an upcoming route city marker or its label is tapped THEN its popup SHALL show remaining virtual itinerary distance in kilometers, calculated from the city checkpoint minus current journey progress. Collected/origin places SHALL retain their status without a positive remaining-distance claim.
+
 ### S6: Browse the passport and celebrate arrivals
 
 29. WHEN the passport is collapsed THEN it SHALL show at most three unique stamps, and an inline disclosure SHALL expose remaining collected and known upcoming stamps without navigation or duplicates.
@@ -403,6 +405,10 @@ The repository carries [three project-local skills](skills.md), including source
 - US municipality increment: `lib/municipalities.ts` centralizes Brazilian and US eligibility checks for the provider adapter. The US snapshot combines official place and municipal-town records, with reference coordinates only for ambiguous names. City/state aliases remain normalized through the shared place helpers. The saved catalog removes two CDPs; Census-recognized municipal towns such as Brookline/Weehawken and the federal capital remain available. No new endpoint, dependency, backend, or route-selection control is added.
 
 - US municipality validation: all seventy-seven rule tests, lint, and production build pass. Regression checks preserve every remaining saved city, Washington DC, municipal Brookline/Winthrop/Weehawken, and incorporated villages; reject White Center and mislabeled neighborhoods; distinguish Westchester’s Greenville CDP from the actual Greenville towns; and retain offline route candidates. An isolated Chromium run checks Seattle discovery/search with injected CDP/neighborhood results, first-sync arrival, blocked-service Boston fallback, and no duplicate-key console warnings.
+
+- City distance popup increment: marker popups now append kilometers remaining for upcoming checkpoints, using the same cumulative route distance as the main next-stop display. Permanent city labels also open their marker popup on tap. Popup text remains safe DOM text, and origin/collected markers show status without an obsolete distance. This map detail intentionally remains metric as requested, independently of the page display-unit switch. No distance/state source or dependency changes.
+
+- City distance popup validation: lint and production build pass. Chromium checks both marker and label activation, Washington → Alexandria at 11.12km, Occoquan at 32.85km before sync and 20.93km after sync, and metric details retained when the main page uses miles.
 
 For subsequent changes, test rules that change distance, identity, ordering, or rewards through their public behavior. Inspect the main and sheet states at phone size, with both units, keyboard interaction, and reduced motion. Run the repository's lint and build commands and exercise the app in a browser. Keep validation records limited to checks actually performed.
 

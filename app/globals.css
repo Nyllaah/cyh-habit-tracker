@@ -281,3 +281,5 @@ button.origin .origin-chevron { width: 16px; height: 16px; }
 @keyframes arrival-reveal { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes arrival-leaves { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(6px) scale(.99); } }
 @keyframes spark-reveal { from { opacity: 0; transform: scale(.65); } to { opacity: 1; transform: scale(1); } }
+
+.leaflet-popup-content .map-city-distance { color: var(--ink); font-size: 16px; font-weight: 700; margin: 10px 0 0; }

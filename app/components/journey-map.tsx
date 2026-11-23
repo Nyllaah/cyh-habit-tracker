@@ -72,11 +72,19 @@ export function JourneyMap({ route: fullRoute, meters }: { route: City[]; meters
       const marker = L.marker([city.latitude, city.longitude], { icon, title: `${city.name}${capital ? ", capital milestone" : ""}`, alt: city.name, keyboard: true }).addTo(layers);
       const label = document.createElement("span");
       label.textContent = city.name;
-      marker.bindTooltip(label, { permanent: true, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
+      label.addEventListener("click", () => marker.openPopup());
+      marker.bindTooltip(label, { interactive: true, permanent: true, direction: "bottom", offset: [0, 1], className: earned ? "map-city-label" : "map-city-label map-city-upcoming" });
       const content = document.createElement("div");
       const title = document.createElement("strong"); title.textContent = city.name;
       const status = document.createElement("p"); status.textContent = `${capital ? "Capital · " : ""}${city.cumulativeMeters === 0 ? "Origin" : earned ? "Collected" : "Up next"}`;
-      content.append(title, status); marker.bindPopup(content);
+      content.append(title, status);
+      if (!earned) {
+        const distance = document.createElement("p");
+        distance.className = "map-city-distance";
+        distance.textContent = `${((city.cumulativeMeters - meters) / 1000).toLocaleString("en-US", { maximumFractionDigits: 2 })} km to go`;
+        content.append(distance);
+      }
+      marker.bindPopup(content);
     });
     L.circleMarker([position.latitude, position.longitude], { radius: 7, color: "#FEFFFD", weight: 3, fillColor: "#E87C3B", fillOpacity: 1, interactive: false }).addTo(layers);
     const key = `${fullRoute[0].id}|${route.map((city) => city.id).join("|")}`;
